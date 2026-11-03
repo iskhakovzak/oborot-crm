@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { CheckCircle2, Clock, ShieldCheck, XCircle } from "lucide-react";
 import { db, schema } from "@/db";
 import { getSetting } from "@/lib/settings";
-import { fmtMoneyFull, fmtDateTime } from "@/lib/format";
+import { fmtMoney, fmtMoneyFull, fmtDateTime } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { findPaymentLink, markPaymentLinkPaid } from "./actions";
 
@@ -49,7 +49,7 @@ export default async function PayPage({ params, searchParams }: { params: Promis
             <>
               <div className="border-b border-line px-7 pt-7 pb-6 text-center">
                 <div className="text-[13px] text-muted">{status === "paid" ? "Оплачено" : "К оплате"}</div>
-                <div className="mt-1 text-[40px] font-semibold leading-none tracking-[-0.02em] tnum">{fmtMoneyFull(link!.amount)}</div>
+                <div className="mt-1 whitespace-nowrap text-[32px] font-semibold leading-none tracking-[-0.02em] tnum sm:text-[36px]">{Number.isInteger(link!.amount) ? fmtMoney(link!.amount) : fmtMoneyFull(link!.amount)}</div>
                 <div className="mt-3 text-[14px] text-ink-2 leading-relaxed">{link!.purpose}</div>
                 {payer && <div className="mt-1 text-[13px] text-muted">Плательщик: {payer.name}</div>}
               </div>
@@ -57,7 +57,7 @@ export default async function PayPage({ params, searchParams }: { params: Promis
                 <div className="px-7 py-10 text-center">
                   <div className="mx-auto mb-4 grid size-16 place-items-center rounded-full bg-good-soft text-good"><CheckCircle2 className="size-9" /></div>
                   <div className="stamp text-accent text-sm mb-3">ОПЛАЧЕНО</div>
-                  <p className="text-[14px] text-ink-2">Платёж получен {fmtDateTime(link!.paidAt)}. Спасибо! Чек и закрывающие документы придут от {company.shortName}.</p>
+                  <p className="text-[14px] text-ink-2">Платёж получен {fmtDateTime(link!.paidAt)}. Чек и закрывающие документы придут от {company.shortName}.</p>
                 </div>
               ) : (
                 <div className="px-7 py-6">

@@ -94,13 +94,13 @@ export function ProductDialog({ product, categories, hideCost, openByParam, trig
       <Dialog open={open} onOpenChange={(o) => (o ? setOpen(true) : close())}>
         <DialogContent title={product ? "Товар" : "Новый товар"} description="Введите штрихкод или артикул и нажмите «Заполнить» — карточка подтянется из справочника" wide>
           <form onSubmit={(e) => { e.preventDefault(); submit(); }} className="space-y-4">
-            <div className="grid gap-3 md:grid-cols-[1fr_1fr_auto]">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_1fr_auto]">
               <Field label="Штрихкод"><Input value={form.barcode} onChange={(e) => set({ barcode: e.target.value })} inputMode="numeric" placeholder="4601234567890" className="tnum" autoFocus={!product} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); fillByCode(); } }} /></Field>
               <Field label="Артикул"><Input value={form.sku} onChange={(e) => set({ sku: e.target.value })} placeholder="BSAG-09" onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); fillByCode(); } }} /></Field>
               <div className="flex items-end"><Button variant="secondary" onClick={fillByCode} disabled={busy === "code" || (!form.barcode.trim() && !form.sku.trim())}><ScanBarcode /> {busy === "code" ? "Ищем…" : "Заполнить"}</Button></div>
             </div>
             <Field label="Название"><Input value={form.name} onChange={(e) => set({ name: e.target.value })} required placeholder="Кондиционер настенный Ballu BSAG-09HN8" /></Field>
-            <div className="grid gap-3 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
               <Field label="Категория">
                 <Input value={form.category} onChange={(e) => set({ category: e.target.value })} list="product-categories" placeholder="Кондиционеры" />
                 <datalist id="product-categories">{categories.map((c) => <option key={c} value={c} />)}</datalist>
@@ -135,7 +135,7 @@ export function ProductDialog({ product, categories, hideCost, openByParam, trig
               ) : (
                 <div className="space-y-1.5">
                   {form.attrs.map((a, i) => (
-                    <div key={i} className="grid grid-cols-[1fr_1.4fr_auto] gap-1.5">
+                    <div key={i} className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)_auto] gap-1.5">
                       <Input value={a.k} onChange={(e) => set({ attrs: form.attrs.map((x, j) => (j === i ? { ...x, k: e.target.value } : x)) })} placeholder="Мощность" className="h-8 text-[13px]" />
                       <Input value={a.v} onChange={(e) => set({ attrs: form.attrs.map((x, j) => (j === i ? { ...x, v: e.target.value } : x)) })} placeholder="2,6 кВт" className="h-8 text-[13px]" />
                       <button type="button" onClick={() => set({ attrs: form.attrs.filter((_, j) => j !== i) })} className="rounded-md p-1.5 text-muted hover:bg-accent-soft hover:text-accent" aria-label="Удалить"><X className="size-4" /></button>

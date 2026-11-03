@@ -42,7 +42,7 @@ export function Tile({ label, value, sub, tone, href, icon }: { label: string; v
         <div className="text-[12px] font-medium text-muted">{label}</div>
         {icon && <span className={cn("grid size-6 shrink-0 place-items-center rounded-[6px] [&_svg]:size-3.5", tone ? chips[tone] : "bg-surface-3 text-ink-2")}>{icon}</span>}
       </div>
-      <div className={cn("mt-1 text-[22px] font-semibold leading-7 tracking-[-0.02em] tnum", tone ? tones[tone] : "text-ink")}>{value}</div>
+      <div className={cn("mt-1 min-w-0 truncate text-[22px] font-semibold leading-7 tracking-[-0.02em] tnum", tone ? tones[tone] : "text-ink")}>{value}</div>
       {sub && <div className="mt-0.5 truncate text-xs text-muted">{sub}</div>}
     </>
   );
@@ -52,6 +52,7 @@ export function Tile({ label, value, sub, tone, href, icon }: { label: string; v
 }
 
 export function Tiles({ children, cols = 6, className }: { children: React.ReactNode; cols?: 3 | 4 | 5 | 6; className?: string }) {
-  const lg = { 3: "lg:grid-cols-3", 4: "lg:grid-cols-4", 5: "lg:grid-cols-5", 6: "lg:grid-cols-6" }[cols];
-  return <div className={cn("mb-5 grid grid-cols-2 gap-2.5 sm:grid-cols-3", lg, className)}>{children}</div>;
+  // До xl — не больше трёх плиток в ряд, иначе суммы в сумах не помещаются в плитку
+  const xl = { 3: "md:grid-cols-3", 4: "md:grid-cols-4", 5: "md:grid-cols-3 xl:grid-cols-5", 6: "md:grid-cols-3 xl:grid-cols-6" }[cols];
+  return <div className={cn("mb-5 grid grid-cols-2 gap-2.5", xl, className)}>{children}</div>;
 }

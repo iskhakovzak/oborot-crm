@@ -6,12 +6,13 @@ import { requireUser } from "@/lib/auth";
 import { can, hiddenFields } from "@/lib/permissions";
 import { marketing, sales, production, periodDays, type MarketingReport, type SalesReport, type ProductionReport } from "@/lib/analytics";
 import { resolve } from "@/lib/integrations/registry";
-import { fmtMoney, fmtNum, fmtPct, fmtDateTime, fmtDate, plural } from "@/lib/format";
+import { fmtMoney, fmtMoneyShort, fmtNum, fmtPct, fmtDateTime, fmtDate, plural } from "@/lib/format";
 import { PageHeader, Section, Stat, EmptyState } from "@/components/ui/page";
 import { Button } from "@/components/ui/button";
 import { Badge, type Tone } from "@/components/ui/badge";
 import { Table } from "@/components/ui/table";
 import { Avatar } from "@/components/ui/avatar";
+import { Money } from "@/components/ui/money";
 import { BarsChart, TrendChart, HBars, Funnel, Segments, CHART } from "@/components/analytics/charts";
 import { ResendButton } from "@/components/analytics/resend-button";
 import { cn } from "@/lib/utils";
@@ -42,7 +43,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
     <>
       <PageHeader
         title="Аналитика"
-        description={`Маркетинг, продажи и производство за выбранный период. ${periodLabel}.`}
+        description={`Маркетинг, продажи и производство: ${periodLabel}.`}
         actions={
           <Button asChild variant="primary">
             <a href={`/api/reports?type=${tab}&days=${days}`} target="_blank" rel="noopener"><FileDown /> Отчёт за 1 клик</a>
@@ -80,15 +81,15 @@ async function MarketingTab({ data }: { data: MarketingReport }) {
   const romi = (v: number | null) => (v == null ? "—" : `${v > 0 ? "+" : ""}${fmtNum(v)}%`);
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-6">
-        <Stat label="Расход на рекламу" value={fmtMoney(t.spend)} sub="пропорционально периоду" />
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+        <Stat label="Расход на рекламу" value={<Money value={t.spend} compact />} sub="пропорционально периоду" />
         <Stat label="Лиды" value={fmtNum(t.leads)} sub="сделок создано" />
         <Stat label="Оплаты" value={fmtNum(t.won)} sub={`конверсия ${fmtPct(t.conversion, 1)}`} tone="good" />
-        <Stat label="Выручка" value={fmtMoney(t.revenue)} sub="по оплаченным сделкам" />
-        <Stat label="CPL / CAC" value={<span className="tnum">{fmtMoney(t.cpl)} <span className="text-muted">/</span> {fmtMoney(t.cac)}</span>} sub="стоимость лида / клиента" />
+        <Stat label="Выручка" value={<Money value={t.revenue} compact />} sub="по оплаченным сделкам" />
+        <Stat label="CPL · стоимость лида" value={<Money value={t.cpl} compact />} sub={<>CAC <Money value={t.cac} compact /></>} />
         <Stat label="ROMI" value={romi(t.romi)} tone={t.romi == null ? undefined : t.romi >= 0 ? "good" : "accent"} sub="(выручка − расход) / расход" />
       </div>
-      <div className="grid gap-5 lg:grid-cols-5">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-5">
         <Section title="Расход и выручка по источникам" description="Источники с рекламным бюджетом и сделками за период" className="lg:col-span-3">
           <BarsChart data={data.sources.slice(0, 8).map((s) => ({ source: s.source, spend: s.spend, revenue: s.revenue }))} xKey="source" series={[{ key: "spend", label: "Расход", color: CHART.soft, money: true }, { key: "revenue", label: "Выручка", color: CHART.ink, money: true }]} height={260} />
         </Section>
@@ -102,7 +103,7 @@ async function MarketingTab({ data }: { data: MarketingReport }) {
           <tbody>
             {data.sources.map((s) => (
               <tr key={s.source}>
-                <td className="font-medium">{s.source}</td>
+                <td className="max-w-[220px] truncate font-medium">{s.source}</td>
                 <td className="text-right tnum">{s.spend ? fmtMoney(s.spend) : <span className="text-muted">—</span>}</td>
                 <td className="text-right tnum">{s.leads}</td>
                 <td className="text-right tnum">{s.won}</td>
@@ -117,19 +118,19 @@ async function MarketingTab({ data }: { data: MarketingReport }) {
           </tbody>
         </Table>
       </Section>
-      <div className="grid gap-5 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <Section title="Воронка по рекламным кампаниям" description="По UTM-метке utm_campaign в сделках">
           <Table className="border-0 rounded-none">
-            <thead><tr><th>Кампания</th><th>Источник</th><th className="text-right">Лиды</th><th className="text-right">Оплаты</th><th className="text-right">Конверсия</th><th className="text-right">Выручка</th></tr></thead>
+            <thead><tr><th>Кампания</th><th>Источник</th><th className="text-right">Лиды</th><th className="text-right">Оплаты</th><th className="text-right">Конв.</th><th className="text-right">Выручка</th></tr></thead>
             <tbody>
               {data.campaigns.map((c) => (
                 <tr key={c.campaign}>
-                  <td className="font-medium">{c.campaign}</td>
-                  <td className="text-ink-2">{c.source}</td>
+                  <td className="max-w-[200px] truncate font-medium" title={c.campaign}>{c.campaign}</td>
+                  <td className="max-w-[140px] truncate text-ink-2">{c.source}</td>
                   <td className="text-right tnum">{c.leads}</td>
                   <td className="text-right tnum">{c.won}</td>
                   <td className="text-right tnum">{fmtPct(c.conversion, 1)}</td>
-                  <td className="text-right tnum">{fmtMoney(c.revenue)}</td>
+                  <td className="text-right"><Money value={c.revenue} compact /></td>
                 </tr>
               ))}
             </tbody>
@@ -176,7 +177,7 @@ async function MetrikaBlock() {
             {e.response && <div className="basis-full text-xs text-muted">{e.response}</div>}
           </div>
         ))}
-        {!rows.length && <div className="py-6 text-center text-[13px] text-muted">Пока ничего не отправлялось: конверсии появятся после создания сделки с ClientID и оплаты.</div>}
+        {!rows.length && <div className="py-6 text-center text-[13px] text-muted">Конверсии появятся после оплаты сделки с ClientID.</div>}
       </div>
     </Section>
   );
@@ -188,15 +189,15 @@ function SalesTab({ data }: { data: SalesReport }) {
   const t = data.totals;
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-6">
-        <Stat label="Выручка" value={fmtMoney(t.revenue)} sub={`${plural(t.won, "оплата", "оплаты", "оплат")} за период`} tone="good" />
-        <Stat label="Средний чек" value={fmtMoney(t.avgCheck)} />
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+        <Stat label="Выручка" value={<Money value={t.revenue} compact />} sub={`${plural(t.won, "оплата", "оплаты", "оплат")} за период`} tone="good" />
+        <Stat label="Средний чек" value={<Money value={t.avgCheck} compact />} />
         <Stat label="Конверсия в оплату" value={fmtPct(t.conversion, 1)} sub={`${t.won} выиграно · ${t.lost} отказов`} />
         <Stat label="Новых сделок" value={fmtNum(t.created)} sub="создано за период" />
-        <Stat label="В работе" value={fmtMoney(t.openSum)} sub={plural(t.openCount, "открытая сделка", "открытые сделки", "открытых сделок")} />
-        <Stat label="Прогноз" value={fmtMoney(t.forecast)} sub="сумма × вероятность этапа" tone="info" />
+        <Stat label="В работе" value={<Money value={t.openSum} compact />} sub={plural(t.openCount, "открытая сделка", "открытые сделки", "открытых сделок")} />
+        <Stat label="Прогноз" value={<Money value={t.forecast} compact />} sub="сумма × вероятность этапа" tone="info" />
       </div>
-      <div className="grid gap-5 lg:grid-cols-5">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-5">
         <Section title="Выручка по неделям" description="Оплаченные сделки по дате закрытия" className="lg:col-span-3">
           <TrendChart kind="area" data={data.revenueByWeek} xKey="label" series={[{ key: "revenue", label: "Выручка", color: CHART.ink, money: true }]} height={260} />
         </Section>
@@ -210,7 +211,7 @@ function SalesTab({ data }: { data: SalesReport }) {
           <tbody>
             {data.managers.map((m) => (
               <tr key={m.managerId}>
-                <td><span className="flex items-center gap-2"><Avatar name={m.name} color={m.color} size={24} /><span className="font-medium">{m.name}</span></span></td>
+                <td><span className="flex items-center gap-2 whitespace-nowrap"><Avatar name={m.name} color={m.color} size={24} /><span className="font-medium">{m.name}</span></span></td>
                 <td className="text-right tnum">{m.deals}</td>
                 <td className="text-right tnum text-good">{m.won}</td>
                 <td className="text-right tnum">{m.lost}</td>
@@ -224,9 +225,9 @@ function SalesTab({ data }: { data: SalesReport }) {
           </tbody>
         </Table>
       </Section>
-      <div className="grid gap-5 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <Section title="Причины отказов" description={`${plural(t.lost, "отказ", "отказа", "отказов")} за период`}>
-          <HBars rows={data.lostReasons.map((r) => ({ label: r.reason, value: r.count, display: plural(r.count, "сделка", "сделки", "сделок"), sub: fmtMoney(r.sum) }))} color={CHART.muted} />
+          <HBars rows={data.lostReasons.map((r) => ({ label: r.reason, value: r.count, display: plural(r.count, "сделка", "сделки", "сделок"), sub: fmtMoneyShort(r.sum) }))} color={CHART.muted} />
         </Section>
         <Section title="Оплаты по неделям" description="Количество выигранных сделок">
           <BarsChart data={data.revenueByWeek} xKey="label" series={[{ key: "won", label: "Оплат", color: CHART.good }]} height={200} />
@@ -244,7 +245,7 @@ function ProductionTab({ data }: { data: ProductionReport }) {
   const t = data.totals;
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-6">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
         <Stat label="Заказов" value={fmtNum(t.orders)} sub={`${t.queued} в очереди · ${t.inProgress} в работе`} />
         <Stat label="Выполнено" value={fmtNum(t.done)} sub={`${fmtNum(t.qty)} ед. в заказах`} tone="good" />
         <Stat label="Средний цикл" value={`${fmtNum(t.cycleDays)} дн.`} sub="от запуска до готовности" />
@@ -252,7 +253,7 @@ function ProductionTab({ data }: { data: ProductionReport }) {
         <Stat label="Брак" value={fmtPct(t.defectRate, 1)} sub={`${plural(t.defects, "дефект", "дефекта", "дефектов")}`} tone={t.defectRate > 5 ? "accent" : undefined} />
         <Stat label="Просрочено" value={fmtNum(t.overdue)} sub="план уже прошёл" tone={t.overdue ? "accent" : undefined} />
       </div>
-      <div className="grid gap-5 lg:grid-cols-5">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-5">
         <Section title="Заказы по статусам" className="lg:col-span-2">
           <BarsChart data={data.byStatus.map((s) => ({ label: s.label, count: s.count }))} xKey="label" series={[{ key: "count", label: "Заказов", color: CHART.ink }]} height={220} />
           <div className="mt-4"><Segments parts={data.byStatus.map((s) => ({ label: s.label, value: s.count, color: STATUS_COLOR[s.status] }))} /></div>
@@ -261,14 +262,14 @@ function ProductionTab({ data }: { data: ProductionReport }) {
           <TrendChart data={data.doneByWeek} xKey="label" series={[{ key: "created", label: "Создано", color: CHART.soft }, { key: "done", label: "Выполнено", color: CHART.good }]} height={260} />
         </Section>
       </div>
-      <div className="grid gap-5 lg:grid-cols-5">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-5">
         <Section title="Загрузка исполнителей" className="lg:col-span-3">
           <Table className="border-0 rounded-none">
             <thead><tr><th>Исполнитель</th><th className="text-right">Заказов</th><th className="text-right">В работе</th><th className="text-right">Готово</th><th className="text-right">В срок</th><th className="text-right">Ед.</th><th className="text-right">Брак</th><th className="text-right">Цикл, дн.</th></tr></thead>
             <tbody>
               {data.byAssignee.map((a) => (
                 <tr key={a.assigneeId}>
-                  <td><span className="flex items-center gap-2"><Avatar name={a.name} color={a.color} size={24} /><span className="font-medium">{a.name}</span></span></td>
+                  <td><span className="flex items-center gap-2 whitespace-nowrap"><Avatar name={a.name} color={a.color} size={24} /><span className="font-medium">{a.name}</span></span></td>
                   <td className="text-right tnum">{a.orders}</td>
                   <td className="text-right tnum text-info">{a.inProgress}</td>
                   <td className="text-right tnum text-good">{a.done}</td>

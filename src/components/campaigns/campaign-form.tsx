@@ -70,9 +70,9 @@ export function CampaignForm({ open, options, initial, closeHref = "/campaigns" 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && close()}>
       <DialogContent title={initial?.id ? "Рассылка" : "Новая рассылка"} description="Сообщение уйдёт основному контакту каждой компании из сегмента" wide>
-        <div className="grid gap-5 lg:grid-cols-[1fr_280px]">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_280px]">
           <div className="space-y-4">
-            <div className="grid gap-4 sm:grid-cols-[1fr_180px]">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_180px]">
               <Field label="Название"><Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Осеннее ТО со скидкой" autoFocus /></Field>
               <Field label="Канал">
                 <Select value={channel} onChange={(e) => setChannel(e.target.value as CampaignChannel)}>

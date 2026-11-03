@@ -82,7 +82,7 @@ export function DealHeader({ deal, company, contacts, users, stages, pipelineNam
           </h1>
           <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-[13.5px]">
             {!hidden.includes("amount") && (
-              <span className="text-[18px] font-semibold tnum">
+              <span className="text-[18px] font-semibold tnum whitespace-nowrap">
                 <InlineText value={deal.amount} type="number" onSave={(v) => save({ amount: Number(v) })} disabled={!editable("amount")} format={(v) => fmtMoney(Number(v))} inputClassName="w-40 tnum" />
               </span>
             )}

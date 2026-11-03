@@ -114,6 +114,8 @@ h1, h2, h3 { letter-spacing: -0.01em; }
   font-size: 13px;
 }
 .table-base tr:last-child td { border-bottom: 0; }
+/* Числа и суммы в ячейках таблиц — всегда одной строкой */
+.table-base td.tnum, .table-base th.tnum { white-space: nowrap; }
 .table-base tbody tr { transition: background-color 0.1s ease; }
 .table-base tbody tr:hover { background: var(--surface-2); }
 .stamp {

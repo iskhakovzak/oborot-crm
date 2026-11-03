@@ -62,7 +62,7 @@ export default async function CampaignsPage({ searchParams }: { searchParams: Pr
           </tbody>
         </Table>
       ) : (
-        <EmptyState icon={<Megaphone />} title="Рассылок пока нет" description="Создайте первую: выберите сегмент клиентов, канал и текст с подстановками." action={canCreate && <Button asChild><Link href="/campaigns?new=1"><Plus /> Новая рассылка</Link></Button>} />
+        <EmptyState icon={<Megaphone />} title="Рассылок пока нет" description="Выберите сегмент клиентов, канал и текст." action={canCreate && <Button asChild><Link href="/campaigns?new=1"><Plus /> Новая рассылка</Link></Button>} />
       )}
       {canCreate && <CampaignForm open={sp.new === "1"} options={options} />}
     </>

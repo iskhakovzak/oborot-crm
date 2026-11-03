@@ -51,7 +51,7 @@ export default async function AiPage() {
         <Stat label="Передано менеджеру" value={handoffs.n} sub="задачи от ИИ за 7 дней" tone={handoffs.n > 0 ? "warn" : undefined} />
         <Stat label="Переписок на ИИ" value={convs.n} sub="открытых, ИИ отвечает сам" />
       </div>
-      <div className="grid gap-5 xl:grid-cols-[1.15fr_1fr]">
+      <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.15fr)_1fr]">
         <AiSettingsForm settings={ai} canEdit={canEdit} />
         <AiSandbox assistantName={ai.assistantName} live={r.live} />
       </div>

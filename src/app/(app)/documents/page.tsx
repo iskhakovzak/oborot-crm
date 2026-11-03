@@ -9,6 +9,7 @@ import { can } from "@/lib/permissions";
 import { fmtMoney, fmtDate, plural } from "@/lib/format";
 import { PageHeader, Stat, EmptyState } from "@/components/ui/page";
 import { Table } from "@/components/ui/table";
+import { Money } from "@/components/ui/money";
 import { Badge } from "@/components/ui/badge";
 import { LinkTabs } from "@/components/documents/link-tabs";
 import { DocumentsFilters } from "@/components/documents/documents-filters";
@@ -69,12 +70,12 @@ export default async function DocumentsPage({ searchParams }: { searchParams: Pr
     <>
       <PageHeader
         title="Документы"
-        description="Счета, договоры, ЭСФ, акты и КП формируются по сделке в один клик, уходят клиенту и в ЭДО."
+        description="Счета, договоры, ЭСФ, акты и КП по сделкам, отправка клиенту и в ЭДО."
         actions={<NewDocumentDialog deals={dealOptions} companies={companyOptions} initialType={sp.new} canCreate={canCreate} />}
       />
-      <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Stat label="Выставлено счетов за месяц" value={fmtMoney(invoicedMonth)} sub={`с ${fmtDate(monthStart.toISOString(), { day: "numeric", month: "long" })}`} />
-        <Stat label="Не оплачено" value={fmtMoney(unpaidSum)} tone={unpaidSum > 0 ? "warn" : undefined} sub={plural(unpaid.length, "счёт", "счёта", "счетов")} />
+      <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <Stat label="Выставлено счетов за месяц" value={<Money value={invoicedMonth} compact />} sub={`с ${fmtDate(monthStart.toISOString(), { day: "numeric", month: "long" })}`} />
+        <Stat label="Не оплачено" value={<Money value={unpaidSum} compact />} tone={unpaidSum > 0 ? "warn" : undefined} sub={plural(unpaid.length, "счёт", "счёта", "счетов")} />
         <Stat label="Подписано в ЭДО" value={signedEdo} tone="good" sub={inEdo ? `ещё ${plural(inEdo, "документ", "документа", "документов")} в работе` : "все отправленные подписаны"} />
         <Stat label="Всего документов" value={rows.length} sub={`${plural(rows.filter((r) => r.d.type === "report").length, "отчёт", "отчёта", "отчётов")} для клиентов`} />
       </div>
@@ -83,7 +84,7 @@ export default async function DocumentsPage({ searchParams }: { searchParams: Pr
         <DocumentsFilters />
       </div>
       {list.length === 0 ? (
-        <EmptyState icon={<FileText />} title="Документов не найдено" description={rows.length ? "Измените фильтры или поисковый запрос." : "Создайте первый документ по сделке — PDF будет готов сразу."} />
+        <EmptyState icon={<FileText />} title="Документов не найдено" description={rows.length ? "Измените фильтры или поисковый запрос." : "Создайте первый документ по сделке."} />
       ) : (
         <Table>
           <thead>
@@ -98,7 +99,7 @@ export default async function DocumentsPage({ searchParams }: { searchParams: Pr
                 <td><Badge tone={DOC_TYPE_TONE[d.type]}>{DOC_TYPE_LABEL[d.type]}</Badge></td>
                 <td className="max-w-[260px] truncate">{d.companyId ? <Link href={`/companies/${d.companyId}`} className="hover:underline">{companyName ?? "—"}</Link> : <span className="text-muted">—</span>}</td>
                 <td className="max-w-[240px] truncate">{d.dealId ? <Link href={`/deals/${d.dealId}`} className="hover:underline" title={dealTitle ?? ""}>№{dealNumber} · {dealTitle}</Link> : <span className="text-muted">—</span>}</td>
-                <td className="text-right tnum font-medium">{fmtMoney(d.amount)}</td>
+                <td className="text-right tnum font-medium whitespace-nowrap">{fmtMoney(d.amount)}</td>
                 <td className="text-muted whitespace-nowrap">{fmtDate(d.createdAt, { day: "numeric", month: "short", year: "numeric" })}</td>
                 <td><Badge tone={DOC_STATUS_TONE[d.status as DocStatus]} dot>{DOC_STATUS_LABEL[d.status as DocStatus]}</Badge></td>
                 <td>{d.edoStatus === "none" ? <span className="text-muted">—</span> : <Badge tone={EDO_STATUS_TONE[d.edoStatus as EdoStatus]}>{EDO_STATUS_LABEL[d.edoStatus as EdoStatus]}</Badge>}</td>

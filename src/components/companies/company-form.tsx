@@ -72,21 +72,21 @@ export function CompanyForm({ values, onChange, users, hidden, readonly, autoFoc
           </div>
         </Field>
       )}
-      <div className="grid gap-3 md:grid-cols-[2fr_1fr]">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,2fr)_1fr]">
         <Field label="Название"><Input value={values.name} onChange={(e) => set({ name: e.target.value })} required placeholder="ООО «Ромашка»" disabled={ro("name")} /></Field>
         <Field label="Короткое имя"><Input value={values.shortName} onChange={(e) => set({ shortName: e.target.value })} placeholder="Ромашка" /></Field>
       </div>
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         <Field label="ОКЭД"><Input value={values.oked} onChange={(e) => set({ oked: e.target.value })} className="tnum" placeholder="46.90" /></Field>
         <Field label="Рег. номер"><Input value={values.regNumber} onChange={(e) => set({ regNumber: e.target.value })} className="tnum" /></Field>
       </div>
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         <Field label="Руководитель"><Input value={values.director} onChange={(e) => set({ director: e.target.value })} placeholder="Иванов Иван Иванович" /></Field>
         <Field label="Должность"><Input value={values.directorPosition} onChange={(e) => set({ directorPosition: e.target.value })} placeholder="Директор" /></Field>
       </div>
       <Field label="Юридический адрес"><Input value={values.legalAddress} onChange={(e) => set({ legalAddress: e.target.value })} placeholder="г. Ташкент, ул. Амира Темура, 1" /></Field>
       <Field label="Фактический адрес"><Input value={values.address} onChange={(e) => set({ address: e.target.value })} /></Field>
-      <div className="grid gap-3 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
         {show("phone") && <Field label="Телефон"><Input value={values.phone} onChange={(e) => set({ phone: e.target.value })} placeholder="+998 90 123-45-67" disabled={ro("phone")} /></Field>}
         {show("email") && <Field label="Email"><Input value={values.email} onChange={(e) => set({ email: e.target.value })} type="email" disabled={ro("email")} /></Field>}
         <Field label="Сайт"><Input value={values.website} onChange={(e) => set({ website: e.target.value })} placeholder="example.uz" /></Field>
@@ -94,7 +94,7 @@ export function CompanyForm({ values, onChange, users, hidden, readonly, autoFoc
       {(show("bankName") || show("account")) && (
         <div className="rounded-[10px] border border-line bg-surface-2 p-3">
           <div className="mb-2 flex items-center gap-1.5 text-[13px] font-medium"><Landmark className="size-4 text-muted" /> Банковские реквизиты</div>
-          <div className="grid gap-3 md:grid-cols-[1fr_2fr]">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_2fr]">
             <Field label="МФО">
               <div className="flex gap-1.5">
                 <Input value={values.mfo} onChange={(e) => set({ mfo: e.target.value })} inputMode="numeric" className="tnum" placeholder="01088" onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); fillByMfo(); } }} />
@@ -110,7 +110,7 @@ export function CompanyForm({ values, onChange, users, hidden, readonly, autoFoc
           )}
         </div>
       )}
-      <div className="grid gap-3 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
         <Field label="Статус">
           <Select value={values.status} onChange={(e) => set({ status: e.target.value as CompanyFormValues["status"] })}>
             {STATUSES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
@@ -131,7 +131,7 @@ export function CompanyForm({ values, onChange, users, hidden, readonly, autoFoc
           </Select>
         </Field>
       </div>
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         <Field label="Отрасль"><Input value={values.industry} onChange={(e) => set({ industry: e.target.value })} placeholder="Строительство" /></Field>
         <Field label="Теги" hint="Через запятую: vip, опт, horeca"><Input value={values.tags} onChange={(e) => set({ tags: e.target.value })} /></Field>
       </div>

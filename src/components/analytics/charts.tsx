@@ -1,6 +1,6 @@
 "use client";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { fmtCompact, fmtMoney, fmtNum } from "@/lib/format";
+import { fmtMoney, fmtMoneyCompact, fmtMoneyShort, fmtNum } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 /** Палитра графиков: один акцент, остальное приглушено */
@@ -41,7 +41,7 @@ export function BarsChart({ data, xKey, series, height = 240, className }: { dat
         <BarChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }} barGap={2} barCategoryGap="28%">
           <CartesianGrid vertical={false} stroke={CHART.line} />
           <XAxis dataKey={xKey} {...axisProps} interval={data.length > 8 ? "preserveStartEnd" : 0} minTickGap={12} tickFormatter={(v: string) => (v.length > 14 ? v.slice(0, 13) + "…" : v)} />
-          <YAxis {...axisProps} width={58} allowDecimals={false} tickFormatter={(v: number) => (money ? fmtCompact(v) : fmtNum(v))} />
+          <YAxis {...axisProps} width={money ? 84 : 44} allowDecimals={false} tickFormatter={(v: number) => (money ? fmtMoneyCompact(v) : fmtNum(v))} />
           <Tooltip cursor={{ fill: "rgba(22,24,29,0.04)" }} content={<ChartTooltip series={series} />} />
           {series.length > 1 && <Legend {...legendProps} />}
           {series.map((s) => (
@@ -61,7 +61,7 @@ export function TrendChart({ data, xKey, series, kind = "line", height = 220, cl
     <>
       <CartesianGrid vertical={false} stroke={CHART.line} />
       <XAxis dataKey={xKey} {...axisProps} minTickGap={16} />
-      <YAxis {...axisProps} width={58} allowDecimals={false} tickFormatter={(v: number) => (money ? fmtCompact(v) : fmtNum(v))} />
+      <YAxis {...axisProps} width={money ? 84 : 44} allowDecimals={false} tickFormatter={(v: number) => (money ? fmtMoneyCompact(v) : fmtNum(v))} />
       <Tooltip cursor={{ stroke: CHART.soft }} content={<ChartTooltip series={series} />} />
       {series.length > 1 && <Legend {...legendProps} />}
     </>
@@ -99,7 +99,7 @@ export function HBars({ rows, color = CHART.ink, className }: { rows: { label: s
         <div key={r.label}>
           <div className="mb-1 flex items-baseline justify-between gap-3 text-[13px]">
             <span className="truncate text-ink">{r.label}</span>
-            <span className="shrink-0 tnum text-ink-2">{r.display ?? fmtNum(r.value)}{r.sub && <span className="ml-1.5 text-muted">{r.sub}</span>}</span>
+            <span className="shrink-0 whitespace-nowrap tnum text-ink-2">{r.display ?? fmtNum(r.value)}{r.sub && <span className="ml-1.5 text-muted">{r.sub}</span>}</span>
           </div>
           <div className="h-2 rounded-full bg-surface-2">
             <div className="h-2 rounded-full" style={{ width: `${Math.max(2, (r.value / max) * 100)}%`, background: r.color ?? color }} />
@@ -116,20 +116,20 @@ export function Funnel({ stages, won }: { stages: { name: string; color: string;
   return (
     <div className="space-y-2">
       {stages.map((s, i) => (
-        <div key={s.name} className="grid grid-cols-[150px_1fr_auto] items-center gap-3 text-[13px]">
-          <div className="flex items-center gap-2 truncate"><span className="size-2 shrink-0 rounded-full" style={{ background: s.color }} />{s.name}</div>
+        <div key={s.name} className="grid grid-cols-[minmax(0,130px)_minmax(0,1fr)_auto] items-center gap-3 text-[13px]">
+          <div className="flex min-w-0 items-center gap-2 truncate"><span className="size-2 shrink-0 rounded-full" style={{ background: s.color }} />{s.name}</div>
           <div className="flex items-center gap-2">
             <div className="h-6 rounded-[4px] bg-ink/90" style={{ width: `${Math.max(2, (s.reached / max) * 100)}%` }} title={`Дошли до этапа: ${s.reached}`} />
             <span className="tnum text-ink-2">{s.reached}</span>
           </div>
-          <div className="text-right tnum text-muted">
-            <span className="text-ink">{s.openCount} откр.</span> · {fmtMoney(s.openSum)}
+          <div className="whitespace-nowrap text-right tnum text-muted">
+            <span className="text-ink">{s.openCount} откр.</span> · <span title={fmtMoney(s.openSum)}>{fmtMoneyShort(s.openSum)}</span>
             {s.conversion != null && <span className="ml-2 inline-block rounded-full bg-surface-2 px-1.5 text-xs text-ink-2">→ {s.conversion}%{i === stages.length - 1 ? " оплата" : ""}</span>}
           </div>
         </div>
       ))}
-      <div className="grid grid-cols-[150px_1fr_auto] items-center gap-3 text-[13px]">
-        <div className="flex items-center gap-2"><span className="size-2 shrink-0 rounded-full bg-good" />Оплачено</div>
+      <div className="grid grid-cols-[minmax(0,130px)_minmax(0,1fr)_auto] items-center gap-3 text-[13px]">
+        <div className="flex min-w-0 items-center gap-2"><span className="size-2 shrink-0 rounded-full bg-good" />Оплачено</div>
         <div className="flex items-center gap-2">
           <div className="h-6 rounded-[4px] bg-good" style={{ width: `${Math.max(2, (won / max) * 100)}%` }} />
           <span className="tnum text-ink-2">{won}</span>

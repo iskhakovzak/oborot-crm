@@ -59,7 +59,7 @@ export default async function IntegrationsPage({ searchParams }: { searchParams:
 
   return (
     <>
-      <PageHeader title="Интеграции" description="Мессенджеры, телефония, банк, ЭДО, финучёт, аналитика и ИИ подключаются ключами. Без ключей всё работает в демо-режиме — действия логируются, ничего не уходит наружу." />
+      <PageHeader title="Интеграции" description="Мессенджеры, телефония, банк, ЭДО, финучёт, аналитика и ИИ. Без ключей сервис работает в демо-режиме." />
       <Tiles cols={4}>
         <Tile label="Подключено" value={connected} tone={connected ? "good" : undefined} sub="ключи заданы, обмен реальный" />
         <Tile label="В демо-режиме" value={demo} tone="warn" sub="включено без ключей" />
@@ -71,7 +71,7 @@ export default async function IntegrationsPage({ searchParams }: { searchParams:
       {tab === "catalog" ? (
         <IntegrationCatalog cards={cards} canEdit={canEdit} />
       ) : (
-        <Section title="Журнал обмена" description="Последние 200 событий: отправки, приём, проверки. Payload раскрывается по клику." className="[&>div:last-child]:p-0">
+        <Section title="Журнал обмена" description="Последние 200 событий обмена" className="[&>div:last-child]:p-0">
           {events.length === 0 ? (
             <p className="px-5 py-10 text-center text-[13px] text-muted">Событий пока нет. Нажмите «Проверить» у любой интеграции.</p>
           ) : (

@@ -32,6 +32,13 @@ export const fmtNum = (v: number | null | undefined) => num.format(v ?? 0);
 export const fmtCompact = (v: number | null | undefined) => compact.format(v ?? 0);
 /** «1,3 млн сум» — компактно, для графиков и плиток */
 export const fmtMoneyCompact = (v: number | null | undefined) => `${compact.format(v ?? 0)} ${CURRENCY_LABEL}`;
+/** Порог, с которого в узких местах показываем компактную сумму */
+export const COMPACT_FROM = 1_000_000;
+/**
+ * Для узких мест (плитки, карточки канбана, бейджи, узкие колонки, строки рабочего стола):
+ * от 1 млн — «17,3 млн сум», меньше — полная «850 000 сум». Полную сумму кладите в title.
+ */
+export const fmtMoneyShort = (v: number | null | undefined) => (Math.abs(v ?? 0) >= COMPACT_FROM ? fmtMoneyCompact(v) : fmtMoney(v));
 export const fmtPct = (v: number | null | undefined, digits = 0) => `${(v ?? 0).toFixed(digits)}%`;
 
 export function fmtDate(iso: string | null | undefined, opts: Intl.DateTimeFormatOptions = { day: "numeric", month: "short" }) {

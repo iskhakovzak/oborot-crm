@@ -9,6 +9,7 @@ import { resolve } from "@/lib/integrations/registry";
 import { fmtMoney, fmtDate, fmtDateTime, relTime, plural } from "@/lib/format";
 import { PageHeader, Stat, EmptyState, Section } from "@/components/ui/page";
 import { Table } from "@/components/ui/table";
+import { Money } from "@/components/ui/money";
 import { Badge } from "@/components/ui/badge";
 import { LinkTabs } from "@/components/documents/link-tabs";
 import { PAYMENT_METHOD_LABEL, PAYMENT_METHOD_TONE } from "@/components/documents/labels";
@@ -77,12 +78,12 @@ export default async function FinancePage({ searchParams }: { searchParams: Prom
 
   return (
     <>
-      <PageHeader title="Финансы" description="Оплаты, выписка банка с авторазноской, ссылки Payme/Click и синхронизация с финучётом." actions={canCreate ? <PaymentDialog options={options} /> : undefined} />
-      <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Stat label="Поступления за 30 дней" value={fmtMoney(monthIn)} tone="good" sub={plural(incoming.filter((x) => x.p.paidAt >= monthAgo).length, "платёж", "платежа", "платежей")} />
-        <Stat label="За 7 дней" value={fmtMoney(weekIn)} sub={plural(incoming.filter((x) => x.p.paidAt >= weekAgo).length, "платёж", "платежа", "платежей")} />
-        <Stat label="Дебиторка" value={fmtMoney(receivable)} tone={receivable > 0 ? "warn" : undefined} sub={plural(sentInvoices.length, "выставленный счёт", "выставленных счёта", "выставленных счетов")} />
-        <Stat label="Предоплаты клиентов" value={fmtMoney(prepaid)} tone="info" sub={plural(companies.filter((c) => c.balance > 0).length, "клиент", "клиента", "клиентов")} />
+      <PageHeader title="Финансы" description="Оплаты, выписка банка, ссылки Payme/Click и синхронизация с финучётом." actions={canCreate ? <PaymentDialog options={options} /> : undefined} />
+      <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <Stat label="Поступления за 30 дней" value={<Money value={monthIn} compact />} tone="good" sub={plural(incoming.filter((x) => x.p.paidAt >= monthAgo).length, "платёж", "платежа", "платежей")} />
+        <Stat label="За 7 дней" value={<Money value={weekIn} compact />} sub={plural(incoming.filter((x) => x.p.paidAt >= weekAgo).length, "платёж", "платежа", "платежей")} />
+        <Stat label="Дебиторка" value={<Money value={receivable} compact />} tone={receivable > 0 ? "warn" : undefined} sub={plural(sentInvoices.length, "выставленный счёт", "выставленных счёта", "выставленных счетов")} />
+        <Stat label="Предоплаты клиентов" value={<Money value={prepaid} compact />} tone="info" sub={plural(companies.filter((c) => c.balance > 0).length, "клиент", "клиента", "клиентов")} />
       </div>
       <div className="mb-4">
         <LinkTabs active={tab} items={TABS.map((t) => ({ key: t.key, label: t.label, href: `/finance?tab=${t.key}` }))} />
@@ -99,7 +100,7 @@ export default async function FinancePage({ searchParams }: { searchParams: Prom
                   <td className="max-w-[240px] truncate">{p.companyId ? <Link href={`/companies/${p.companyId}`} className="hover:underline">{companyName}</Link> : "—"}</td>
                   <td>{p.dealId ? <Link href={`/deals/${p.dealId}`} className="hover:underline">№{dealNumber}</Link> : <span className="text-muted">—</span>}</td>
                   <td>{p.documentId ? <Link href={`/documents/${p.documentId}`} className="hover:underline">{docNumber}</Link> : <span className="text-muted">—</span>}</td>
-                  <td className={`text-right tnum font-medium ${p.direction === "in" ? "text-good" : "text-accent"}`}>{p.direction === "in" ? "+" : "−"}{fmtMoney(p.amount)}</td>
+                  <td className={`text-right tnum font-medium whitespace-nowrap ${p.direction === "in" ? "text-good" : "text-accent"}`}>{p.direction === "in" ? "+" : "−"}{fmtMoney(p.amount)}</td>
                   <td><Badge tone={PAYMENT_METHOD_TONE[p.method]}>{PAYMENT_METHOD_LABEL[p.method]}</Badge></td>
                   <td className="max-w-[320px] truncate text-ink-2" title={p.purpose ?? ""}>{p.purpose ?? "—"}</td>
                   <td className="text-center">{p.syncedToFinance ? <span className="text-good" title="Передано в финучёт">✓</span> : <span className="text-muted">—</span>}</td>
@@ -125,16 +126,16 @@ export default async function FinancePage({ searchParams }: { searchParams: Prom
             <tbody>
               {list.map((c) => (
                 <tr key={c.id}>
-                  <td><Link href={`/companies/${c.id}`} className="font-medium hover:underline">{c.name}</Link></td>
-                  <td className="text-ink-2">{c.managerName ?? "—"}</td>
+                  <td className="max-w-[320px] truncate"><Link href={`/companies/${c.id}`} className="font-medium hover:underline">{c.name}</Link></td>
+                  <td className="whitespace-nowrap text-ink-2">{c.managerName ?? "—"}</td>
                   <td><Badge tone={c.balance > 0 ? "good" : "accent"} dot>{c.balance > 0 ? "Предоплата" : "Долг"}</Badge></td>
-                  <td className={`text-right tnum font-medium ${c.balance > 0 ? "text-good" : "text-accent"}`}>{fmtMoney(c.balance)}</td>
+                  <td className={`text-right tnum font-medium whitespace-nowrap ${c.balance > 0 ? "text-good" : "text-accent"}`}>{fmtMoney(c.balance)}</td>
                 </tr>
               ))}
               <tr className="bg-surface-2 font-medium">
                 <td colSpan={2}>Итого</td>
                 <td className="text-[13px] text-muted">предоплаты / долг</td>
-                <td className="text-right tnum"><span className="text-good">{fmtMoney(prepaid)}</span> <span className="text-muted">/</span> <span className="text-accent">{fmtMoney(debt)}</span></td>
+                <td className="text-right tnum whitespace-nowrap"><span className="text-good">{fmtMoney(prepaid)}</span> <span className="text-muted">/</span> <span className="text-accent">{fmtMoney(debt)}</span></td>
               </tr>
             </tbody>
           </Table>
@@ -152,7 +153,7 @@ async function BankTab({ options, canCreate, status }: { options: FinanceOptions
   return (
     <Section title="Выписка по расчётному счёту" description={status} action={<LoadStatementButton canEdit={canCreate} />} className="[&>div:last-child]:p-0">
       {rows.length === 0 ? (
-        <div className="p-5"><EmptyState icon={<Landmark />} title="Выписка ещё не загружалась" description="Нажмите «Загрузить выписку»: операции сопоставятся со счетами по номеру, ИНН и сумме." /></div>
+        <div className="p-5"><EmptyState icon={<Landmark />} title="Выписка ещё не загружалась" description="Загрузите выписку — операции сопоставятся со счетами по номеру, ИНН и сумме." /></div>
       ) : (
         <>
           {unmatched > 0 && <div className="border-b border-line px-5 py-2.5 text-[13px] text-warn">{plural(unmatched, "операция", "операции", "операций")} без разноски — привяжите вручную.</div>}
@@ -230,7 +231,7 @@ async function FinanceTab({ canEdit, unsynced, status }: { canEdit: boolean; uns
   return (
     <div className="space-y-5">
       <Section title="Синхронизация с финучётом" description={status} action={<SyncFinanceButton canEdit={canEdit} unsynced={unsynced} />}>
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           <Stat label="Не синхронизировано оплат" value={unsynced} tone={unsynced ? "warn" : "good"} sub={unsynced ? "будут переданы при следующей синхронизации" : "всё передано"} />
           <Stat label="Записей в журнале" value={log.length} />
           <Stat label="Ошибок" value={log.filter((l) => l.status === "error").length} tone={log.some((l) => l.status === "error") ? "accent" : undefined} />

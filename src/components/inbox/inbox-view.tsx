@@ -56,7 +56,7 @@ export function InboxView(props: {
   const filters = [["all", "Все", counts.all], ["mine", "Мои", counts.mine], ["unanswered", "Без ответа", counts.unanswered]] as const;
 
   return (
-    <div className="grid min-h-0 flex-1 grid-cols-1 overflow-hidden rounded-[12px] border border-line bg-surface lg:grid-cols-[340px_1fr]">
+    <div className="grid min-h-0 flex-1 grid-cols-1 overflow-hidden rounded-[12px] border border-line bg-surface lg:grid-cols-[340px_minmax(0,1fr)]">
       <aside className={cn("flex min-h-0 flex-col border-r border-line", selected && "hidden lg:flex")}>
         <div className="space-y-2.5 border-b border-line px-3 pt-3 pb-2.5">
           <div className="flex items-center gap-1.5">

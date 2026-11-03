@@ -4,7 +4,8 @@ import { Plus, CheckSquare, Workflow } from "lucide-react";
 import { db, schema } from "@/db";
 import { requireUser } from "@/lib/auth";
 import { can, scopeOf } from "@/lib/permissions";
-import { fmtMoney, fmtTime, relTime, plural } from "@/lib/format";
+import { fmtTime, relTime, plural } from "@/lib/format";
+import { Money } from "@/components/ui/money";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar } from "@/components/ui/avatar";
@@ -143,17 +144,17 @@ export default async function Dashboard() {
       </div>
 
       <Tiles>
-        {seeDeals && <Tile label={dealsTile.label} value={dealsTile.n} sub={fmtMoney(dealsTile.s)} href="/deals" />}
-        {won && <Tile label="Выручка за месяц" value={fmtMoney(Number(won.s ?? 0))} sub={won.n ? plural(won.n, "сделка закрыта", "сделки закрыты", "сделок закрыто") : "пока без закрытий"} tone="good" href="/analytics" />}
+        {seeDeals && <Tile label={dealsTile.label} value={dealsTile.n} sub={<Money value={dealsTile.s} compact />} href="/deals" />}
+        {won && <Tile label="Выручка за месяц" value={<Money value={Number(won.s ?? 0)} compact />} sub={won.n ? plural(won.n, "сделка закрыта", "сделки закрыты", "сделок закрыто") : "пока без закрытий"} tone="good" href="/analytics" />}
         <Tile label="Задачи на сегодня" value={dueToday.length} sub={noDue.length ? `${plural(noDue.length, "задача", "задачи", "задач")} без срока` : "по сроку"} href="/tasks" />
         <Tile label="Просрочено" value={overdueTasks.length} tone={overdueTasks.length ? "accent" : undefined} sub={overdueTasks.length ? "требуют внимания" : "всё в срок"} href="/tasks?tab=overdue" />
         {unread && <Tile label="Непрочитанные" value={unread.n} tone={unread.n ? "info" : undefined} sub="переписки с клиентами" href="/inbox" />}
         {seeBookings && <Tile label="Записи на сегодня" value={bookingsToday.length} sub={bookingsToday[0] ? `ближайшая в ${fmtTime(bookingsToday[0].b.startsAt)}` : "встреч нет"} href="/calendar" />}
       </Tiles>
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
         <div className="space-y-4">
-          <Panel title="Задачи на сегодня" count={todayTasks.length} href="/tasks" empty="На сегодня задач нет. Новые появятся от коллег, автоматизаций и Telegram-бота.">
+          <Panel title="Задачи на сегодня" count={todayTasks.length} href="/tasks" empty="На сегодня задач нет.">
             {[...overdueTasks, ...dueToday, ...noDue].slice(0, 10).map((t) => (
               <TaskRow key={t.id} task={t} users={[]} compact />
             ))}
@@ -163,7 +164,7 @@ export default async function Dashboard() {
           </Panel>
 
           {seeDeals && (
-            <Panel title="Сделки, требующие внимания" count={attention.length} href="/deals" empty="Все сделки в движении: по каждой была активность за последние 5 дней.">
+            <Panel title="Сделки, требующие внимания" count={attention.length} href="/deals" empty="По всем сделкам была активность за последние 5 дней.">
               {attention.map(({ d, companyName, stageName, stageColor, managerName, managerColor }) => {
                 const stale = Math.floor((now.getTime() - new Date(d.updatedAt).getTime()) / 86400_000);
                 const expired = !!d.expectedCloseAt && new Date(d.expectedCloseAt).getTime() < now.getTime();
@@ -175,7 +176,7 @@ export default async function Dashboard() {
                       <div className="truncate text-xs text-muted">{companyName ?? "Без клиента"} · {stageName ?? "—"}</div>
                     </div>
                     {expired ? <Badge tone="accent">срок закрытия прошёл</Badge> : <Badge tone="warn">без активности {stale} дн.</Badge>}
-                    <div className="w-[110px] shrink-0 text-right text-sm tnum">{fmtMoney(d.amount)}</div>
+                    <div className="w-[104px] shrink-0 text-right text-sm"><Money value={d.amount} compact /></div>
                     {managerName && <Avatar name={managerName} color={managerColor ?? undefined} size={24} />}
                   </Row>
                 );
@@ -186,14 +187,14 @@ export default async function Dashboard() {
           {seePayments && (
             <Panel title="Деньги" href="/finance">
               <div className="grid grid-cols-2 divide-x divide-line">
-                <div className="px-4 py-3">
+                <div className="min-w-0 px-4 py-3">
                   <div className="text-xs text-muted">Поступления за 7 дней</div>
-                  <div className="mt-0.5 text-[20px] font-semibold tracking-[-0.01em] text-good tnum">{fmtMoney(Number(payWeek?.s ?? 0))}</div>
+                  <div className="mt-0.5 truncate text-[20px] font-semibold tracking-[-0.01em] text-good"><Money value={Number(payWeek?.s ?? 0)} /></div>
                   <div className="text-xs text-muted">{plural(payWeek?.n ?? 0, "платёж", "платежа", "платежей")}</div>
                 </div>
-                <Link href="/documents?type=invoice&status=sent" className="px-4 py-3 transition-colors hover:bg-surface-2">
+                <Link href="/documents?type=invoice&status=sent" className="min-w-0 px-4 py-3 transition-colors hover:bg-surface-2">
                   <div className="text-xs text-muted">Неоплаченные счета</div>
-                  <div className={`mt-0.5 text-[20px] font-semibold tracking-[-0.01em] tnum ${unpaid?.n ? "text-warn" : ""}`}>{fmtMoney(Number(unpaid?.s ?? 0))}</div>
+                  <div className={`mt-0.5 truncate text-[20px] font-semibold tracking-[-0.01em] ${unpaid?.n ? "text-warn" : ""}`}><Money value={Number(unpaid?.s ?? 0)} /></div>
                   <div className="text-xs text-muted">{plural(unpaid?.n ?? 0, "счёт", "счёта", "счетов")} ждут оплаты</div>
                 </Link>
               </div>
@@ -204,7 +205,7 @@ export default async function Dashboard() {
                     <div className="truncate text-xs text-muted">{p.purpose ?? "Оплата"}</div>
                   </div>
                   <Badge tone="neutral">{p.method === "sbp" ? "Payme/Click" : p.method === "bank" ? "банк" : p.method === "card" ? "карта" : "наличные"}</Badge>
-                  <div className="w-[110px] text-right text-good tnum">+{fmtMoney(p.amount)}</div>
+                  <div className="w-[104px] shrink-0 text-right text-good">+<Money value={p.amount} compact /></div>
                   <div className="w-[80px] text-right text-xs text-muted">{relTime(p.paidAt)}</div>
                 </Row>
               ))}
@@ -248,7 +249,7 @@ export default async function Dashboard() {
           )}
 
           {seeAuto && (
-            <Panel title="Что сделала система за 24 часа" count={feed.length} href="/automations" hrefLabel="Автоматизации" empty="За последние сутки автоматизации не запускались. Они сработают сами: при новой заявке, счёте, оплате или сообщении.">
+            <Panel title="Что сделала система за 24 часа" count={feed.length} href="/automations" hrefLabel="Автоматизации" empty="За последние сутки автоматизации не запускались.">
               {!recentRuns.length && feed.length > 0 && <p className="px-4 py-2 text-xs text-muted">За сутки запусков не было — последние запуски:</p>}
               {feed.map(({ r, name }) => (
                 <Row key={r.id} href={`/automations/${r.automationId}`}>

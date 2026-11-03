@@ -86,7 +86,7 @@ export default async function DealPage({ params }: { params: Promise<{ id: strin
         manager={row.managerName ? { name: row.managerName, color: row.managerColor ?? "#4b5260" } : null}
         hasPhone={hasPhone}
       />
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
         <div className="space-y-4">
           <DealItems dealId={deal.id} items={items} products={products} canEdit={canEdit} />
           <DealDocuments dealId={deal.id} documents={documents.map((d) => ({ id: d.id, type: d.type, number: d.number, title: d.title, amount: d.amount, status: d.status, edoStatus: d.edoStatus, sentAt: d.sentAt, createdAt: d.createdAt }))} links={links.map((l) => ({ id: l.id, amount: l.amount, url: l.url, status: l.status, createdAt: l.createdAt, documentId: l.documentId }))} canCreate={can(user.actor, "documents", "create")} canSend={can(user.actor, "documents", "view")} />

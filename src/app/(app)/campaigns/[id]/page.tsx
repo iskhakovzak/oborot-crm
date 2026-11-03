@@ -67,7 +67,7 @@ export default async function CampaignPage({ params, searchParams }: { params: P
         <Stat label="Открыто" value={s.opened} sub={rate(s.opened)} tone="good" />
         <Stat label="Переходы" value={s.clicked} sub={rate(s.clicked)} />
       </div>
-      <div className="grid gap-5 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
         <Section title="Воронка доставки" className="lg:col-span-1">
           {s.total ? (
             <>

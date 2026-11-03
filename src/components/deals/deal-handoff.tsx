@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Section } from "@/components/ui/page";
-import { fmtMoney } from "@/lib/format";
+import { Money } from "@/components/ui/money";
 import { handoff } from "@/app/(app)/deals/actions";
 
 export type RelatedDeal = { id: string; number: number; title: string; amount: number | null; pipelineName: string; stageName: string; stageColor: string; status: "open" | "won" | "lost"; relation: "parent" | "child" };
@@ -46,13 +46,13 @@ export function DealHandoff({ dealId, pipelineKind, related, orders, canHandoff 
             <li key={d.id} className="flex items-center gap-3 py-2.5">
               {d.relation === "parent" ? <ArrowUpLeft className="size-4 shrink-0 text-muted" /> : <ArrowDownRight className="size-4 shrink-0 text-muted" />}
               <div className="min-w-0 flex-1">
-                <Link href={`/deals/${d.id}`} className="font-medium hover:underline">№{d.number} · {d.title}</Link>
+                <Link href={`/deals/${d.id}`} className="block truncate font-medium hover:underline">№{d.number} · {d.title}</Link>
                 <div className="mt-0.5 flex items-center gap-2 text-xs text-muted">
                   <span>{d.relation === "parent" ? "Родительская" : "Дочерняя"} · {d.pipelineName}</span>
                   <span className="inline-flex items-center gap-1"><span className="size-1.5 rounded-full" style={{ background: d.stageColor }} />{d.stageName}</span>
                 </div>
               </div>
-              {d.amount !== null && <span className="text-[13px] font-medium tnum">{fmtMoney(d.amount)}</span>}
+              {d.amount !== null && <span className="shrink-0 text-[13px] font-medium"><Money value={d.amount} compact /></span>}
             </li>
           ))}
           {orders.map((o) => (

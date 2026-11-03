@@ -7,7 +7,8 @@ import { CSS } from "@dnd-kit/utilities";
 import { toast } from "sonner";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { fmtMoney, plural } from "@/lib/format";
+import { plural } from "@/lib/format";
+import { Money } from "@/components/ui/money";
 import { cn } from "@/lib/utils";
 import { moveDealStage } from "@/app/(app)/deals/actions";
 import type { KanbanDeal, StageInfo } from "./types";
@@ -30,7 +31,7 @@ function DealCard({ deal, dragging, overlay }: { deal: KanbanDeal; dragging?: bo
         <span className="shrink-0 text-[11px] text-muted tnum">№{deal.number}</span>
       </div>
       {deal.companyName && <div className="mt-0.5 truncate text-[12.5px] text-ink-2">{deal.companyName}</div>}
-      {deal.amount !== null && <div className="mt-1.5 text-[14px] font-semibold tnum">{fmtMoney(deal.amount)}</div>}
+      {deal.amount !== null && <div className="mt-1.5 truncate text-[14px] font-semibold"><Money value={deal.amount} compact /></div>}
       <div className="mt-2 flex items-center gap-2">
         {deal.managerName ? <Avatar name={deal.managerName} color={deal.managerColor ?? undefined} size={22} /> : <span className="grid size-[22px] place-items-center rounded-full border border-dashed border-line-strong text-[10px] text-muted">?</span>}
         <span className={cn("text-[11.5px] tnum", deal.daysOnStage > 7 && deal.status === "open" ? "text-warn" : "text-muted")}>{deal.daysOnStage === 0 ? "сегодня" : plural(deal.daysOnStage, "день", "дня", "дней")}</span>
@@ -56,9 +57,9 @@ function Column({ stage, deals, hideAmount, active }: { stage: StageInfo; deals:
     <div className="flex w-[272px] shrink-0 flex-col">
       <div className="mb-2 flex items-center gap-2 px-1">
         <span className="size-2 rounded-full" style={{ background: stage.color }} />
-        <span className="truncate text-[13px] font-semibold">{stage.name}</span>
-        <span className="rounded-full bg-black/5 px-1.5 text-[11px] text-ink-2 tnum">{deals.length}</span>
-        {!hideAmount && <span className="ml-auto text-[12px] text-muted tnum">{fmtMoney(sum)}</span>}
+        <span className="min-w-0 truncate text-[13px] font-semibold">{stage.name}</span>
+        <span className="shrink-0 rounded-full bg-black/5 px-1.5 text-[11px] text-ink-2 tnum">{deals.length}</span>
+        {!hideAmount && <span className="ml-auto shrink-0 text-[12px] text-muted"><Money value={sum} compact /></span>}
       </div>
       <div
         ref={setNodeRef}

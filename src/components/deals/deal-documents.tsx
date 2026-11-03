@@ -61,7 +61,7 @@ export function DealDocuments({ dealId, documents, links, canCreate, canSend }: 
       )}
     >
       {!documents.length && !links.length ? (
-        <div className="rounded-[10px] border border-dashed border-line-strong px-4 py-8 text-center text-[13px] text-muted">Документов пока нет. Нажмите «Счёт» или «КП» — PDF будет готов сразу.</div>
+        <div className="rounded-[10px] border border-dashed border-line-strong px-4 py-8 text-center text-[13px] text-muted">Документов нет — нажмите «Счёт» или «КП».</div>
       ) : (
         <ul className="divide-y divide-line -my-2">
           {documents.map((d) => {
@@ -75,7 +75,7 @@ export function DealDocuments({ dealId, documents, links, canCreate, canSend }: 
                     <Badge tone={st}>{sl}</Badge>
                     {edo && <Badge tone={edo[1]}>{edo[0]}</Badge>}
                   </div>
-                  <div className="mt-0.5 text-xs text-muted tnum">{fmtMoney(d.amount)} · {fmtDate(d.createdAt)}{d.sentAt ? ` · отправлен ${fmtDate(d.sentAt)}` : ""}</div>
+                  <div className="mt-0.5 truncate text-xs text-muted tnum">{fmtMoney(d.amount)} · {fmtDate(d.createdAt)}{d.sentAt ? ` · отправлен ${fmtDate(d.sentAt)}` : ""}</div>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <Button size="sm" variant="ghost" asChild><a href={`/api/documents/${d.id}/pdf`} target="_blank" rel="noreferrer"><ExternalLink /> PDF</a></Button>
@@ -91,7 +91,7 @@ export function DealDocuments({ dealId, documents, links, canCreate, canSend }: 
               <li key={l.id} className="flex flex-wrap items-center gap-x-4 gap-y-2 py-2.5">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2"><QrCode className="size-4 text-muted" /><span className="font-medium">Ссылка на оплату Payme/Click</span><Badge tone={lt}>{ll}</Badge></div>
-                  <div className="mt-0.5 text-xs text-muted tnum">{fmtMoney(l.amount)} · {fmtDate(l.createdAt)}</div>
+                  <div className="mt-0.5 truncate text-xs text-muted tnum">{fmtMoney(l.amount)} · {fmtDate(l.createdAt)}</div>
                 </div>
                 <Button size="sm" variant="ghost" asChild><a href={l.url} target="_blank" rel="noreferrer"><ExternalLink /> Открыть</a></Button>
               </li>

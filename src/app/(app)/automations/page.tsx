@@ -43,7 +43,7 @@ export default async function AutomationsPage() {
     <>
       <PageHeader
         title="Автоматизации"
-        description="CRM делает сама: при событии (заявка, счёт, оплата, сообщение, звонок) система пишет клиенту, ставит задачи, выставляет счета, передаёт в отгрузку и отправляет конверсии. Без ключей интеграций всё работает в демо-режиме."
+        description="Правила «событие → действие»: сообщение клиенту, задача, счёт, передача в отгрузку, конверсии."
         actions={can(user.actor, "automations", "create") ? <Button asChild><Link href="/automations?new=1"><Plus /> Новая автоматизация</Link></Button> : undefined}
       />
       <Tiles cols={4}>

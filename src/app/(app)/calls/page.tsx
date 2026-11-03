@@ -46,7 +46,7 @@ export default async function CallsPage() {
 
   return (
     <>
-      <PageHeader title="Звонки" description={`Телефония: ${tel.name}${tel.live ? "" : " (демо-режим)"}. Звонок из карточки одним кликом, входящие с записью, пропущенные — в задачи менеджеру, ИИ принимает звонки ${ai.callsEnabled ? "включён" : "выключен"}.`} />
+      <PageHeader title="Звонки" description={`Телефония: ${tel.name}${tel.live ? "" : " (демо-режим)"} · ИИ на входящих ${ai.callsEnabled ? "включён" : "выключен"}.`} />
       <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {cards.map((s) => (
           <Stat key={s.label} label={s.label} value={stat(dayStart, s.f)} tone={stat(dayStart, s.f) > 0 ? s.tone : undefined} sub={`сегодня · за 7 дней: ${stat(weekStart, s.f)}`} />

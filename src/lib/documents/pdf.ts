@@ -92,7 +92,7 @@ export class Pdf {
     };
     drawHead();
     rows.forEach((r, ri) => {
-      const cellLines = r.map((cell, i) => this.wrap(cell, this.regular, size, cols[i].w - 12));
+      const cellLines = r.map((cell, i) => (cols[i].align === "right" ? [cell] : this.wrap(cell, this.regular, size, cols[i].w - 12)));
       const h = Math.max(...cellLines.map((l) => l.length)) * size * 1.35 + 8;
       if (this.y - h < this.M + 30) { this.newPage(); drawHead(); }
       if (o.zebra && ri % 2) this.page.drawRectangle({ x: this.M, y: this.y - h, width: this.W - 2 * this.M, height: h, color: rgb(0.985, 0.987, 0.99) });
@@ -165,7 +165,7 @@ export async function renderInvoice(p: { number: string; date: string; seller: P
   if (p.paid) pdf.stamp("ОПЛАЧЕНО");
   pdf.kv([["Поставщик", `${p.seller.name}, ИНН ${p.seller.inn}${p.seller.oked ? `, ОКЭД ${p.seller.oked}` : ""}, ${p.seller.address}`], ["Покупатель", `${p.buyer.name}, ИНН ${p.buyer.inn}${p.buyer.oked ? `, ОКЭД ${p.buyer.oked}` : ""}, ${p.buyer.address}`]], { labelW: 90 });
   pdf.gap(10);
-  pdf.table([{ title: "№", w: 28 }, { title: "Наименование", w: 203 }, { title: "Кол-во", w: 52, align: "right" }, { title: "Ед.", w: 36 }, { title: "Цена", w: 90, align: "right" }, { title: "Сумма", w: 90, align: "right" }],
+  pdf.table([{ title: "№", w: 28 }, { title: "Наименование", w: 175 }, { title: "Кол-во", w: 52, align: "right" }, { title: "Ед.", w: 36 }, { title: "Цена", w: 100, align: "right" }, { title: "Сумма", w: 108, align: "right" }],
     p.lines.map((l, i) => [String(i + 1), l.name, String(l.qty), l.unit, money(l.price), money(l.qty * l.price * (1 - (l.discount ?? 0) / 100))]), { zebra: true });
   pdf.gap(8);
   pdf.text(`Итого: ${money(t.sum)}`, { align: "right", bold: true, size: 11 });
@@ -197,7 +197,7 @@ export async function renderContract(p: { number: string; date: string; seller: 
   ];
   for (const [h, body] of sections) { pdf.gap(6); pdf.text(h, { bold: true, size: 10.5 }); pdf.text(body, { size: 9.5 }); }
   pdf.gap(10); pdf.text("Приложение № 1. Спецификация", { bold: true, size: 10.5 }); pdf.gap(4);
-  pdf.table([{ title: "№", w: 28 }, { title: "Наименование", w: 233 }, { title: "Кол-во", w: 52, align: "right" }, { title: "Цена", w: 93, align: "right" }, { title: "Сумма", w: 93, align: "right" }], p.lines.map((l, i) => [String(i + 1), l.name, `${l.qty} ${l.unit}`, money(l.price), money(l.qty * l.price * (1 - (l.discount ?? 0) / 100))]), { zebra: true });
+  pdf.table([{ title: "№", w: 28 }, { title: "Наименование", w: 211 }, { title: "Кол-во", w: 52, align: "right" }, { title: "Цена", w: 100, align: "right" }, { title: "Сумма", w: 108, align: "right" }], p.lines.map((l, i) => [String(i + 1), l.name, `${l.qty} ${l.unit}`, money(l.price), money(l.qty * l.price * (1 - (l.discount ?? 0) / 100))]), { zebra: true });
   pdf.gap(14); pdf.text("7. Реквизиты и подписи сторон", { bold: true, size: 10.5 }); pdf.gap(4);
   const half = (pdf.W - 2 * pdf.M) / 2 - 10;
   const y0 = pdf.y;
@@ -224,7 +224,7 @@ export async function renderUpd(p: { number: string; date: string; seller: Party
   if (p.signed) pdf.stamp("ПОДПИСАНО В ЭДО");
   pdf.kv([["Поставщик", `${p.seller.name}, ИНН ${p.seller.inn}${p.seller.oked ? `, ОКЭД ${p.seller.oked}` : ""}, ${p.seller.address}`], ["Банк поставщика", p.seller.bankName ? `${p.seller.bankName}, МФО ${p.seller.mfo ?? ""}, р/с ${p.seller.account ?? ""}` : ""], ["Покупатель", `${p.buyer.name}, ИНН ${p.buyer.inn}${p.buyer.oked ? `, ОКЭД ${p.buyer.oked}` : ""}, ${p.buyer.address}`], ["Банк покупателя", p.buyer.bankName ? `${p.buyer.bankName}, МФО ${p.buyer.mfo ?? ""}, р/с ${p.buyer.account ?? ""}` : ""], ["Валюта", "Узбекский сум, UZS (860)"]], { labelW: 110 });
   pdf.gap(10);
-  pdf.table([{ title: "№", w: 24 }, { title: "Наименование товара (работ, услуг)", w: 155 }, { title: "Ед.", w: 34 }, { title: "Кол-во", w: 46, align: "right" }, { title: "Цена без НДС", w: 92, align: "right" }, { title: "Ставка", w: 44, align: "right" }, { title: "Сумма с НДС", w: 104, align: "right" }],
+  pdf.table([{ title: "№", w: 24 }, { title: "Наименование", w: 137 }, { title: "Ед.", w: 34 }, { title: "Кол-во", w: 46, align: "right" }, { title: "Цена без НДС", w: 100, align: "right" }, { title: "Ставка", w: 44, align: "right" }, { title: "Сумма с НДС", w: 114, align: "right" }],
     p.lines.map((l, i) => { const rate = l.vatRate ?? DEFAULT_VAT; const s = l.qty * l.price * (1 - (l.discount ?? 0) / 100); return [String(i + 1), l.name, l.unit, String(l.qty), money(l.price / (1 + rate / 100)), rate ? `${rate}%` : "без НДС", money(s)]; }), { size: 8.5, zebra: true });
   pdf.gap(8);
   pdf.text(`Всего к оплате: ${money(t.sum)}`, { align: "right", bold: true, size: 11 });
@@ -250,7 +250,7 @@ export async function renderAct(p: { number: string; date: string; seller: Party
   if (p.signed) pdf.stamp("ПОДПИСАНО");
   pdf.kv([["Исполнитель", `${p.seller.name}, ИНН ${p.seller.inn}`], ["Заказчик", `${p.buyer.name}, ИНН ${p.buyer.inn}`]], { labelW: 90 });
   pdf.gap(8);
-  pdf.table([{ title: "№", w: 28 }, { title: "Работы / услуги", w: 243 }, { title: "Кол-во", w: 52, align: "right" }, { title: "Цена", w: 88, align: "right" }, { title: "Сумма", w: 88, align: "right" }], p.lines.map((l, i) => [String(i + 1), l.name, `${l.qty} ${l.unit}`, money(l.price), money(l.qty * l.price)]), { zebra: true });
+  pdf.table([{ title: "№", w: 28 }, { title: "Работы / услуги", w: 211 }, { title: "Кол-во", w: 52, align: "right" }, { title: "Цена", w: 100, align: "right" }, { title: "Сумма", w: 108, align: "right" }], p.lines.map((l, i) => [String(i + 1), l.name, `${l.qty} ${l.unit}`, money(l.price), money(l.qty * l.price)]), { zebra: true });
   pdf.gap(8);
   pdf.text(`Итого: ${money(t.sum)}, в т.ч. НДС ${DEFAULT_VAT}% ${money(t.vat)}`, { align: "right", bold: true });
   pdf.gap(8);
@@ -268,7 +268,7 @@ export async function renderKp(p: { number: string; date: string; seller: Party;
   pdf.heading(`Коммерческое предложение № ${p.number}`, `${dateRu(p.date)} · для ${p.buyer.name}`);
   pdf.text(p.intro ?? "Подготовили решение под вашу задачу. Цены включают доставку, монтаж и пусконаладку; гарантия — 3 года на оборудование и 2 года на работы.", { size: 10 });
   pdf.gap(10);
-  pdf.table([{ title: "№", w: 28 }, { title: "Позиция", w: 233 }, { title: "Кол-во", w: 52, align: "right" }, { title: "Цена", w: 93, align: "right" }, { title: "Сумма", w: 93, align: "right" }], p.lines.map((l, i) => [String(i + 1), l.name, `${l.qty} ${l.unit}`, money(l.price), money(l.qty * l.price * (1 - (l.discount ?? 0) / 100))]), { zebra: true });
+  pdf.table([{ title: "№", w: 28 }, { title: "Позиция", w: 211 }, { title: "Кол-во", w: 52, align: "right" }, { title: "Цена", w: 100, align: "right" }, { title: "Сумма", w: 108, align: "right" }], p.lines.map((l, i) => [String(i + 1), l.name, `${l.qty} ${l.unit}`, money(l.price), money(l.qty * l.price * (1 - (l.discount ?? 0) / 100))]), { zebra: true });
   pdf.gap(8);
   pdf.text(`Итого с НДС ${DEFAULT_VAT}%: ${money(t.sum)}`, { align: "right", bold: true, size: 12 });
   pdf.gap(12);
@@ -294,7 +294,7 @@ export async function renderClientReport(p: { title: string; period: string; sel
   pdf.gap(10); pdf.text("Оплаты", { bold: true, size: 10.5 }); pdf.gap(4);
   pdf.table([{ title: "Дата", w: 110 }, { title: "Назначение", w: 279 }, { title: "Сумма", w: 110, align: "right" }], p.payments, { zebra: true });
   pdf.gap(10); pdf.text("Документы", { bold: true, size: 10.5 }); pdf.gap(4);
-  pdf.table([{ title: "Документ", w: 229 }, { title: "Дата", w: 90 }, { title: "Статус", w: 90 }, { title: "Сумма", w: 90, align: "right" }], p.documents, { zebra: true });
+  pdf.table([{ title: "Документ", w: 209 }, { title: "Дата", w: 90 }, { title: "Статус", w: 90 }, { title: "Сумма", w: 110, align: "right" }], p.documents, { zebra: true });
   pdf.footer(`${p.seller.name} · ${p.seller.phone ?? ""} · ${p.seller.email ?? ""}`);
   return pdf.bytes();
 }

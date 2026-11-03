@@ -134,7 +134,7 @@ export default async function DealsPage({ searchParams }: { searchParams: Promis
       {!deals.length ? (
         <EmptyState
           title={q || mine ? "Ничего не найдено" : "В этой воронке пока нет сделок"}
-          description={q || mine ? "Измените условия поиска или снимите фильтр «Мои»." : "Создайте первую сделку — менеджер будет назначен автоматически."}
+          description={q || mine ? "Измените запрос или снимите фильтр «Мои»." : "Создайте первую сделку — менеджер назначится по правилам распределения."}
           icon={<KanbanSquare />}
           action={q || mine ? <Button variant="secondary" asChild><Link href={href({ q: undefined, mine: undefined })}>Сбросить фильтры</Link></Button> : can(user.actor, "deals", "create") ? <Button asChild><Link href={href({ new: "1" })}>Новая сделка</Link></Button> : undefined}
         />
@@ -161,17 +161,17 @@ export default async function DealsPage({ searchParams }: { searchParams: Promis
               return (
                 <tr key={d.id}>
                   <td className="tnum text-muted">{d.number}</td>
-                  <td>
-                    <Link href={`/deals/${d.id}`} className="font-medium hover:underline">{d.title}</Link>
+                  <td className="max-w-[320px] truncate">
+                    <Link href={`/deals/${d.id}`} className="font-medium hover:underline" title={d.title}>{d.title}</Link>
                   </td>
-                  <td>{d.companyId ? <Link href={`/companies/${d.companyId}`} className="text-ink-2 hover:underline">{d.companyName}</Link> : <span className="text-muted">—</span>}</td>
+                  <td className="max-w-[220px] truncate">{d.companyId ? <Link href={`/companies/${d.companyId}`} className="text-ink-2 hover:underline">{d.companyName}</Link> : <span className="text-muted">—</span>}</td>
                   <td>
                     <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
                       <span className="size-2 rounded-full" style={{ background: st?.color }} />
                       {st?.name}
                     </span>
                   </td>
-                  {!hidden.includes("amount") && <td className="text-right tnum font-medium">{fmtMoney(d.amount)}</td>}
+                  {!hidden.includes("amount") && <td className="text-right tnum font-medium whitespace-nowrap">{fmtMoney(d.amount)}</td>}
                   <td>
                     {d.managerName ? (
                       <span className="inline-flex items-center gap-2 whitespace-nowrap"><Avatar name={d.managerName} color={d.managerColor ?? undefined} size={22} />{d.managerName}</span>
@@ -179,7 +179,7 @@ export default async function DealsPage({ searchParams }: { searchParams: Promis
                       <span className="text-muted">—</span>
                     )}
                   </td>
-                  {!hidden.includes("source") && <td>{d.source ? <Badge>{d.source}</Badge> : <span className="text-muted">—</span>}</td>}
+                  {!hidden.includes("source") && <td>{d.source ? <Badge className="max-w-[140px] truncate">{d.source}</Badge> : <span className="text-muted">—</span>}</td>}
                   <td className={cn("text-right tnum", d.daysOnStage > 7 && d.status === "open" ? "text-warn" : "text-muted")}>{plural(d.daysOnStage, "день", "дня", "дней")}</td>
                   <td className="text-right text-muted tnum">{fmtDate(d.updatedAt)}</td>
                 </tr>

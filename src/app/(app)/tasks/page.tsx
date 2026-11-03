@@ -60,7 +60,7 @@ export default async function TasksPage({ searchParams }: { searchParams: Promis
     <>
       <PageHeader
         title="Задачи"
-        description="Задачи ставят сотрудники, автоматизации, Telegram-бот и ИИ. Чекбокс закрывает задачу, срок и исполнителя можно поменять из меню строки."
+        description="Задачи сотрудников, автоматизаций, Telegram-бота и ИИ."
         actions={canCreate ? <Button asChild><Link href={`/tasks?${tab === "my" ? "" : `tab=${tab}&`}new=1`}><Plus /> Новая задача</Link></Button> : undefined}
       />
       <LinkTabs items={tabs} active={effectiveTab} className="mb-4" />

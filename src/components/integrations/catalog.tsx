@@ -31,7 +31,7 @@ export function IntegrationCatalog({ cards, canEdit }: { cards: ProviderCard[]; 
             <h2 className="text-[14px] font-semibold">{g.title}</h2>
             {g.hint && <span className="text-xs text-muted">{g.hint}</span>}
           </div>
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
             {g.items.map((c) => (
               <IntegrationCard key={`${c.kind}:${c.provider}`} card={c} canEdit={canEdit} />
             ))}

@@ -53,14 +53,14 @@ export function NewOrderDialog({ deals, companies, users }: { deals: DealForOrde
             ) : (
               <>
                 <Field label="Название"><Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Воздуховоды Ø200, 40 м" autoFocus /></Field>
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <Field label="Клиент"><Select value={companyId} onChange={(e) => setCompanyId(e.target.value)}><option value="">—</option>{companies.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</Select></Field>
                   <Field label="Количество"><Input type="number" min={1} value={qty} onChange={(e) => setQty(e.target.value)} className="tnum" /></Field>
                 </div>
                 <Field label="Заметки"><Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Состав, материалы, особенности" /></Field>
               </>
             )}
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Field label="Исполнитель"><Select value={assigneeId} onChange={(e) => setAssigneeId(e.target.value)}><option value="">Не назначен</option>{users.map((u) => <option key={u.id} value={u.id}>{u.name}{u.teamId === "production" ? "" : " (не производство)"}</option>)}</Select></Field>
               <Field label="Плановая дата"><Input type="datetime-local" value={plannedAt} onChange={(e) => setPlannedAt(e.target.value)} /></Field>
             </div>

@@ -29,7 +29,7 @@ export default async function TelegramPage() {
     <>
       <PageHeader
         title="Telegram-бот для сотрудников"
-        description="Пункт 20: любое действие в CRM — командой из Telegram. «Создай сделку», «поставь задачу Ивану», «покажи продажи за неделю» — бот поймёт и сделает."
+        description="Команды из Telegram: «создай сделку», «поставь задачу Ивану», «покажи продажи за неделю»."
         actions={r.live ? <Badge tone="good" dot>Бот подключён</Badge> : <Badge tone="warn" dot>Демо-режим</Badge>}
       />
       <TelegramView

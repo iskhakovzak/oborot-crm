@@ -81,7 +81,7 @@ export default async function CompaniesPage({ searchParams }: { searchParams: Pr
       {!list.length ? (
         <EmptyState
           title={hasFilters ? "Ничего не найдено" : "Клиентов пока нет"}
-          description={hasFilters ? "Попробуйте изменить запрос или снять фильтры." : "Добавьте первого клиента — по ИНН реквизиты заполнятся автоматически."}
+          description={hasFilters ? "Измените запрос или снимите фильтры." : "Добавьте первого клиента — по ИНН реквизиты заполнятся автоматически."}
           icon={<Building2 />}
           action={hasFilters ? <Button variant="secondary" asChild><Link href="/companies">Сбросить фильтры</Link></Button> : can(user.actor, "companies", "create") ? <Button asChild><Link href="/companies?new=1">Новый клиент</Link></Button> : undefined}
         />
@@ -104,9 +104,9 @@ export default async function CompaniesPage({ searchParams }: { searchParams: Pr
               const [sl, st] = COMPANY_STATUS[c.status] ?? ["—", "neutral"];
               return (
                 <tr key={c.id}>
-                  <td>
-                    <Link href={`/companies/${c.id}`} className="font-medium hover:underline">{c.name}</Link>
-                    {c.industry && <div className="text-xs text-muted">{c.industry}</div>}
+                  <td className="max-w-[300px]">
+                    <div className="truncate"><Link href={`/companies/${c.id}`} className="font-medium hover:underline">{c.name}</Link></div>
+                    {c.industry && <div className="truncate text-xs text-muted">{c.industry}</div>}
                   </td>
                   {!hidden.includes("inn") && <td className="tnum text-ink-2">{c.inn ?? <span className="text-muted">—</span>}</td>}
                   <td><Badge tone={st} dot>{sl}</Badge></td>
@@ -114,7 +114,7 @@ export default async function CompaniesPage({ searchParams }: { searchParams: Pr
                   {!hidden.includes("managerId") && (
                     <td>{managerName ? <span className="inline-flex items-center gap-2 whitespace-nowrap"><Avatar name={managerName} color={managerColor ?? undefined} size={22} />{managerName}</span> : <span className="text-muted">—</span>}</td>
                   )}
-                  {!hidden.includes("balance") && <td className={cn("text-right tnum font-medium", c.balance < 0 ? "text-accent" : c.balance > 0 ? "text-good" : "text-muted")}>{fmtMoney(c.balance)}</td>}
+                  {!hidden.includes("balance") && <td className={cn("text-right tnum font-medium whitespace-nowrap", c.balance < 0 ? "text-accent" : c.balance > 0 ? "text-good" : "text-muted")}>{fmtMoney(c.balance)}</td>}
                   <td>{c.source ? <Badge>{c.source}</Badge> : <span className="text-muted">—</span>}</td>
                   <td className="text-right text-muted whitespace-nowrap">{relTime(lastMap.get(c.id) ?? c.updatedAt)}</td>
                 </tr>

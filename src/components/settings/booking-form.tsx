@@ -25,7 +25,7 @@ export function BookingForm({ initial, pipelines, bookingUrl, canEdit }: { initi
   return (
     <form onSubmit={submit} className="space-y-4">
       <Section title="Онлайн-запись" description="Клиент выбирает слот на публичной странице, запись попадает в календарь сотрудника, а система подтверждает её сама">
-        <fieldset disabled={!canEdit} className="grid gap-4 sm:grid-cols-2">
+        <fieldset disabled={!canEdit} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Канал подтверждения" hint="Куда уходит подтверждение и напоминание клиенту">
             <Select value={v.confirmByChannel} onChange={(e) => setV({ ...v, confirmByChannel: e.target.value as BookingSettings["confirmByChannel"] })}>
               <option value="telegram">Telegram</option>

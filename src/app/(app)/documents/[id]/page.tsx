@@ -58,7 +58,7 @@ export default async function DocumentPage({ params }: { params: Promise<{ id: s
         title={<span className="flex flex-wrap items-center gap-2">{doc.title}<Badge tone={DOC_STATUS_TONE[doc.status as DocStatus]} dot>{DOC_STATUS_LABEL[doc.status as DocStatus]}</Badge>{(doc.status === "paid" || doc.status === "signed") && <span className="stamp text-accent text-xs">{doc.status === "paid" ? "ОПЛАЧЕНО" : "ПОДПИСАНО"}</span>}</span>}
         description={`${DOC_TYPE_LABEL_FULL[doc.type]} от ${fmtDate(doc.createdAt, { day: "numeric", month: "long", year: "numeric" })}${company ? ` · ${company.name}` : ""}`}
       />
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_380px]">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_380px]">
         <div className="space-y-5">
           <div className="overflow-hidden rounded-[12px] border border-line bg-surface-2">
             <iframe src={`/api/documents/${doc.id}/pdf#toolbar=1&view=FitH`} title={doc.title} className="block w-full bg-white" style={{ height: "80vh" }} />

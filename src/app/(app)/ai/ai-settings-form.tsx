@@ -25,7 +25,7 @@ export function AiSettingsForm({ settings, canEdit }: { settings: AiSettings; ca
   return (
     <div className="space-y-5">
       <Section title="Ассистент" description="Имя и манера общения — одинаковые в чатах и на телефоне">
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Имя ассистента"><Input value={s.assistantName} onChange={(e) => set("assistantName", e.target.value)} disabled={ro} /></Field>
           <Field label="Модель">
             <Select value={MODELS.includes(s.model) ? s.model : "custom"} onChange={(e) => e.target.value !== "custom" && set("model", e.target.value)} disabled={ro}>
@@ -40,7 +40,7 @@ export function AiSettingsForm({ settings, canEdit }: { settings: AiSettings; ca
         </div>
       </Section>
 
-      <Section title={<span className="inline-flex items-center gap-2"><MessageSquareText className="size-4 text-muted" /> Переписки</span>} description="Пункт 23: ИИ отвечает в Telegram, WhatsApp, MAX, Instagram и почте">
+      <Section title={<span className="inline-flex items-center gap-2"><MessageSquareText className="size-4 text-muted" /> Переписки</span>} description="ИИ отвечает в Telegram, WhatsApp, MAX, Instagram и почте">
         <div className="space-y-4">
           <label className="flex items-center justify-between gap-4 rounded-[10px] border border-line px-3.5 py-3">
             <span>
@@ -49,14 +49,14 @@ export function AiSettingsForm({ settings, canEdit }: { settings: AiSettings; ca
             </span>
             <Switch checked={s.chatAutoReply} onCheckedChange={(v) => set("chatAutoReply", v)} disabled={ro} />
           </label>
-          <div className="grid gap-4 sm:grid-cols-[1fr_160px]">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_160px]">
             <Field label="Правило передачи менеджеру"><Textarea value={s.chatHandoffRule} onChange={(e) => set("chatHandoffRule", e.target.value)} className="min-h-[72px]" disabled={ro} /></Field>
             <Field label="Лимит автоответов" hint="на одну переписку, затем — менеджер"><Input type="number" min={1} max={50} value={s.maxAutoReplies} onChange={(e) => set("maxAutoReplies", Number(e.target.value))} disabled={ro} className="tnum" /></Field>
           </div>
         </div>
       </Section>
 
-      <Section title={<span className="inline-flex items-center gap-2"><PhoneIncoming className="size-4 text-muted" /> Входящие звонки</span>} description="Пункт 24: ИИ отвечает на звонок, выясняет потребность и создаёт заявку">
+      <Section title={<span className="inline-flex items-center gap-2"><PhoneIncoming className="size-4 text-muted" /> Входящие звонки</span>} description="ИИ отвечает на звонок, выясняет потребность и создаёт заявку">
         <div className="space-y-4">
           <label className="flex items-center justify-between gap-4 rounded-[10px] border border-line px-3.5 py-3">
             <span>

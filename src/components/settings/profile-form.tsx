@@ -40,13 +40,13 @@ export function ProfileForm({ user }: { user: { name: string; email: string; pho
             <div className="mt-1 flex gap-1.5"><Badge tone="ink">{user.roleName}</Badge><Badge>{user.teamLabel}</Badge>{user.telegramLinked && <Badge tone="good">Telegram привязан</Badge>}</div>
           </div>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Имя и фамилия"><Input value={name} onChange={(e) => setName(e.target.value)} required /></Field>
           <Field label="Телефон"><Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+998 90 123-45-67" /></Field>
         </div>
       </Section>
       <Section title="Смена пароля" description="Оставьте поля пустыми, если пароль менять не нужно">
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Новый пароль"><Input type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} minLength={6} /></Field>
           <Field label="Повторите пароль"><Input type="password" autoComplete="new-password" value={confirm} onChange={(e) => setConfirm(e.target.value)} /></Field>
         </div>

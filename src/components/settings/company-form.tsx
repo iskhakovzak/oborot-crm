@@ -27,7 +27,7 @@ export function CompanyForm({ initial, canEdit }: { initial: CompanyProfile; can
   return (
     <form onSubmit={submit} className="space-y-4">
       <Section title="Реквизиты продавца" description="Подставляются в счета, договоры, ЭСФ, акты и КП">
-        <fieldset disabled={!canEdit} className="grid gap-4 sm:grid-cols-2">
+        <fieldset disabled={!canEdit} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Полное название" className="sm:col-span-2"><Input value={v.name} onChange={set("name")} required /></Field>
           <Field label="Короткое название" hint="Используется в сообщениях клиентам: {{company.name}}"><Input value={v.shortName} onChange={set("shortName")} /></Field>
           <Field label="ИНН"><Input value={v.inn} onChange={set("inn")} inputMode="numeric" /></Field>
@@ -42,7 +42,7 @@ export function CompanyForm({ initial, canEdit }: { initial: CompanyProfile; can
         </fieldset>
       </Section>
       <Section title="Банк и НДС">
-        <fieldset disabled={!canEdit} className="grid gap-4 sm:grid-cols-2">
+        <fieldset disabled={!canEdit} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Банк" className="sm:col-span-2"><Input value={v.bankName} onChange={set("bankName")} /></Field>
           <Field label="МФО" hint="5 цифр"><Input value={v.mfo} onChange={set("mfo")} inputMode="numeric" placeholder="01088" /></Field>
           <Field label="Расчётный счёт" hint="20 цифр"><Input value={v.account} onChange={set("account")} inputMode="numeric" /></Field>

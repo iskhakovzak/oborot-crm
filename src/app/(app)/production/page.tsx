@@ -69,10 +69,10 @@ export default async function ProductionPage({ searchParams }: { searchParams: P
     <>
       <PageHeader
         title="Производство"
-        description="Заказы по этапам, сроки, исполнители и брак — данные для аналитики производства собираются сами."
+        description="Заказы по этапам, сроки, исполнители и брак."
         actions={canCreate ? <NewOrderDialog deals={dealOptions} companies={companyOptions} users={users} /> : undefined}
       />
-      <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <Stat label="В очереди" value={queued} />
         <Stat label="В работе" value={inProgress} tone="info" />
         <Stat label="Готово за 30 дней" value={doneMonth} tone="good" />

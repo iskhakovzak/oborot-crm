@@ -130,7 +130,7 @@ function RoleDialog({ state, onClose, canEdit }: { state: { role: RoleRow | null
     <Dialog open={!!state} onOpenChange={(o) => !o && onClose()}>
       <DialogContent wide className="max-w-6xl" title={role ? `Роль: ${role.name}` : "Новая роль"} description={isAdmin ? "Администратор всегда имеет полный доступ — матрицу урезать нельзя" : "Для каждого раздела: область просмотра, создание, редактирование, удаление, скрытые поля и поля только для чтения"}>
         <form onSubmit={submit} className="space-y-4">
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field label="Название"><Input value={name} onChange={(e) => setName(e.target.value)} required disabled={!canEdit} /></Field>
             <Field label="Описание"><Input value={description} onChange={(e) => setDescription(e.target.value)} disabled={!canEdit} /></Field>
           </div>

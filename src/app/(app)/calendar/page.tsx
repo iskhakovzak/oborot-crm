@@ -75,7 +75,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
 
   return (
     <>
-      <PageHeader title="Календарь" description="Встречи, замеры и консультации сотрудников. Клиенты записываются сами через публичную страницу — слоты считаются с учётом занятости и буфера." />
+      <PageHeader title="Календарь" description="Встречи, замеры и консультации сотрудников; клиенты записываются через публичную страницу." />
       <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Stat label="Событий на неделе" value={weekCount} sub={`${iso(start).slice(8)}.${iso(start).slice(5, 7)} — ${iso(new Date(end.getTime() - 1)).slice(8)}.${iso(new Date(end.getTime() - 1)).slice(5, 7)}`} />
         <Stat label="Через онлайн-запись" value={publicCount} sub="за 30 дней" tone="info" />

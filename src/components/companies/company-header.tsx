@@ -107,7 +107,7 @@ export function CompanyHeader({ company, users, hidden, readonly, canEdit, canRe
           <h2 className="text-[13px] font-semibold">Реквизиты</h2>
           {canEdit && show("inn") && company.inn && <Button size="sm" variant="ghost" onClick={refresh} disabled={pending}><RefreshCw className={cn(pending && "animate-spin")} /> Обновить по ИНН</Button>}
         </div>
-        <dl className="grid gap-x-6 gap-y-2 text-[13px] md:grid-cols-2 xl:grid-cols-3">
+        <dl className="grid grid-cols-1 gap-x-6 gap-y-2 text-[13px] md:grid-cols-2 xl:grid-cols-3">
           {req.map(([k, v]) => (
             <div key={k} className="flex gap-3">
               <dt className="w-28 shrink-0 text-muted">{k}</dt>

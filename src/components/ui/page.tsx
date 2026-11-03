@@ -30,13 +30,13 @@ const toneMap = {
 
 export function Stat({ label, value, sub, tone, icon, className }: { label: string; value: React.ReactNode; sub?: React.ReactNode; tone?: keyof typeof toneMap; icon?: React.ReactNode; className?: string }) {
   return (
-    <div className={cn("card px-4 py-3.5", className)}>
+    <div className={cn("card min-w-0 px-4 py-3.5", className)}>
       <div className="flex items-center justify-between gap-2">
         <div className="text-[12px] font-medium text-muted">{label}</div>
         {icon && <div className="text-muted [&_svg]:size-4">{icon}</div>}
       </div>
-      <div className={cn("mt-1.5 text-[22px] font-semibold leading-7 tnum tracking-[-0.02em]", tone ? toneMap[tone] : "")}>{value}</div>
-      {sub && <div className="mt-0.5 text-[12px] text-muted">{sub}</div>}
+      <div className={cn("mt-1.5 min-w-0 truncate text-[22px] font-semibold leading-7 tnum tracking-[-0.02em]", tone ? toneMap[tone] : "")}>{value}</div>
+      {sub && <div className="mt-0.5 truncate text-[12px] text-muted">{sub}</div>}
     </div>
   );
 }

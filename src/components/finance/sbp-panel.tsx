@@ -40,7 +40,7 @@ export function CreatePaymentLinkDialog({ options }: { options: FinanceOptions }
                 {options.companies.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
               </Select>
             </Field>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Field label="Сделка"><Select value={dealId} onChange={(e) => pickDeal(e.target.value)}><option value="">—</option>{deals.map((d) => <option key={d.id} value={d.id}>№{d.number} · {d.title}</option>)}</Select></Field>
               <Field label="Счёт"><Select value={documentId} onChange={(e) => pickInvoice(e.target.value)}><option value="">—</option>{invoices.map((i) => <option key={i.id} value={i.id}>{i.number} · {fmtMoney(i.amount)}</option>)}</Select></Field>
             </div>

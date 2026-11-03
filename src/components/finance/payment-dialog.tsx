@@ -44,7 +44,7 @@ export function PaymentDialog({ options }: { options: FinanceOptions }) {
                 {options.companies.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
               </Select>
             </Field>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Field label="Сделка (необязательно)">
                 <Select value={dealId} onChange={(e) => { setDealId(e.target.value); setDocumentId(""); }}>
                   <option value="">—</option>
@@ -58,7 +58,7 @@ export function PaymentDialog({ options }: { options: FinanceOptions }) {
                 </Select>
               </Field>
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Field label="Сумма, сум"><Input type="number" min={1} step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="150 000" className="tnum" /></Field>
               <Field label="Способ">
                 <Select value={method} onChange={(e) => setMethod(e.target.value as typeof method)}>

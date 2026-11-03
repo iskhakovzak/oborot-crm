@@ -32,7 +32,7 @@ export function BookingTypes({ types, users, appUrl, canEdit, canCreate, current
         {canCreate && <Button size="sm" onClick={() => setEditing({})}><Plus /> Новый тип записи</Button>}
       </div>
       {types.length ? (
-        <div className="grid gap-3 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
           {types.map((t) => {
             const url = `${appUrl}/book/${t.slug}`;
             return (
@@ -96,7 +96,7 @@ function BookingTypeDialog({ initial, users, currentUserId, lockUser, onClose }:
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent title={f.id ? "Тип записи" : "Новый тип записи"} description="Что клиент увидит на публичной странице и когда можно записаться" wide>
-        <form className="grid gap-4 sm:grid-cols-2" onSubmit={(e) => { e.preventDefault(); submit(); }}>
+        <form className="grid grid-cols-1 gap-4 sm:grid-cols-2" onSubmit={(e) => { e.preventDefault(); submit(); }}>
           <Field label="Название" className="sm:col-span-2"><Input value={f.name} onChange={(e) => { set("name", e.target.value); if (!f.id && !f.slug) set("slug", translit(e.target.value)); }} placeholder="Консультация по подбору оборудования" autoFocus required /></Field>
           <Field label="Ссылка" hint="Латиницей: /book/consult"><Input value={f.slug} onChange={(e) => set("slug", e.target.value)} placeholder="consult" required /></Field>
           <Field label="Сотрудник">

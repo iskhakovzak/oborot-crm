@@ -84,7 +84,7 @@ export function AutomationEditor({ open, onOpenChange, rule, users, stages, labe
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent wide title={rule ? "Редактировать автоматизацию" : "Новая автоматизация"} description="Когда происходит событие и выполняются условия — система делает действия по порядку">
         <form onSubmit={submit} className="space-y-5">
-          <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
             <Field label="Название">
               <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Новая заявка → приветствие и задача менеджеру" required autoFocus />
             </Field>
@@ -124,7 +124,7 @@ export function AutomationEditor({ open, onOpenChange, rule, users, stages, labe
             {conditions.length > 0 && (
               <div className="space-y-2 p-4">
                 {conditions.map((c, i) => (
-                  <div key={i} className="grid grid-cols-[1.4fr_1fr_1.2fr_auto] items-center gap-2">
+                  <div key={i} className="grid grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1.2fr)_auto] items-center gap-2">
                     <input list="automation-fields" className={inputClass} value={c.field} onChange={(e) => setConditions((xs) => xs.map((x, j) => (j === i ? { ...x, field: e.target.value } : x)))} placeholder="deal.amount" />
                     <Select value={c.op} onChange={(e) => setConditions((xs) => xs.map((x, j) => (j === i ? { ...x, op: e.target.value as ConditionDraft["op"] } : x)))}>
                       {(Object.keys(OP_LABELS) as ConditionDraft["op"][]).map((op) => (

@@ -126,7 +126,7 @@ function UserDialog({ open, onOpenChange, user, roles }: { open: boolean; onOpen
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent wide title={user ? "Редактировать сотрудника" : "Новый сотрудник"} description="Роль определяет, что сотрудник видит и может менять; команда — область «Команда» в правах">
-        <form onSubmit={submit} className="grid gap-4 sm:grid-cols-2">
+        <form onSubmit={submit} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Имя и фамилия"><Input value={v.name} onChange={(e) => setV({ ...v, name: e.target.value })} required autoFocus /></Field>
           <Field label="Email (логин)"><Input type="email" value={v.email} onChange={(e) => setV({ ...v, email: e.target.value })} required /></Field>
           <Field label="Телефон"><Input value={v.phone ?? ""} onChange={(e) => setV({ ...v, phone: e.target.value })} placeholder="+998 90 123-45-67" /></Field>

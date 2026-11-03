@@ -16,7 +16,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
     redirect(next.startsWith("/") ? next : "/");
   }
   return (
-    <div className="grid min-h-screen lg:grid-cols-[1.1fr_1fr]">
+    <div className="grid grid-cols-1 min-h-screen lg:grid-cols-[minmax(0,1.1fr)_1fr]">
       <div className="hidden lg:flex flex-col justify-between bg-mesh p-12 text-white">
         <div className="flex items-center gap-2.5">
           <span className="grid size-9 place-items-center rounded-[8px] bg-white text-ink text-sm font-bold">W</span>

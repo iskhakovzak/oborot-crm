@@ -51,7 +51,7 @@ export function DistributionForm({ initial, managers, sources, canEdit }: { init
   return (
     <form onSubmit={submit} className="space-y-4">
       <Section title="Режим распределения" description="Как новая заявка находит менеджера. Применяется при создании сделки и клиента без явного менеджера">
-        <fieldset disabled={!canEdit} className="grid gap-2 sm:grid-cols-2">
+        <fieldset disabled={!canEdit} className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           {MODES.map((m) => (
             <label key={m.value} className={cn("flex cursor-pointer gap-3 rounded-[10px] border px-4 py-3 transition-colors", v.mode === m.value ? "border-ink bg-surface" : "border-line hover:border-line-strong")}>
               <input type="radio" name="mode" className="mt-1 accent-ink" checked={v.mode === m.value} onChange={() => setV({ ...v, mode: m.value })} />
@@ -65,7 +65,7 @@ export function DistributionForm({ initial, managers, sources, canEdit }: { init
       </Section>
 
       <Section title="Участвующие менеджеры" description="Если никто не отмечен — участвуют все, кто принимает заявки (флаг в карточке сотрудника)">
-        <fieldset disabled={!canEdit} className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        <fieldset disabled={!canEdit} className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {managers.map((m) => (
             <label key={m.id} className={cn("flex cursor-pointer items-center gap-3 rounded-[10px] border px-3 py-2.5", v.managerIds.includes(m.id) ? "border-ink" : "border-line")}>
               <input type="checkbox" className="accent-ink" checked={v.managerIds.includes(m.id)} onChange={() => toggleManager(m.id)} />
@@ -80,11 +80,11 @@ export function DistributionForm({ initial, managers, sources, canEdit }: { init
         </fieldset>
       </Section>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Section title="Правила по источнику" description="Работают в режиме «По источнику»" action={canEdit && <Button type="button" variant="ghost" size="sm" onClick={() => setV({ ...v, sourceRules: [...v.sourceRules, { source: sources[0] ?? "", managerId: managers[0]?.id ?? "" }] })}><Plus /> Правило</Button>}>
           <div className="space-y-2">
             {v.sourceRules.map((r, i) => (
-              <div key={i} className="grid grid-cols-[1fr_1fr_auto] items-center gap-2">
+              <div key={i} className="grid grid-cols-[minmax(0,1fr)_1fr_auto] items-center gap-2">
                 <input list="lead-sources" className="flex h-9 w-full rounded-[8px] border border-line-strong bg-surface px-3 text-sm focus:border-info focus:outline-none focus:ring-2 focus:ring-info/20" value={r.source} disabled={!canEdit} onChange={(e) => setV({ ...v, sourceRules: v.sourceRules.map((x, j) => (j === i ? { ...x, source: e.target.value } : x)) })} placeholder="Источник" />
                 <Select value={r.managerId} disabled={!canEdit} onChange={(e) => setV({ ...v, sourceRules: v.sourceRules.map((x, j) => (j === i ? { ...x, managerId: e.target.value } : x)) })}>
                   {managers.map((m) => (

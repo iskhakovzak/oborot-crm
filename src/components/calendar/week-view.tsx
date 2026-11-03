@@ -61,7 +61,7 @@ export function WeekView({ weekStart, bookings, users, companies, filterUser, ca
 
       <div className="overflow-x-auto rounded-[12px] border border-line bg-surface">
         <div className="min-w-[860px]">
-          <div className="grid grid-cols-[56px_repeat(7,1fr)] border-b border-line">
+          <div className="grid grid-cols-[56px_repeat(7,minmax(0,1fr))] border-b border-line">
             <div />
             {days.map((d, i) => {
               const key = iso(d), isToday = key === todayKey;
@@ -75,7 +75,7 @@ export function WeekView({ weekStart, bookings, users, companies, filterUser, ca
               );
             })}
           </div>
-          <div className="grid grid-cols-[56px_repeat(7,1fr)]" style={{ height: hours.length * HOUR_H }}>
+          <div className="grid grid-cols-[56px_repeat(7,minmax(0,1fr))]" style={{ height: hours.length * HOUR_H }}>
             <div className="relative">
               {hours.map((h) => (
                 <div key={h} className="absolute right-2 -translate-y-1/2 text-[11px] tnum text-muted" style={{ top: (h - HOUR_START) * HOUR_H }}>{h === HOUR_START ? "" : `${String(h).padStart(2, "0")}:00`}</div>

@@ -53,9 +53,9 @@ export function TelegramView({ live, hasToken, webhookUrl, settings, linked, log
   const copy = (t: string) => navigator.clipboard?.writeText(t).then(() => toast.success("Скопировано"));
 
   return (
-    <div className="grid gap-5 xl:grid-cols-[1fr_1.1fr]">
+    <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
       <div className="space-y-5">
-        <Section title="Подключение" description={live ? "Бот подключён, команды из Telegram выполняются в CRM" : "Без токена бот работает в демо-режиме: команды можно проверять в консоли справа"}>
+        <Section title="Подключение" description={live ? "Бот подключён, команды из Telegram выполняются в CRM" : "Без токена бот работает в демо-режиме — команды проверяются в консоли справа"}>
           <ol className="space-y-3 text-[13.5px]">
             {[
               <>Откройте в Telegram <b>@BotFather</b>, отправьте <code className="rounded bg-black/5 px-1">/newbot</code> и получите токен вида <span className="tnum">123456:ABC…</span></>,
