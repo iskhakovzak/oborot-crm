@@ -1,9 +1,9 @@
-import { sqliteTable, text, integer, real, index } from "drizzle-orm/sqlite-core";
+import { pgTable, text, integer, doublePrecision, boolean, jsonb, index } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
-const now = () => sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))`;
+const now = () => sql`to_char(now() at time zone 'utc', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`;
 const id = () => text("id").primaryKey();
-const json = <T>(name: string) => text(name, { mode: "json" }).$type<T>();
+const json = <T>(name: string) => jsonb(name).$type<T>();
 
 // ───────────────────────────── Пользователи и права ─────────────────────────────
 
@@ -18,17 +18,17 @@ export type EntityPermission = {
 };
 export type PermissionMap = Record<string, EntityPermission>;
 
-export const roles = sqliteTable("roles", {
+export const roles = pgTable("roles", {
   id: id(),
   name: text("name").notNull(),
   slug: text("slug").notNull().unique(),
   description: text("description"),
   permissions: json<PermissionMap>("permissions").notNull(),
-  isSystem: integer("is_system", { mode: "boolean" }).notNull().default(false),
+  isSystem: boolean("is_system").notNull().default(false),
   createdAt: text("created_at").notNull().default(now()),
 });
 
-export const users = sqliteTable("users", {
+export const users = pgTable("users", {
   id: id(),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
@@ -37,8 +37,8 @@ export const users = sqliteTable("users", {
   roleId: text("role_id").notNull().references(() => roles.id),
   teamId: text("team_id"),
   color: text("color").notNull().default("#2456D6"),
-  isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
-  acceptsLeads: integer("accepts_leads", { mode: "boolean" }).notNull().default(true),
+  isActive: boolean("is_active").notNull().default(true),
+  acceptsLeads: boolean("accepts_leads").notNull().default(true),
   leadWeight: integer("lead_weight").notNull().default(1),
   skills: json<string[]>("skills").default([]),
   telegramChatId: text("telegram_chat_id"),
@@ -48,7 +48,7 @@ export const users = sqliteTable("users", {
   createdAt: text("created_at").notNull().default(now()),
 });
 
-export const sessions = sqliteTable("sessions", {
+export const sessions = pgTable("sessions", {
   id: id(),
   userId: text("user_id").notNull().references(() => users.id),
   expiresAt: text("expires_at").notNull(),
@@ -59,7 +59,7 @@ export const sessions = sqliteTable("sessions", {
 
 export type Utm = { source?: string; medium?: string; campaign?: string; content?: string; term?: string };
 
-export const companies = sqliteTable(
+export const companies = pgTable(
   "companies",
   {
     id: id(),
@@ -85,7 +85,7 @@ export const companies = sqliteTable(
     source: text("source"),
     utm: json<Utm>("utm"),
     managerId: text("manager_id").references(() => users.id),
-    balance: real("balance").notNull().default(0),
+    balance: doublePrecision("balance").notNull().default(0),
     tags: json<string[]>("tags").default([]),
     notes: text("notes"),
     createdAt: text("created_at").notNull().default(now()),
@@ -94,7 +94,7 @@ export const companies = sqliteTable(
   (t) => [index("companies_inn").on(t.inn), index("companies_manager").on(t.managerId)],
 );
 
-export const contacts = sqliteTable("contacts", {
+export const contacts = pgTable("contacts", {
   id: id(),
   companyId: text("company_id").references(() => companies.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
@@ -105,14 +105,14 @@ export const contacts = sqliteTable("contacts", {
   whatsapp: text("whatsapp"),
   vk: text("vk"),
   max: text("max"),
-  isPrimary: integer("is_primary", { mode: "boolean" }).notNull().default(false),
+  isPrimary: boolean("is_primary").notNull().default(false),
   birthday: text("birthday"),
   createdAt: text("created_at").notNull().default(now()),
 });
 
 // ───────────────────────────── Воронки и сделки ─────────────────────────────
 
-export const pipelines = sqliteTable("pipelines", {
+export const pipelines = pgTable("pipelines", {
   id: id(),
   name: text("name").notNull(),
   kind: text("kind").$type<"sales" | "shipping" | "service" | "production">().notNull(),
@@ -120,7 +120,7 @@ export const pipelines = sqliteTable("pipelines", {
   handoffPipelineId: text("handoff_pipeline_id"),
 });
 
-export const stages = sqliteTable("stages", {
+export const stages = pgTable("stages", {
   id: id(),
   pipelineId: text("pipeline_id").notNull().references(() => pipelines.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
@@ -130,7 +130,7 @@ export const stages = sqliteTable("stages", {
   kind: text("kind").$type<"open" | "won" | "lost">().notNull().default("open"),
 });
 
-export const deals = sqliteTable(
+export const deals = pgTable(
   "deals",
   {
     id: id(),
@@ -140,7 +140,7 @@ export const deals = sqliteTable(
     contactId: text("contact_id").references(() => contacts.id),
     pipelineId: text("pipeline_id").notNull().references(() => pipelines.id),
     stageId: text("stage_id").notNull().references(() => stages.id),
-    amount: real("amount").notNull().default(0),
+    amount: doublePrecision("amount").notNull().default(0),
     managerId: text("manager_id").references(() => users.id),
     status: text("status").$type<"open" | "won" | "lost">().notNull().default("open"),
     lostReason: text("lost_reason"),
@@ -158,7 +158,7 @@ export const deals = sqliteTable(
   (t) => [index("deals_stage").on(t.stageId), index("deals_company").on(t.companyId), index("deals_manager").on(t.managerId)],
 );
 
-export const products = sqliteTable("products", {
+export const products = pgTable("products", {
   id: id(),
   sku: text("sku"),
   barcode: text("barcode"),
@@ -167,26 +167,26 @@ export const products = sqliteTable("products", {
   category: text("category"),
   brand: text("brand"),
   unit: text("unit").notNull().default("шт"),
-  price: real("price").notNull().default(0),
-  cost: real("cost").notNull().default(0),
+  price: doublePrecision("price").notNull().default(0),
+  cost: doublePrecision("cost").notNull().default(0),
   vatRate: integer("vat_rate").notNull().default(20),
-  stock: real("stock").notNull().default(0),
-  weightKg: real("weight_kg"),
+  stock: doublePrecision("stock").notNull().default(0),
+  weightKg: doublePrecision("weight_kg"),
   imageUrl: text("image_url"),
   attributes: json<Record<string, string>>("attributes").default({}),
-  isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
+  isActive: boolean("is_active").notNull().default(true),
   createdAt: text("created_at").notNull().default(now()),
 });
 
-export const dealItems = sqliteTable("deal_items", {
+export const dealItems = pgTable("deal_items", {
   id: id(),
   dealId: text("deal_id").notNull().references(() => deals.id, { onDelete: "cascade" }),
   productId: text("product_id").references(() => products.id),
   name: text("name").notNull(),
   unit: text("unit").notNull().default("шт"),
-  qty: real("qty").notNull().default(1),
-  price: real("price").notNull().default(0),
-  discount: real("discount").notNull().default(0),
+  qty: doublePrecision("qty").notNull().default(1),
+  price: doublePrecision("price").notNull().default(0),
+  discount: doublePrecision("discount").notNull().default(0),
   vatRate: integer("vat_rate").notNull().default(20),
 });
 
@@ -194,7 +194,7 @@ export const dealItems = sqliteTable("deal_items", {
 
 export type DocumentType = "invoice" | "contract" | "upd" | "act" | "kp" | "report";
 
-export const documents = sqliteTable(
+export const documents = pgTable(
   "documents",
   {
     id: id(),
@@ -203,7 +203,7 @@ export const documents = sqliteTable(
     title: text("title").notNull(),
     dealId: text("deal_id").references(() => deals.id),
     companyId: text("company_id").references(() => companies.id),
-    amount: real("amount").notNull().default(0),
+    amount: doublePrecision("amount").notNull().default(0),
     status: text("status").$type<"draft" | "sent" | "signed" | "paid" | "cancelled">().notNull().default("draft"),
     filePath: text("file_path"),
     payload: json<Record<string, unknown>>("payload"),
@@ -217,12 +217,12 @@ export const documents = sqliteTable(
   (t) => [index("documents_deal").on(t.dealId), index("documents_company").on(t.companyId)],
 );
 
-export const paymentLinks = sqliteTable("payment_links", {
+export const paymentLinks = pgTable("payment_links", {
   id: id(),
   dealId: text("deal_id").references(() => deals.id),
   documentId: text("document_id").references(() => documents.id),
   companyId: text("company_id").references(() => companies.id),
-  amount: real("amount").notNull(),
+  amount: doublePrecision("amount").notNull(),
   purpose: text("purpose").notNull(),
   provider: text("provider").notNull().default("sbp"),
   url: text("url").notNull(),
@@ -234,7 +234,7 @@ export const paymentLinks = sqliteTable("payment_links", {
   createdAt: text("created_at").notNull().default(now()),
 });
 
-export const payments = sqliteTable(
+export const payments = pgTable(
   "payments",
   {
     id: id(),
@@ -242,24 +242,24 @@ export const payments = sqliteTable(
     dealId: text("deal_id").references(() => deals.id),
     documentId: text("document_id").references(() => documents.id),
     paymentLinkId: text("payment_link_id").references(() => paymentLinks.id),
-    amount: real("amount").notNull(),
+    amount: doublePrecision("amount").notNull(),
     direction: text("direction").$type<"in" | "out">().notNull().default("in"),
     method: text("method").$type<"sbp" | "bank" | "cash" | "card">().notNull().default("bank"),
     purpose: text("purpose"),
     externalId: text("external_id"),
-    syncedToFinance: integer("synced_to_finance", { mode: "boolean" }).notNull().default(false),
+    syncedToFinance: boolean("synced_to_finance").notNull().default(false),
     paidAt: text("paid_at").notNull().default(now()),
     createdAt: text("created_at").notNull().default(now()),
   },
   (t) => [index("payments_company").on(t.companyId), index("payments_deal").on(t.dealId)],
 );
 
-export const bankTransactions = sqliteTable("bank_transactions", {
+export const bankTransactions = pgTable("bank_transactions", {
   id: id(),
   provider: text("provider").notNull(),
   externalId: text("external_id").notNull(),
   date: text("date").notNull(),
-  amount: real("amount").notNull(),
+  amount: doublePrecision("amount").notNull(),
   direction: text("direction").$type<"in" | "out">().notNull(),
   counterpartyName: text("counterparty_name"),
   counterpartyInn: text("counterparty_inn"),
@@ -270,7 +270,7 @@ export const bankTransactions = sqliteTable("bank_transactions", {
   createdAt: text("created_at").notNull().default(now()),
 });
 
-export const financeSyncLog = sqliteTable("finance_sync_log", {
+export const financeSyncLog = pgTable("finance_sync_log", {
   id: id(),
   provider: text("provider").notNull(),
   entity: text("entity").notNull(),
@@ -283,7 +283,7 @@ export const financeSyncLog = sqliteTable("finance_sync_log", {
 
 // ───────────────────────────── Задачи и активности ─────────────────────────────
 
-export const tasks = sqliteTable(
+export const tasks = pgTable(
   "tasks",
   {
     id: id(),
@@ -305,7 +305,7 @@ export const tasks = sqliteTable(
 
 export type ActivityType = "note" | "call" | "email" | "message" | "stage" | "document" | "payment" | "system" | "task" | "ai";
 
-export const activities = sqliteTable(
+export const activities = pgTable(
   "activities",
   {
     id: id(),
@@ -326,7 +326,7 @@ export const activities = sqliteTable(
 
 export type Channel = "telegram" | "whatsapp" | "vk" | "max" | "email" | "sms" | "web";
 
-export const conversations = sqliteTable(
+export const conversations = pgTable(
   "conversations",
   {
     id: id(),
@@ -339,7 +339,7 @@ export const conversations = sqliteTable(
     peerName: text("peer_name").notNull(),
     peerAddress: text("peer_address").notNull(),
     status: text("status").$type<"open" | "closed">().notNull().default("open"),
-    aiEnabled: integer("ai_enabled", { mode: "boolean" }).notNull().default(false),
+    aiEnabled: boolean("ai_enabled").notNull().default(false),
     unread: integer("unread").notNull().default(0),
     lastMessageAt: text("last_message_at").notNull().default(now()),
     createdAt: text("created_at").notNull().default(now()),
@@ -347,7 +347,7 @@ export const conversations = sqliteTable(
   (t) => [index("conversations_last").on(t.lastMessageAt)],
 );
 
-export const messages = sqliteTable(
+export const messages = pgTable(
   "messages",
   {
     id: id(),
@@ -356,8 +356,8 @@ export const messages = sqliteTable(
     text: text("text").notNull(),
     attachments: json<{ name: string; url: string }[]>("attachments").default([]),
     authorUserId: text("author_user_id").references(() => users.id),
-    isAi: integer("is_ai", { mode: "boolean" }).notNull().default(false),
-    isAutomation: integer("is_automation", { mode: "boolean" }).notNull().default(false),
+    isAi: boolean("is_ai").notNull().default(false),
+    isAutomation: boolean("is_automation").notNull().default(false),
     externalId: text("external_id"),
     status: text("status").$type<"queued" | "sent" | "delivered" | "read" | "failed">().notNull().default("sent"),
     createdAt: text("created_at").notNull().default(now()),
@@ -365,7 +365,7 @@ export const messages = sqliteTable(
   (t) => [index("messages_conversation").on(t.conversationId)],
 );
 
-export const calls = sqliteTable(
+export const calls = pgTable(
   "calls",
   {
     id: id(),
@@ -382,7 +382,7 @@ export const calls = sqliteTable(
     recordingUrl: text("recording_url"),
     transcript: text("transcript"),
     aiSummary: text("ai_summary"),
-    aiHandled: integer("ai_handled", { mode: "boolean" }).notNull().default(false),
+    aiHandled: boolean("ai_handled").notNull().default(false),
     startedAt: text("started_at").notNull().default(now()),
     createdAt: text("created_at").notNull().default(now()),
   },
@@ -391,7 +391,7 @@ export const calls = sqliteTable(
 
 // ───────────────────────────── Календарь и онлайн-запись ─────────────────────────────
 
-export const bookingTypes = sqliteTable("booking_types", {
+export const bookingTypes = pgTable("booking_types", {
   id: id(),
   slug: text("slug").notNull().unique(),
   name: text("name").notNull(),
@@ -404,11 +404,11 @@ export const bookingTypes = sqliteTable("booking_types", {
   workEnd: text("work_end").notNull().default("18:00"),
   horizonDays: integer("horizon_days").notNull().default(14),
   location: text("location").notNull().default("Онлайн, ссылка придёт в подтверждении"),
-  isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
+  isActive: boolean("is_active").notNull().default(true),
   createdAt: text("created_at").notNull().default(now()),
 });
 
-export const bookings = sqliteTable(
+export const bookings = pgTable(
   "bookings",
   {
     id: id(),
@@ -464,20 +464,20 @@ export type AutomationAction =
 
 export type AutomationCondition = { field: string; op: "eq" | "neq" | "gt" | "lt" | "contains" | "in"; value: string | number | string[] };
 
-export const automations = sqliteTable("automations", {
+export const automations = pgTable("automations", {
   id: id(),
   name: text("name").notNull(),
   description: text("description"),
   event: text("event").$type<AutomationEvent>().notNull(),
   conditions: json<AutomationCondition[]>("conditions").notNull().default([]),
   actions: json<AutomationAction[]>("actions").notNull().default([]),
-  isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
+  isActive: boolean("is_active").notNull().default(true),
   runsCount: integer("runs_count").notNull().default(0),
   lastRunAt: text("last_run_at"),
   createdAt: text("created_at").notNull().default(now()),
 });
 
-export const automationRuns = sqliteTable("automation_runs", {
+export const automationRuns = pgTable("automation_runs", {
   id: id(),
   automationId: text("automation_id").notNull().references(() => automations.id, { onDelete: "cascade" }),
   event: text("event").notNull(),
@@ -504,20 +504,20 @@ export type IntegrationKind =
   | "product_data"
   | "telegram_bot";
 
-export const integrations = sqliteTable("integrations", {
+export const integrations = pgTable("integrations", {
   id: id(),
   kind: text("kind").$type<IntegrationKind>().notNull(),
   provider: text("provider").notNull(),
   name: text("name").notNull(),
   config: json<Record<string, string>>("config").notNull().default({}),
-  isEnabled: integer("is_enabled", { mode: "boolean" }).notNull().default(false),
+  isEnabled: boolean("is_enabled").notNull().default(false),
   status: text("status").$type<"sandbox" | "connected" | "error">().notNull().default("sandbox"),
   lastSyncAt: text("last_sync_at"),
   lastError: text("last_error"),
   createdAt: text("created_at").notNull().default(now()),
 });
 
-export const integrationEvents = sqliteTable("integration_events", {
+export const integrationEvents = pgTable("integration_events", {
   id: id(),
   integrationId: text("integration_id").references(() => integrations.id, { onDelete: "cascade" }),
   provider: text("provider").notNull(),
@@ -530,7 +530,7 @@ export const integrationEvents = sqliteTable("integration_events", {
 
 // ───────────────────────────── Рассылки и маркетинг ─────────────────────────────
 
-export const campaigns = sqliteTable("campaigns", {
+export const campaigns = pgTable("campaigns", {
   id: id(),
   name: text("name").notNull(),
   channel: text("channel").$type<"email" | "telegram" | "whatsapp" | "max" | "vk" | "sms">().notNull(),
@@ -545,7 +545,7 @@ export const campaigns = sqliteTable("campaigns", {
   createdAt: text("created_at").notNull().default(now()),
 });
 
-export const campaignDeliveries = sqliteTable("campaign_deliveries", {
+export const campaignDeliveries = pgTable("campaign_deliveries", {
   id: id(),
   campaignId: text("campaign_id").notNull().references(() => campaigns.id, { onDelete: "cascade" }),
   contactId: text("contact_id").references(() => contacts.id, { onDelete: "set null" }),
@@ -558,23 +558,23 @@ export const campaignDeliveries = sqliteTable("campaign_deliveries", {
   clickedAt: text("clicked_at"),
 });
 
-export const marketingCosts = sqliteTable("marketing_costs", {
+export const marketingCosts = pgTable("marketing_costs", {
   id: id(),
   source: text("source").notNull(),
   month: text("month").notNull(),
-  amount: real("amount").notNull(),
+  amount: doublePrecision("amount").notNull(),
   leads: integer("leads"),
   clicks: integer("clicks"),
   impressions: integer("impressions"),
 });
 
-export const analyticsExports = sqliteTable("analytics_exports", {
+export const analyticsExports = pgTable("analytics_exports", {
   id: id(),
   provider: text("provider").notNull().default("yandex_metrika"),
   dealId: text("deal_id").references(() => deals.id, { onDelete: "cascade" }),
   goal: text("goal").notNull(),
   clientId: text("client_id"),
-  revenue: real("revenue"),
+  revenue: doublePrecision("revenue"),
   status: text("status").$type<"queued" | "sent" | "sandbox" | "error">().notNull().default("queued"),
   response: text("response"),
   createdAt: text("created_at").notNull().default(now()),
@@ -582,7 +582,7 @@ export const analyticsExports = sqliteTable("analytics_exports", {
 
 // ───────────────────────────── Производство ─────────────────────────────
 
-export const productionOrders = sqliteTable("production_orders", {
+export const productionOrders = pgTable("production_orders", {
   id: id(),
   number: integer("number").notNull(),
   dealId: text("deal_id").references(() => deals.id, { onDelete: "set null" }),
@@ -590,7 +590,7 @@ export const productionOrders = sqliteTable("production_orders", {
   title: text("title").notNull(),
   stageId: text("stage_id").references(() => stages.id),
   assigneeId: text("assignee_id").references(() => users.id),
-  qty: real("qty").notNull().default(1),
+  qty: doublePrecision("qty").notNull().default(1),
   plannedAt: text("planned_at"),
   startedAt: text("started_at"),
   finishedAt: text("finished_at"),
@@ -602,13 +602,13 @@ export const productionOrders = sqliteTable("production_orders", {
 
 // ───────────────────────────── Настройки, бот, аудит ─────────────────────────────
 
-export const settings = sqliteTable("settings", {
+export const settings = pgTable("settings", {
   key: text("key").primaryKey(),
   value: json<unknown>("value").notNull(),
   updatedAt: text("updated_at").notNull().default(now()),
 });
 
-export const telegramCommands = sqliteTable("telegram_commands", {
+export const telegramCommands = pgTable("telegram_commands", {
   id: id(),
   chatId: text("chat_id").notNull(),
   userId: text("user_id").references(() => users.id),
@@ -619,7 +619,7 @@ export const telegramCommands = sqliteTable("telegram_commands", {
   createdAt: text("created_at").notNull().default(now()),
 });
 
-export const auditLog = sqliteTable(
+export const auditLog = pgTable(
   "audit_log",
   {
     id: id(),
@@ -633,7 +633,7 @@ export const auditLog = sqliteTable(
   (t) => [index("audit_entity").on(t.entity, t.entityId)],
 );
 
-export const counters = sqliteTable("counters", {
+export const counters = pgTable("counters", {
   key: text("key").primaryKey(),
   value: integer("value").notNull().default(0),
 });

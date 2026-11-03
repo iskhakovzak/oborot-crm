@@ -11,7 +11,11 @@ import { emit } from "@/lib/events";
 import { renderInvoice, renderContract, renderUpd, renderAct, renderKp, renderClientReport, type Party, type Line, totals, money, dateRu } from "./pdf";
 import { fmtMoney, fmtDate } from "@/lib/format";
 
-const STORAGE = path.join(process.cwd(), "storage", "documents");
+function storageDir() {
+  const local = path.join(process.cwd(), "storage", "documents");
+  try { fs.mkdirSync(local, { recursive: true }); fs.accessSync(local, fs.constants.W_OK); return local; } catch { const tmp = path.join(process.env.TMPDIR ?? "/tmp", "oborot-documents"); fs.mkdirSync(tmp, { recursive: true }); return tmp; }
+}
+const STORAGE = storageDir();
 
 const TITLES: Record<DocumentType, string> = { invoice: "Счёт", contract: "Договор", upd: "УПД", act: "Акт", kp: "Коммерческое предложение", report: "Отчёт для клиента" };
 const PREFIX: Record<DocumentType, string> = { invoice: "СЧ", contract: "Д", upd: "УПД", act: "АКТ", kp: "КП", report: "ОТЧ" };
@@ -55,9 +59,8 @@ export async function createDocument(p: { type: DocumentType; dealId?: string | 
     default: throw new Error("Для отчёта используйте createClientReport");
   }
   const id = newId("doc");
-  fs.mkdirSync(STORAGE, { recursive: true });
-  const filePath = path.join("storage", "documents", `${id}.pdf`);
-  fs.writeFileSync(path.join(process.cwd(), filePath), bytes);
+  const filePath = path.join(STORAGE, `${id}.pdf`);
+  try { fs.writeFileSync(filePath, bytes); } catch { /* файл не критичен: PDF перерисуется из payload */ }
   const title = p.title ?? `${TITLES[p.type]} ${number}`;
   await db.insert(schema.documents).values({ id, type: p.type, number, title, dealId: p.dealId ?? null, companyId, amount: t.sum, status: "draft", filePath, payload: { seller, buyer, lines, totals: t, date }, createdBy: p.userId ?? null });
   await logActivity({ type: "document", title: `${TITLES[p.type]} ${number} сформирован`, body: `${lines.length} поз., ${fmtMoney(t.sum)}`, dealId: p.dealId, companyId, userId: p.userId, meta: { documentId: id } });
@@ -80,7 +83,7 @@ export async function sendDocument(documentId: string, channel: Channel | "prefe
     const company = doc.companyId ? await db.query.companies.findFirst({ where: eq(schema.companies.id, doc.companyId) }) : null;
     const to = pref?.address ?? company?.email;
     if (!to) return { ok: false, sandbox: true, channel: ch, error: "Нет email клиента" };
-    const r = await sendEmail({ to, subject: `${doc.title} от ${(await getSetting("company")).shortName}`, text: `Здравствуйте!\n\nНаправляем ${doc.title.toLowerCase()} на сумму ${fmtMoney(doc.amount)}.\nДокумент во вложении и по ссылке: ${link}\n\nС уважением, ${(await getSetting("company")).shortName}`, attachments: doc.filePath ? [{ filename: `${doc.number}.pdf`, path: path.join(process.cwd(), doc.filePath) }] : [] });
+    const r = await sendEmail({ to, subject: `${doc.title} от ${(await getSetting("company")).shortName}`, text: `Здравствуйте!\n\nНаправляем ${doc.title.toLowerCase()} на сумму ${fmtMoney(doc.amount)}.\nДокумент во вложении и по ссылке: ${link}\n\nС уважением, ${(await getSetting("company")).shortName}`, attachments: doc.filePath && fs.existsSync(path.isAbsolute(doc.filePath) ? doc.filePath : path.join(process.cwd(), doc.filePath)) ? [{ filename: `${doc.number}.pdf`, path: path.isAbsolute(doc.filePath) ? doc.filePath : path.join(process.cwd(), doc.filePath) }] : [] });
     await db.update(schema.documents).set({ status: doc.status === "draft" ? "sent" : doc.status, sentAt: new Date().toISOString() }).where(eq(schema.documents.id, doc.id));
     await logActivity({ type: "document", title: `${doc.title} отправлен на ${to}`, dealId: doc.dealId, companyId: doc.companyId, userId, meta: { documentId: doc.id } });
     return { ok: r.ok, sandbox: r.sandbox, channel: ch, error: r.error };
@@ -120,9 +123,8 @@ export async function createClientReport(companyId: string, p: { months?: number
     documents: docs.filter((d) => d.type !== "report").map((d) => [d.title, dateRu(d.createdAt), d.edoStatus === "signed" ? "подписан" : d.status === "paid" ? "оплачен" : d.status === "sent" ? "отправлен" : "черновик", money(d.amount)]),
   });
   const id = newId("doc");
-  fs.mkdirSync(STORAGE, { recursive: true });
-  const filePath = path.join("storage", "documents", `${id}.pdf`);
-  fs.writeFileSync(path.join(process.cwd(), filePath), bytes);
+  const filePath = path.join(STORAGE, `${id}.pdf`);
+  try { fs.writeFileSync(filePath, bytes); } catch { /* файл не критичен: PDF перерисуется из payload */ }
   await db.insert(schema.documents).values({ id, type: "report", number, title: `Отчёт для клиента ${number}`, companyId, amount: paid, status: "draft", filePath, payload: { summary, period, aiSandbox: ai.sandbox }, createdBy: p.userId ?? null });
   await logActivity({ type: "document", title: `Сформирован отчёт для клиента ${number}`, body: summary, companyId, userId: p.userId, meta: { documentId: id } });
   return { id, number, filePath, summary, aiSandbox: ai.sandbox };
@@ -131,7 +133,7 @@ export async function createClientReport(companyId: string, p: { months?: number
 export async function documentBytes(documentId: string): Promise<{ bytes: Buffer; filename: string } | null> {
   const doc = await db.query.documents.findFirst({ where: eq(schema.documents.id, documentId) });
   if (!doc) return null;
-  const abs = doc.filePath ? path.join(process.cwd(), doc.filePath) : null;
+  const abs = doc.filePath ? (path.isAbsolute(doc.filePath) ? doc.filePath : path.join(process.cwd(), doc.filePath)) : null;
   if (abs && fs.existsSync(abs)) return { bytes: fs.readFileSync(abs), filename: `${doc.number}.pdf` };
   // файла нет (например, после переустановки) — перерисуем из payload
   const pl = (doc.payload ?? {}) as { seller?: Party; buyer?: Party; lines?: Line[]; date?: string };

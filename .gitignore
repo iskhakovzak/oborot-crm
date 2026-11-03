@@ -39,7 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-data/*.db
-data/*.db-journal
 .env.local
 storage/
+data/pg/

@@ -1,16 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Search, Plus, LogOut, Bell, Menu } from "lucide-react";
+import { Search, Plus, LogOut, Bell } from "lucide-react";
+import { MobileNav } from "./mobile-nav";
 import { Avatar } from "@/components/ui/avatar";
 import { Dropdown, DropdownContent, DropdownItem, DropdownLabel, DropdownSeparator, DropdownTrigger } from "@/components/ui/dropdown";
 import { Button } from "@/components/ui/button";
 import { CommandPalette } from "./command-palette";
 import Link from "next/link";
 
-export function Topbar({ user, onLogout, openTasks }: { user: { name: string; color: string; roleName: string; email: string }; onLogout: () => Promise<void>; openTasks: number }) {
+export function Topbar({ user, onLogout, openTasks, allowed }: { user: { name: string; color: string; roleName: string; email: string }; onLogout: () => Promise<void>; openTasks: number; allowed: Record<string, boolean> }) {
   const [open, setOpen] = useState(false);
-  const router = useRouter();
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
@@ -23,9 +22,7 @@ export function Topbar({ user, onLogout, openTasks }: { user: { name: string; co
   }, []);
   return (
     <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-line bg-surface/90 backdrop-blur px-4 lg:px-6">
-      <button className="lg:hidden rounded-md p-1.5 text-ink-2 hover:bg-black/5" aria-label="Меню" onClick={() => router.push("/")}>
-        <Menu className="size-5" />
-      </button>
+      <MobileNav allowed={allowed} />
       <button
         onClick={() => setOpen(true)}
         className="flex h-9 w-full max-w-md items-center gap-2 rounded-[9px] border border-line bg-surface-2 px-3 text-[13px] text-muted hover:border-line-strong"

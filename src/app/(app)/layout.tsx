@@ -21,7 +21,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <div className="min-h-screen">
       <Sidebar allowed={allowed} />
       <div className="lg:pl-[232px]">
-        <Topbar user={{ name: user.name, color: user.color, roleName: user.roleName, email: user.email }} onLogout={doLogout} openTasks={n} />
+        <Topbar user={{ name: user.name, color: user.color, roleName: user.roleName, email: user.email }} onLogout={doLogout} openTasks={n} allowed={allowed} />
         <main className="mx-auto w-full max-w-[1440px] px-4 py-5 lg:px-6">{children}</main>
       </div>
     </div>

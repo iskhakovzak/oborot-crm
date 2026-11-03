@@ -53,7 +53,7 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
     .innerJoin(schema.users, eq(schema.sessions.userId, schema.users.id))
     .innerJoin(schema.roles, eq(schema.users.roleId, schema.roles.id))
     .where(and(eq(schema.sessions.id, sid), gt(schema.sessions.expiresAt, new Date().toISOString())))
-    .get();
+    .then((r) => r[0]);
   if (!row || !row.user.isActive) return null;
   const { user, role } = row;
   return {

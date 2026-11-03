@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC = [/^\/login/, /^\/book\//, /^\/api\/webhooks\//, /^\/api\/telegram\//, /^\/api\/public\//, /^\/pay\//, /^\/_next\//, /^\/favicon/];
+const PUBLIC = [/^\/login/, /^\/book(\/|$)/, /^\/api\/documents\/[^/]+\/pdf/, /^\/api\/webhooks\//, /^\/api\/telegram\//, /^\/api\/public\//, /^\/pay\//, /^\/_next\//, /^\/favicon/];
 
 export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
