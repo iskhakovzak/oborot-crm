@@ -10,7 +10,7 @@ let seedState = 42;
 const rnd = () => { seedState = (seedState * 1664525 + 1013904223) >>> 0; return seedState / 4294967296; };
 const pick = <T,>(a: T[]) => a[Math.floor(rnd() * a.length)];
 const id = (p: string) => `${p}_${Math.floor(rnd() * 1e12).toString(36)}${Math.floor(rnd() * 1e6).toString(36)}`;
-const daysAgo = (d: number, h = 10) => { const t = new Date(); t.setDate(t.getDate() - d); t.setHours(h, Math.floor(rnd() * 50), 0, 0); return t.toISOString(); };
+const daysAgo = (d: number, h = 10) => { const t = new Date(); t.setDate(t.getDate() - d); t.setHours(Math.floor(h), Math.floor((h % 1) * 60) + Math.floor(rnd() * 20), 0, 0); if (t.getTime() > Date.now()) t.setDate(t.getDate() - 1); return t.toISOString(); };
 const inFuture = (d: number, h = 11) => { const t = new Date(); t.setDate(t.getDate() + d); t.setHours(h, 0, 0, 0); return t.toISOString(); };
 
 /** валидный ИНН юрлица с контрольной суммой */

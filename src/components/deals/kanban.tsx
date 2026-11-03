@@ -16,11 +16,11 @@ function DealCard({ deal, dragging, overlay }: { deal: KanbanDeal; dragging?: bo
   return (
     <div
       className={cn(
-        "group rounded-[10px] border border-line bg-surface px-3 py-2.5 transition-colors",
+        "group rounded-[12px] border border-line bg-surface px-3.5 py-3 shadow-card transition-all",
         deal.canEdit ? "cursor-grab active:cursor-grabbing" : "cursor-default",
         dragging && "opacity-30",
         overlay && "rotate-[1.5deg] border-line-strong shadow-pop",
-        !overlay && "hover:border-line-strong",
+        !overlay && "hover:-translate-y-px hover:shadow-hover",
       )}
     >
       <div className="flex items-start justify-between gap-2">
@@ -63,8 +63,8 @@ function Column({ stage, deals, hideAmount, active }: { stage: StageInfo; deals:
       <div
         ref={setNodeRef}
         className={cn(
-          "flex min-h-[160px] flex-1 flex-col gap-2 rounded-[12px] border p-2 transition-colors",
-          isOver ? "border-info bg-info-soft/60" : active ? "border-dashed border-line-strong bg-surface-2/60" : "border-line bg-surface-2/60",
+          "flex min-h-[160px] flex-1 flex-col gap-2.5 rounded-[14px] border p-2.5 transition-colors",
+          isOver ? "border-brand bg-brand-soft/50" : active ? "border-dashed border-line-strong bg-surface-3/70" : "border-transparent bg-surface-3/70",
         )}
       >
         {deals.map((d) => (

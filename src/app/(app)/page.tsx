@@ -151,7 +151,7 @@ export default async function Dashboard() {
         {seeBookings && <Tile label="Записи на сегодня" value={bookingsToday.length} sub={bookingsToday[0] ? `ближайшая в ${fmtTime(bookingsToday[0].b.startsAt)}` : "встреч нет"} href="/calendar" />}
       </Tiles>
 
-      <div className="grid gap-4 lg:grid-cols-[1.55fr_1fr]">
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
         <div className="space-y-4">
           <Panel title="Задачи на сегодня" count={todayTasks.length} href="/tasks" empty="На сегодня задач нет. Новые появятся от коллег, автоматизаций и Telegram-бота.">
             {[...overdueTasks, ...dueToday, ...noDue].slice(0, 10).map((t) => (

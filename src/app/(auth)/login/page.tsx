@@ -17,9 +17,9 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   }
   return (
     <div className="grid min-h-screen lg:grid-cols-[1.1fr_1fr]">
-      <div className="hidden lg:flex flex-col justify-between bg-ink p-12 text-white">
+      <div className="hidden lg:flex flex-col justify-between bg-mesh p-12 text-white">
         <div className="flex items-center gap-2.5">
-          <span className="grid size-8 place-items-center rounded-[8px] bg-white text-ink text-sm font-bold">О</span>
+          <span className="grid size-9 place-items-center rounded-[11px] bg-brand-gradient text-white text-sm font-bold shadow-brand">О</span>
           <span className="text-lg font-semibold">Оборот</span>
         </div>
         <div className="max-w-[34ch]">
@@ -34,8 +34,8 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
           <div><div className="text-2xl font-semibold text-white tnum">24/7</div>ИИ отвечает и принимает звонки</div>
         </div>
       </div>
-      <div className="flex items-center justify-center p-6">
-        <form action={action} className="w-full max-w-sm">
+      <div className="flex items-center justify-center bg-canvas p-6">
+        <form action={action} className="card w-full max-w-sm p-8">
           <h2 className="text-[22px] font-semibold">Вход в систему</h2>
           <p className="mt-1 text-[13px] text-muted">Демо-доступ: admin@oborot.ru / admin123</p>
           {sp.error && <div className="mt-4 rounded-[8px] bg-accent-soft px-3 py-2 text-[13px] text-accent">{sp.error}</div>}
@@ -45,7 +45,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
             <Field label="Пароль"><Input name="password" type="password" required autoComplete="current-password" defaultValue="admin123" /></Field>
             <Button type="submit" size="lg" className="w-full">Войти</Button>
           </div>
-          <div className="mt-6 rounded-[10px] border border-line bg-surface p-3 text-xs text-muted leading-relaxed">
+          <div className="mt-6 rounded-[10px] bg-surface-2 p-3 text-xs text-muted leading-relaxed">
             Другие роли для проверки прав: менеджер — ivan@oborot.ru, производство — oleg@oborot.ru, бухгалтер — anna@oborot.ru. Пароль у всех: demo123.
           </div>
         </form>

@@ -2,37 +2,60 @@
 @import "@fontsource-variable/golos-text";
 
 :root {
-  --canvas: #eef0f3;
+  /* Полотно и поверхности */
+  --canvas: #f3f4f8;
   --surface: #ffffff;
-  --surface-2: #f7f8fa;
-  --ink: #16181d;
-  --ink-2: #4b5260;
-  --muted: #8a91a0;
-  --line: #e3e6eb;
-  --line-strong: #cdd2da;
-  --accent: #c8102e;
-  --accent-soft: #fbe9ec;
-  --good: #138a5e;
-  --good-soft: #e3f4ec;
-  --warn: #b96a00;
-  --warn-soft: #fff1dc;
-  --info: #2456d6;
-  --info-soft: #e6ecfb;
-  --violet: #6b3fd6;
-  --violet-soft: #ede7fb;
-  --radius: 10px;
-  --shadow-pop: 0 12px 32px -12px rgba(22, 24, 29, 0.28), 0 1px 2px rgba(22, 24, 29, 0.08);
+  --surface-2: #f7f8fb;
+  --surface-3: #eef0f6;
+  /* Текст */
+  --ink: #0f1222;
+  --ink-2: #3f455c;
+  --muted: #7b8299;
+  /* Линии */
+  --line: #e6e8ef;
+  --line-strong: #d3d7e3;
+  /* Акцент: индиго */
+  --brand: #4f46e5;
+  --brand-2: #6d5bf5;
+  --brand-soft: #eceafd;
+  --brand-ink: #3730a3;
+  /* Семантика */
+  --accent: #d6294b;
+  --accent-soft: #fde8ec;
+  --good: #0f9f6e;
+  --good-soft: #e3f7ef;
+  --warn: #d97706;
+  --warn-soft: #fff3df;
+  --info: #2563eb;
+  --info-soft: #e6eefc;
+  --violet: #7c3aed;
+  --violet-soft: #f0e9fd;
+  /* Тёмная боковая панель */
+  --side: #0f1222;
+  --side-2: #171b33;
+  --side-text: #c4c8dc;
+  --side-muted: #7d84a6;
+  --radius: 12px;
+  --shadow-card: 0 1px 2px rgba(15, 18, 34, 0.04), 0 2px 8px -2px rgba(15, 18, 34, 0.06);
+  --shadow-hover: 0 4px 16px -4px rgba(15, 18, 34, 0.12), 0 1px 2px rgba(15, 18, 34, 0.05);
+  --shadow-pop: 0 24px 48px -16px rgba(15, 18, 34, 0.32), 0 2px 6px rgba(15, 18, 34, 0.08);
+  --shadow-brand: 0 8px 20px -8px rgba(79, 70, 229, 0.55);
 }
 
 @theme inline {
   --color-canvas: var(--canvas);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
   --color-ink: var(--ink);
   --color-ink-2: var(--ink-2);
   --color-muted: var(--muted);
   --color-line: var(--line);
   --color-line-strong: var(--line-strong);
+  --color-brand: var(--brand);
+  --color-brand-2: var(--brand-2);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-ink: var(--brand-ink);
   --color-accent: var(--accent);
   --color-accent-soft: var(--accent-soft);
   --color-good: var(--good);
@@ -43,9 +66,16 @@
   --color-info-soft: var(--info-soft);
   --color-violet: var(--violet);
   --color-violet-soft: var(--violet-soft);
+  --color-side: var(--side);
+  --color-side-2: var(--side-2);
+  --color-side-text: var(--side-text);
+  --color-side-muted: var(--side-muted);
   --font-sans: "Golos Text Variable", "Golos Text", system-ui, -apple-system, "Segoe UI", sans-serif;
   --radius-md: var(--radius);
+  --shadow-card: var(--shadow-card);
+  --shadow-hover: var(--shadow-hover);
   --shadow-pop: var(--shadow-pop);
+  --shadow-brand: var(--shadow-brand);
 }
 
 html {
@@ -62,51 +92,48 @@ body {
   color: var(--ink);
   font-feature-settings: "ss01", "cv02";
 }
-.tnum {
-  font-variant-numeric: tabular-nums;
-}
+h1, h2, h3 { letter-spacing: -0.015em; }
+.tnum { font-variant-numeric: tabular-nums; }
 *:focus-visible {
-  outline: 2px solid var(--info);
+  outline: 2px solid var(--brand);
   outline-offset: 2px;
-  border-radius: 6px;
+  border-radius: 8px;
 }
-::selection {
-  background: #fbd9df;
-}
+::selection { background: #dcd9fb; }
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
-/* тонкий скроллбар */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: var(--line-strong) transparent;
+* { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+
+/* Карточка-поверхность: единый стиль для секций, таблиц, панелей */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow-card);
 }
-/* таблицы */
+/* Таблицы */
 .table-base th {
   font-weight: 500;
+  font-size: 12px;
   color: var(--muted);
   text-align: left;
-  padding: 8px 12px;
+  padding: 10px 14px;
   border-bottom: 1px solid var(--line);
   white-space: nowrap;
+  background: var(--surface-2);
 }
+.table-base th:first-child { border-top-left-radius: 14px; }
+.table-base th:last-child { border-top-right-radius: 14px; }
 .table-base td {
-  padding: 10px 12px;
+  padding: 11px 14px;
   border-bottom: 1px solid var(--line);
   vertical-align: middle;
 }
-.table-base tr:last-child td {
-  border-bottom: 0;
-}
-.table-base tbody tr:hover {
-  background: var(--surface-2);
-}
-/* печать-штамп: единственный декоративный элемент — для статусов «оплачено/подписано» */
+.table-base tr:last-child td { border-bottom: 0; }
+.table-base tbody tr { transition: background-color 0.12s ease; }
+.table-base tbody tr:hover { background: #f8f8ff; }
+/* Печать-штамп для статусов «оплачено/подписано» */
 .stamp {
   display: inline-block;
   padding: 2px 8px;
@@ -116,8 +143,15 @@ body {
   letter-spacing: 0.02em;
   transform: rotate(-4deg);
 }
-@keyframes rise {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: none; }
+/* Градиентная кнопка и бренд-плитка */
+.bg-brand-gradient { background-image: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 100%); }
+.bg-side-gradient { background-image: linear-gradient(180deg, #11152a 0%, #0f1222 60%, #0c0f1d 100%); }
+.bg-mesh {
+  background-color: #0f1222;
+  background-image:
+    radial-gradient(60% 50% at 10% 10%, rgba(109, 91, 245, 0.45) 0%, rgba(109, 91, 245, 0) 70%),
+    radial-gradient(50% 45% at 90% 20%, rgba(37, 99, 235, 0.35) 0%, rgba(37, 99, 235, 0) 70%),
+    radial-gradient(60% 60% at 60% 100%, rgba(15, 159, 110, 0.25) 0%, rgba(15, 159, 110, 0) 70%);
 }
+@keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 .rise { animation: rise 0.22s ease-out both; }

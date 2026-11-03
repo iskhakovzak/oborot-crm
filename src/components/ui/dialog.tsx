@@ -14,7 +14,7 @@ export function DialogContent({ className, children, title, description, wide }:
       <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-ink/40 backdrop-blur-[2px] data-[state=open]:animate-in" />
       <DialogPrimitive.Content
         className={cn(
-          "fixed left-1/2 top-1/2 z-50 w-[calc(100vw-32px)] -translate-x-1/2 -translate-y-1/2 rounded-[14px] bg-surface shadow-pop outline-none rise max-h-[calc(100vh-32px)] overflow-y-auto",
+          "fixed left-1/2 top-1/2 z-50 w-[calc(100vw-32px)] -translate-x-1/2 -translate-y-1/2 rounded-[16px] bg-surface shadow-pop outline-none rise max-h-[calc(100vh-32px)] overflow-y-auto",
           wide ? "max-w-3xl" : "max-w-lg",
           className,
         )}
