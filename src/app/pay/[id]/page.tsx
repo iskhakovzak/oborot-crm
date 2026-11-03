@@ -67,10 +67,10 @@ export default async function PayPage({ params, searchParams }: { params: Promis
                   </div>
                   <p className="mt-3 text-center text-[13px] text-muted">Отсканируйте QR в приложении Payme или Click, либо нажмите кнопку на телефоне</p>
                   <div className="mt-5 space-y-2">
-                    <Button size="lg" className="w-full border-transparent bg-[#00c2b3] text-white hover:bg-[#00a99c]" asChild>
+                    <Button size="lg" variant="secondary" className="w-full !border-transparent !bg-[#00c2b3] !text-white hover:!bg-[#00a99c]" asChild>
                       <a href={link!.qrPayload}><span className="rounded-[5px] bg-white/20 px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-wide">Payme</span> Оплатить через Payme</a>
                     </Button>
-                    <Button size="lg" className="w-full border-transparent bg-[#0f9af0] text-white hover:bg-[#0b85d1]" asChild>
+                    <Button size="lg" variant="secondary" className="w-full !border-transparent !bg-[#0f9af0] !text-white hover:!bg-[#0b85d1]" asChild>
                       <a href={link!.qrPayload}><span className="rounded-[5px] bg-white/20 px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-wide">Click</span> Оплатить через Click</a>
                     </Button>
                     <form action={simulate}>

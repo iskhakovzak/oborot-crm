@@ -165,7 +165,7 @@ img, svg { color-scheme: dark; }
 .btn-primary { border-color: var(--ink); color: var(--canvas); background: linear-gradient(90deg, var(--brand) 50%, var(--brand-2) 50%); background-size: 200% 100%; background-position: 100% 0; }
 .btn-primary:hover { background-position: 0 0; }
 /* Крупная цифра */
-.bigstat { font-size: clamp(22px, 2.1vw, 30px); font-weight: 700; line-height: 1; letter-spacing: -0.035em; color: var(--ink); font-variant-numeric: tabular-nums; }
+.bigstat { font-size: clamp(20px, 1.7vw, 28px); font-weight: 700; line-height: 1; letter-spacing: -0.035em; color: var(--ink); font-variant-numeric: tabular-nums; }
 /* «Громкая» карточка: металлическое свечение, зерно, стеклянный осколок */
 .insight {
   --glow-a: var(--ramp-3); --glow-b: var(--ramp-1); --glow-c: var(--ramp-4);
@@ -195,3 +195,12 @@ img, svg { color-scheme: dark; }
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
   .pressable:hover, .pressable:active { transform: none !important; box-shadow: none !important; }
 }
+/* Каскадное появление: порядок внутри слэба и внутри сеток, если --rise-i не задан явно */
+.slab > :nth-child(2).rise, .slab > :not(.rise) > :nth-child(1).rise { --rise-i: 1; }
+.slab > :nth-child(3).rise, .slab > :not(.rise) > :nth-child(2).rise { --rise-i: 2; }
+.slab > :nth-child(4).rise, .slab > :not(.rise) > :nth-child(3).rise { --rise-i: 3; }
+.slab > :nth-child(5).rise, .slab > :not(.rise) > :nth-child(4).rise { --rise-i: 4; }
+.slab > :nth-child(6).rise, .slab > :not(.rise) > :nth-child(5).rise { --rise-i: 5; }
+.slab > :nth-child(7).rise, .slab > :not(.rise) > :nth-child(6).rise { --rise-i: 6; }
+.slab > :nth-child(8).rise, .slab > :not(.rise) > :nth-child(7).rise { --rise-i: 7; }
+.slab > :nth-child(n+9).rise, .slab > :not(.rise) > :nth-child(n+8).rise { --rise-i: 8; }

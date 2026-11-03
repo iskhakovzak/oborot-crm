@@ -2,20 +2,9 @@
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { fmtMoney, fmtMoneyCompact, fmtMoneyShort, fmtNum } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { CHART } from "./palette";
 
-/** Палитра графиков: данные — рампа синий → лёд → фиолетовый → орхидея (--ramp-1..4), good/warn/accent — семантика */
-export const CHART = {
-  ink: "var(--ramp-1, #6e96f2)",
-  info: "var(--ramp-3, #6656e3)",
-  soft: "var(--ramp-2, #d9e4fb)",
-  violet: "var(--ramp-4, #bd5fe8)",
-  good: "var(--good, #2fd36f)",
-  warn: "var(--warn, #ffb000)",
-  accent: "var(--accent, #ff2d3f)",
-  muted: "var(--ink-2, #9c9c9c)",
-  line: "var(--line, #242424)",
-  text: "var(--ink-2, #9c9c9c)",
-};
+export { CHART } from "./palette";
 
 export type Series = { key: string; label: string; color: string; money?: boolean };
 type Row = Record<string, string | number | null>;
@@ -84,14 +73,14 @@ export function TrendChart({ data, xKey, series, kind = "line", height = 220, cl
           <AreaChart {...common}>
             {children}
             {series.map((s) => (
-              <Area key={s.key} type="monotone" dataKey={s.key} name={s.label} stroke={s.color} strokeWidth={2} fill={s.color} fillOpacity={0.08} dot={false} activeDot={{ r: 4, strokeWidth: 2, stroke: "var(--canvas)" }} />
+              <Area key={s.key} type="monotone" dataKey={s.key} name={s.label} stroke={s.color} strokeWidth={2} fill={s.color} fillOpacity={0.08} dot={false} activeDot={{ r: 4, strokeWidth: 2, stroke: "#0a0a0a" }} />
             ))}
           </AreaChart>
         ) : (
           <LineChart {...common}>
             {children}
             {series.map((s) => (
-              <Line key={s.key} type="monotone" dataKey={s.key} name={s.label} stroke={s.color} strokeWidth={2} dot={false} activeDot={{ r: 4, strokeWidth: 2, stroke: "var(--canvas)" }} />
+              <Line key={s.key} type="monotone" dataKey={s.key} name={s.label} stroke={s.color} strokeWidth={2} dot={false} activeDot={{ r: 4, strokeWidth: 2, stroke: "#0a0a0a" }} />
             ))}
           </LineChart>
         )}
@@ -125,27 +114,31 @@ export function HBars({ rows, color = CHART.ink, className }: { rows: { label: s
 export function Funnel({ stages, won }: { stages: { name: string; color: string; openCount: number; openSum: number; reached: number; conversion: number | null }[]; won: number }) {
   const max = Math.max(1, ...stages.map((s) => s.reached));
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       {stages.map((s, i) => (
-        <div key={s.name} className="grid grid-cols-[minmax(0,130px)_minmax(0,1fr)_auto] items-center gap-3 text-[13px]">
-          <div className="flex min-w-0 items-center gap-2 truncate"><span className="size-2 shrink-0 rounded-full" style={{ background: s.color }} />{s.name}</div>
-          <div className="flex items-center gap-2">
-            <div className="h-6 rounded-[4px]" style={{ background: CHART.ink, width: `${Math.max(2, (s.reached / max) * 100)}%` }} title={`Дошли до этапа: ${s.reached}`} />
-            <span className="tnum text-ink-2">{s.reached}</span>
-          </div>
-          <div className="whitespace-nowrap text-right tnum text-muted">
-            <span className="text-ink">{s.openCount} откр.</span> · <span title={fmtMoney(s.openSum)}>{fmtMoneyShort(s.openSum)}</span>
-            {s.conversion != null && <span className="ml-2 inline-block rounded-full bg-surface-2 px-1.5 text-xs text-ink-2">→ {s.conversion}%{i === stages.length - 1 ? " оплата" : ""}</span>}
+        <div key={s.name} className="grid grid-cols-[minmax(0,112px)_minmax(0,1fr)] items-start gap-3 text-[12.5px]">
+          <div className="flex min-w-0 items-center gap-2 truncate pt-1" title={s.name}><span className="size-2 shrink-0 rounded-full" style={{ background: s.color }} /><span className="truncate">{s.name}</span></div>
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <div className="h-5 rounded-[4px]" style={{ background: CHART.ink, width: `${Math.max(2, (s.reached / max) * 100)}%` }} title={`Дошли до этапа: ${s.reached}`} />
+              <span className="tnum text-ink-2">{s.reached}</span>
+            </div>
+            <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 whitespace-nowrap text-[11px] tnum text-muted">
+              <span className="text-ink-2">{s.openCount} откр.</span><span>·</span><span title={fmtMoney(s.openSum)}>{fmtMoneyShort(s.openSum)}</span>
+              {s.conversion != null && <span className="rounded-full border border-line px-1.5 text-[10px] text-ink-2">→ {s.conversion}%{i === stages.length - 1 ? " оплата" : ""}</span>}
+            </div>
           </div>
         </div>
       ))}
-      <div className="grid grid-cols-[minmax(0,130px)_minmax(0,1fr)_auto] items-center gap-3 text-[13px]">
-        <div className="flex min-w-0 items-center gap-2"><span className="size-2 shrink-0 rounded-full bg-good" />Оплачено</div>
-        <div className="flex items-center gap-2">
-          <div className="h-6 rounded-[4px] bg-good" style={{ width: `${Math.max(2, (won / max) * 100)}%` }} />
-          <span className="tnum text-ink-2">{won}</span>
+      <div className="grid grid-cols-[minmax(0,112px)_minmax(0,1fr)] items-start gap-3 text-[12.5px]">
+        <div className="flex min-w-0 items-center gap-2 pt-1"><span className="size-2 shrink-0 rounded-full bg-good" />Оплачено</div>
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <div className="h-5 rounded-[4px] bg-good" style={{ width: `${Math.max(2, (won / max) * 100)}%` }} />
+            <span className="tnum text-ink-2">{won}</span>
+          </div>
+          <div className="mt-1 text-[11px] text-muted">за период</div>
         </div>
-        <div className="text-right text-muted">за период</div>
       </div>
     </div>
   );

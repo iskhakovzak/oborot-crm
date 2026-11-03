@@ -70,33 +70,33 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         <Table>
           <thead>
             <tr>
-              <th>Артикул</th>
-              <th>Штрихкод</th>
-              <th>Наименование</th>
-              <th>Категория</th>
-              <th>Бренд</th>
-              <th className="text-right">Цена</th>
-              {!hideCost && <th className="text-right">Себестоимость</th>}
-              <th className="text-right">Остаток</th>
-              <th className="text-right">НДС</th>
+              <th className="!px-3">Артикул</th>
+              <th className="hidden !px-3 2xl:table-cell">Штрихкод</th>
+              <th className="min-w-[220px] !px-3">Наименование</th>
+              <th className="!px-3">Категория</th>
+              <th className="hidden !px-3 lg:table-cell">Бренд</th>
+              <th className="!px-3 text-right">Цена</th>
+              {!hideCost && <th className="!px-3 text-right">Себест.</th>}
+              <th className="!px-3 text-right">Остаток</th>
+              <th className="hidden !px-3 text-right 2xl:table-cell">НДС</th>
               {canEdit && <th className="w-10" />}
             </tr>
           </thead>
           <tbody>
             {rows.map((p) => (
               <tr key={p.id} className={cn(!p.isActive && "opacity-50")}>
-                <td className="font-medium tnum whitespace-nowrap">{p.sku ?? <span className="text-muted">—</span>}</td>
-                <td className="tnum text-muted">{p.barcode ?? "—"}</td>
-                <td>
+                <td className="!px-3 font-medium tnum whitespace-nowrap">{p.sku ?? <span className="text-muted">—</span>}</td>
+                <td className="hidden !px-3 tnum text-muted 2xl:table-cell">{p.barcode ?? "—"}</td>
+                <td className="min-w-[220px] !px-3">
                   <div className="font-medium">{p.name}</div>
                   {Object.keys(p.attributes).length > 0 && <div className="mt-0.5 truncate text-xs text-muted max-w-[42ch]">{Object.entries(p.attributes).slice(0, 3).map(([k, v]) => `${k}: ${v}`).join(" · ")}</div>}
                 </td>
-                <td>{p.category ? <Badge>{p.category}</Badge> : <span className="text-muted">—</span>}</td>
-                <td className="text-ink-2">{p.brand ?? "—"}</td>
-                <td className="text-right font-medium tnum whitespace-nowrap">{fmtMoney(p.price)}</td>
-                {!hideCost && <td className="text-right tnum whitespace-nowrap text-ink-2">{fmtMoney(p.cost ?? 0)}{p.price > 0 && (p.cost ?? 0) > 0 && <span className="ml-1 text-xs text-muted">({Math.round((1 - (p.cost ?? 0) / p.price) * 100)}%)</span>}</td>}
-                <td className={cn("text-right tnum whitespace-nowrap", p.unit !== "усл" && p.stock <= 0 ? "text-accent" : p.stock < 5 && p.unit !== "усл" ? "text-warn" : "")}>{p.unit === "усл" ? <span className="text-muted">услуга</span> : `${fmtNum(p.stock)} ${p.unit}`}</td>
-                <td className="text-right tnum text-muted">{p.vatRate ? `${p.vatRate}%` : "без НДС"}</td>
+                <td className="!px-3">{p.category ? <Badge>{p.category}</Badge> : <span className="text-muted">—</span>}</td>
+                <td className="hidden !px-3 text-ink-2 lg:table-cell">{p.brand ?? "—"}</td>
+                <td className="!px-3 text-right font-medium tnum whitespace-nowrap">{fmtMoney(p.price)}</td>
+                {!hideCost && <td className="!px-3 text-right tnum whitespace-nowrap text-ink-2">{fmtMoney(p.cost ?? 0)}{p.price > 0 && (p.cost ?? 0) > 0 && <span className="ml-1 hidden text-xs text-muted 2xl:inline">({Math.round((1 - (p.cost ?? 0) / p.price) * 100)}%)</span>}</td>}
+                <td className={cn("!px-3 text-right tnum whitespace-nowrap", p.unit !== "усл" && p.stock <= 0 ? "text-accent" : p.stock < 5 && p.unit !== "усл" ? "text-warn" : "")}>{p.unit === "усл" ? <span className="text-muted">услуга</span> : `${fmtNum(p.stock)} ${p.unit}`}</td>
+                <td className="hidden !px-3 text-right tnum text-muted 2xl:table-cell">{p.vatRate ? `${p.vatRate}%` : "без НДС"}</td>
                 {canEdit && <td className="text-right"><ProductDialog product={p} categories={categories} hideCost={hideCost} trigger="icon" /></td>}
               </tr>
             ))}

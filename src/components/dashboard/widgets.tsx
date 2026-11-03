@@ -8,10 +8,10 @@ export function Panel({ title, count, href, hrefLabel = "Все", children, clas
   return (
     <section className={cn("card rise min-w-0 overflow-hidden", className)} style={{ ["--rise-i" as string]: i }}>
       <div className="flex items-center gap-2 px-4 py-2.5">
-        <h2 className="text-[15px] font-semibold tracking-[-0.01em]">{title}</h2>
-        {count !== undefined && count > 0 && <span className="rounded-full border border-line px-1.5 text-[10px] text-ink-2 tnum">{count}</span>}
+        <h2 className="min-w-0 truncate text-[15px] font-semibold tracking-[-0.01em]" title={title}>{title}</h2>
+        {count !== undefined && count > 0 && <span className="shrink-0 rounded-full border border-line px-1.5 text-[10px] text-ink-2 tnum">{count}</span>}
         {href && (
-          <Link href={href} className="ml-auto inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-[10.5px] uppercase tracking-[0.12em] text-ink-2 hover:text-ink">
+          <Link href={href} className="ml-auto inline-flex shrink-0 items-center gap-0.5 rounded-md px-1.5 py-0.5 text-[10.5px] uppercase tracking-[0.12em] text-ink-2 hover:text-ink">
             {hrefLabel} <ArrowUpRight className="size-3.5" />
           </Link>
         )}

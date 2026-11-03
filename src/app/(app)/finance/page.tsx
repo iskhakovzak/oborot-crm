@@ -99,7 +99,7 @@ export default async function FinancePage({ searchParams }: { searchParams: Prom
                   <td className="whitespace-nowrap text-muted">{fmtDate(p.paidAt, { day: "numeric", month: "short", year: "numeric" })}</td>
                   <td className="max-w-[240px] truncate">{p.companyId ? <Link href={`/companies/${p.companyId}`} className="hover:underline">{companyName}</Link> : "—"}</td>
                   <td>{p.dealId ? <Link href={`/deals/${p.dealId}`} className="hover:underline">№{dealNumber}</Link> : <span className="text-muted">—</span>}</td>
-                  <td>{p.documentId ? <Link href={`/documents/${p.documentId}`} className="hover:underline">{docNumber}</Link> : <span className="text-muted">—</span>}</td>
+                  <td className="whitespace-nowrap">{p.documentId ? <Link href={`/documents/${p.documentId}`} className="hover:underline">{docNumber}</Link> : <span className="text-muted">—</span>}</td>
                   <td className={`text-right tnum font-medium whitespace-nowrap ${p.direction === "in" ? "text-good" : "text-accent"}`}>{p.direction === "in" ? "+" : "−"}{fmtMoney(p.amount)}</td>
                   <td><Badge tone={PAYMENT_METHOD_TONE[p.method]}>{PAYMENT_METHOD_LABEL[p.method]}</Badge></td>
                   <td className="max-w-[320px] truncate text-ink-2" title={p.purpose ?? ""}>{p.purpose ?? "—"}</td>

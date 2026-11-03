@@ -55,7 +55,7 @@ export function DealItems({ dealId, items, products, canEdit }: { dealId: string
         type="number" step={step} min={0} defaultValue={v} key={`${item.id}-${field}-${v}`}
         onBlur={(e) => { const n = Number(e.target.value); if (n !== v) run(() => updateDealItem(item.id, { [field]: n })); }}
         onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }}
-        className={cn(inputClass, "h-8 px-2 text-right tnum", field === "price" ? "w-28" : "w-16")}
+        className={cn(inputClass, "h-8 px-2 text-right tnum", field === "price" ? "w-24" : "w-14")}
       />
     );
   };
@@ -109,15 +109,15 @@ export function DealItems({ dealId, items, products, canEdit }: { dealId: string
         </div>
       ) : (
         <div className="overflow-x-auto -mx-4 -mb-4">
-          <table className="table-base w-full text-sm">
+          <table className="table-base w-full text-sm [&_td]:!px-3 [&_th]:!px-3">
             <thead>
               <tr>
-                <th className="pl-4">Наименование</th>
-                <th>Ед.</th>
+                <th className="!pl-4">Наименование</th>
+                <th className="hidden 2xl:table-cell">Ед.</th>
                 <th className="text-right">Кол-во</th>
                 <th className="text-right">Цена</th>
-                <th className="text-right">Скидка</th>
-                <th className="text-right">НДС</th>
+                <th className="hidden text-right 2xl:table-cell">Скидка</th>
+                <th className="hidden text-right 2xl:table-cell">НДС</th>
                 <th className="text-right">Сумма</th>
                 {canEdit && <th className="w-10 pr-4" />}
               </tr>
@@ -125,12 +125,12 @@ export function DealItems({ dealId, items, products, canEdit }: { dealId: string
             <tbody>
               {items.map((i) => (
                 <tr key={i.id}>
-                  <td className="max-w-[240px] truncate pl-4 font-medium" title={i.name}>{i.name}</td>
-                  <td className="text-muted">{i.unit}</td>
+                  <td className="max-w-[150px] truncate !pl-4 font-medium 2xl:max-w-[260px]" title={i.name}>{i.name}</td>
+                  <td className="hidden text-muted 2xl:table-cell">{i.unit}</td>
                   <td className="text-right">{cell(i, "qty")}</td>
                   <td className="text-right whitespace-nowrap">{cell(i, "price", "0.01")}</td>
-                  <td className="text-right">{cell(i, "discount", "0.5")}</td>
-                  <td className="text-right text-muted tnum">{i.vatRate}%</td>
+                  <td className="hidden text-right 2xl:table-cell">{cell(i, "discount", "0.5")}</td>
+                  <td className="hidden text-right text-muted tnum 2xl:table-cell">{i.vatRate}%</td>
                   <td className="text-right font-medium tnum whitespace-nowrap">{fmtMoney(lineTotal(i))}</td>
                   {canEdit && (
                     <td className="pr-4 text-right">
@@ -142,7 +142,8 @@ export function DealItems({ dealId, items, products, canEdit }: { dealId: string
             </tbody>
             <tfoot>
               <tr>
-                <td colSpan={6} className="pl-4 text-right text-muted">Итого с НДС</td>
+                <td colSpan={3} className="!pl-4 text-right text-muted">Итого с НДС</td>
+                <td className="hidden 2xl:table-cell" /><td className="hidden 2xl:table-cell" /><td className="hidden 2xl:table-cell" />
                 <td className="text-right text-[15px] font-semibold tnum whitespace-nowrap">{fmtMoney(total)}</td>
                 {canEdit && <td />}
               </tr>

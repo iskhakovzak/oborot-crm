@@ -13,7 +13,8 @@ import { Badge, type Tone } from "@/components/ui/badge";
 import { Table } from "@/components/ui/table";
 import { Avatar } from "@/components/ui/avatar";
 import { Money } from "@/components/ui/money";
-import { BarsChart, TrendChart, HBars, Funnel, Segments, CHART } from "@/components/analytics/charts";
+import { BarsChart, TrendChart, HBars, Funnel, Segments } from "@/components/analytics/charts";
+import { CHART } from "@/components/analytics/palette";
 import { ResendButton } from "@/components/analytics/resend-button";
 import { cn } from "@/lib/utils";
 
@@ -81,7 +82,7 @@ async function MarketingTab({ data }: { data: MarketingReport }) {
   const romi = (v: number | null) => (v == null ? "—" : `${v > 0 ? "+" : ""}${fmtNum(v)}%`);
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 2xl:grid-cols-6">
         <Stat label="Расход на рекламу" value={<Money value={t.spend} compact />} sub="пропорционально периоду" />
         <Stat label="Лиды" value={fmtNum(t.leads)} sub="сделок создано" />
         <Stat label="Оплаты" value={fmtNum(t.won)} sub={`конверсия ${fmtPct(t.conversion, 1)}`} tone="good" />
@@ -121,16 +122,16 @@ async function MarketingTab({ data }: { data: MarketingReport }) {
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <Section title="Воронка по рекламным кампаниям" description="По UTM-метке utm_campaign в сделках">
           <Table className="border-0 rounded-none">
-            <thead><tr><th>Кампания</th><th>Источник</th><th className="text-right">Лиды</th><th className="text-right">Оплаты</th><th className="text-right">Конв.</th><th className="text-right">Выручка</th></tr></thead>
+            <thead><tr><th className="!px-3">Кампания</th><th className="hidden !px-3 xl:table-cell">Источник</th><th className="!px-3 text-right">Лиды</th><th className="!px-3 text-right">Оплаты</th><th className="!px-3 text-right">Конв.</th><th className="!px-3 text-right">Выручка</th></tr></thead>
             <tbody>
               {data.campaigns.map((c) => (
                 <tr key={c.campaign}>
-                  <td className="max-w-[200px] truncate font-medium" title={c.campaign}>{c.campaign}</td>
-                  <td className="max-w-[140px] truncate text-ink-2">{c.source}</td>
-                  <td className="text-right tnum">{c.leads}</td>
-                  <td className="text-right tnum">{c.won}</td>
-                  <td className="text-right tnum">{fmtPct(c.conversion, 1)}</td>
-                  <td className="text-right"><Money value={c.revenue} compact /></td>
+                  <td className="max-w-[160px] truncate !px-3 font-medium" title={c.campaign}>{c.campaign}</td>
+                  <td className="hidden max-w-[140px] truncate !px-3 text-ink-2 xl:table-cell">{c.source}</td>
+                  <td className="!px-3 text-right tnum">{c.leads}</td>
+                  <td className="!px-3 text-right tnum">{c.won}</td>
+                  <td className="!px-3 text-right tnum">{fmtPct(c.conversion, 1)}</td>
+                  <td className="!px-3 text-right"><Money value={c.revenue} compact /></td>
                 </tr>
               ))}
             </tbody>
@@ -189,7 +190,7 @@ function SalesTab({ data }: { data: SalesReport }) {
   const t = data.totals;
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 2xl:grid-cols-6">
         <Stat label="Выручка" value={<Money value={t.revenue} compact />} sub={`${plural(t.won, "оплата", "оплаты", "оплат")} за период`} tone="good" />
         <Stat label="Средний чек" value={<Money value={t.avgCheck} compact />} />
         <Stat label="Конверсия в оплату" value={fmtPct(t.conversion, 1)} sub={`${t.won} выиграно · ${t.lost} отказов`} />
@@ -245,7 +246,7 @@ function ProductionTab({ data }: { data: ProductionReport }) {
   const t = data.totals;
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 2xl:grid-cols-6">
         <Stat label="Заказов" value={fmtNum(t.orders)} sub={`${t.queued} в очереди · ${t.inProgress} в работе`} />
         <Stat label="Выполнено" value={fmtNum(t.done)} sub={`${fmtNum(t.qty)} ед. в заказах`} tone="good" />
         <Stat label="Средний цикл" value={`${fmtNum(t.cycleDays)} дн.`} sub="от запуска до готовности" />

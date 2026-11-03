@@ -120,7 +120,7 @@ export default async function Dashboard() {
   const wonSum = Number(won?.s ?? 0);
   const prevSum = Number(wonPrev?.s ?? 0);
   const deltaPct = prevSum > 0 ? Math.round(((wonSum - prevSum) / prevSum) * 100) : null;
-  const insightTitle = deltaPct === null ? "Первый месяц в системе" : deltaPct === 0 ? "Как в прошлом месяце" : deltaPct > 0 ? `На ${deltaPct}% больше, чем в прошлом месяце` : `На ${Math.abs(deltaPct)}% меньше, чем в прошлом месяце`;
+  const insightTitle = deltaPct === null ? "Первый месяц в системе" : wonSum === 0 ? "Закрытых сделок в этом месяце пока нет" : deltaPct === 0 ? "Как в прошлом месяце" : deltaPct > 0 ? `На ${deltaPct}% больше, чем в прошлом месяце` : `На ${Math.abs(deltaPct)}% меньше, чем в прошлом месяце`;
   const planShare = prevSum > 0 ? wonSum / (prevSum * 1.1) : (won?.n ?? 0) / Math.max(1, (won?.n ?? 0) + (visible?.n ?? 0));
   const ticksOn = Math.max(0, Math.min(8, Math.round(planShare * 8)));
   const insightSub = prevSum > 0 ? `План ${fmtMoneyCompact(prevSum * 1.1)} · выполнено ${Math.min(999, Math.round(planShare * 100))}%` : `${plural(won?.n ?? 0, "сделка закрыта", "сделки закрыты", "сделок закрыто")} из ${(won?.n ?? 0) + (visible?.n ?? 0)}`;

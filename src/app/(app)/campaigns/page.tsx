@@ -41,21 +41,21 @@ export default async function CampaignsPage({ searchParams }: { searchParams: Pr
       </div>
       {rows.length ? (
         <Table>
-          <thead><tr><th>Название</th><th>Канал</th><th>Статус</th><th>Сегмент</th><th>Дата</th><th className="text-right">Получателей</th><th className="text-right">Отправлено</th><th className="text-right">Открыто</th><th className="text-right">Клики</th></tr></thead>
+          <thead><tr><th className="min-w-[220px] !px-3">Название</th><th className="!px-3">Канал</th><th className="!px-3">Статус</th><th className="hidden !px-3 xl:table-cell">Сегмент</th><th className="!px-3">Дата</th><th className="!px-3 text-right">Получ.</th><th className="!px-3 text-right">Отпр.</th><th className="!px-3 text-right">Открыто</th><th className="!px-3 text-right">Клики</th></tr></thead>
           <tbody>
             {rows.map((c) => {
               const st = CAMPAIGN_STATUS[c.status] ?? CAMPAIGN_STATUS.draft;
               return (
                 <tr key={c.id}>
-                  <td><Link href={`/campaigns/${c.id}`} className="font-medium hover:underline">{c.name}</Link>{c.subject && <div className="text-xs text-muted">{c.subject}</div>}</td>
-                  <td><Badge tone={CHANNEL_TONE[c.channel] ?? "neutral"}>{CHANNEL_LABEL[c.channel]}</Badge></td>
-                  <td><Badge tone={st.tone} dot>{st.label}</Badge></td>
-                  <td className="max-w-[260px] truncate text-ink-2" title={segmentSummary(c.segment ?? {}, managers)}>{segmentSummary(c.segment ?? {}, managers)}</td>
-                  <td className="whitespace-nowrap text-ink-2">{fmtDateTime(c.sentAt ?? c.createdAt)}</td>
-                  <td className="text-right tnum">{c.stats.total}</td>
-                  <td className="text-right tnum">{c.stats.sent}</td>
-                  <td className="text-right tnum">{c.stats.opened}{c.stats.sent ? <span className="ml-1 text-xs text-muted">{fmtPct((c.stats.opened / c.stats.sent) * 100)}</span> : null}</td>
-                  <td className="text-right tnum">{c.stats.clicked}</td>
+                  <td className="min-w-[220px] !px-3"><Link href={`/campaigns/${c.id}`} className="font-medium hover:underline">{c.name}</Link>{c.subject && <div className="text-xs text-muted">{c.subject}</div>}</td>
+                  <td className="!px-3"><Badge tone={CHANNEL_TONE[c.channel] ?? "neutral"}>{CHANNEL_LABEL[c.channel]}</Badge></td>
+                  <td className="!px-3"><Badge tone={st.tone} dot>{st.label}</Badge></td>
+                  <td className="hidden max-w-[260px] truncate !px-3 text-ink-2 xl:table-cell" title={segmentSummary(c.segment ?? {}, managers)}>{segmentSummary(c.segment ?? {}, managers)}</td>
+                  <td className="whitespace-nowrap !px-3 text-ink-2">{fmtDateTime(c.sentAt ?? c.createdAt)}</td>
+                  <td className="!px-3 text-right tnum">{c.stats.total}</td>
+                  <td className="!px-3 text-right tnum">{c.stats.sent}</td>
+                  <td className="!px-3 text-right tnum">{c.stats.opened}{c.stats.sent ? <span className="ml-1 text-xs text-muted">{fmtPct((c.stats.opened / c.stats.sent) * 100)}</span> : null}</td>
+                  <td className="!px-3 text-right tnum">{c.stats.clicked}</td>
                 </tr>
               );
             })}
