@@ -1,45 +1,40 @@
 @import "tailwindcss";
-@import "@fontsource-variable/golos-text";
+@import "@fontsource-variable/inter";
 
+/* Визуальная система в духе Linear / Attio: белое полотно, тонкие линии, компактная типографика, один акцент */
 :root {
-  /* Полотно и поверхности */
-  --canvas: #f3f4f8;
+  --canvas: #ffffff;
   --surface: #ffffff;
-  --surface-2: #f7f8fb;
-  --surface-3: #eef0f6;
-  /* Текст */
-  --ink: #0f1222;
-  --ink-2: #3f455c;
-  --muted: #7b8299;
-  /* Линии */
-  --line: #e6e8ef;
-  --line-strong: #d3d7e3;
-  /* Акцент: индиго */
-  --brand: #4f46e5;
-  --brand-2: #6d5bf5;
-  --brand-soft: #eceafd;
-  --brand-ink: #3730a3;
-  /* Семантика */
-  --accent: #d6294b;
-  --accent-soft: #fde8ec;
-  --good: #0f9f6e;
-  --good-soft: #e3f7ef;
-  --warn: #d97706;
-  --warn-soft: #fff3df;
-  --info: #2563eb;
-  --info-soft: #e6eefc;
-  --violet: #7c3aed;
-  --violet-soft: #f0e9fd;
-  /* Тёмная боковая панель */
-  --side: #0f1222;
-  --side-2: #171b33;
-  --side-text: #c4c8dc;
-  --side-muted: #7d84a6;
-  --radius: 12px;
-  --shadow-card: 0 1px 2px rgba(15, 18, 34, 0.04), 0 2px 8px -2px rgba(15, 18, 34, 0.06);
-  --shadow-hover: 0 4px 16px -4px rgba(15, 18, 34, 0.12), 0 1px 2px rgba(15, 18, 34, 0.05);
-  --shadow-pop: 0 24px 48px -16px rgba(15, 18, 34, 0.32), 0 2px 6px rgba(15, 18, 34, 0.08);
-  --shadow-brand: 0 8px 20px -8px rgba(79, 70, 229, 0.55);
+  --surface-2: #fafafa;
+  --surface-3: #f4f4f5;
+  --ink: #18181b;
+  --ink-2: #52525b;
+  --muted: #8b8b94;
+  --line: #e7e7ea;
+  --line-strong: #d9d9de;
+  --brand: #5e6ad2;
+  --brand-2: #4f5bc4;
+  --brand-soft: #eef0fb;
+  --brand-ink: #3f49a8;
+  --accent: #d13c4f;
+  --accent-soft: #fbeaed;
+  --good: #1a9e6a;
+  --good-soft: #e6f6ef;
+  --warn: #c7760a;
+  --warn-soft: #fcf1e2;
+  --info: #2f6fed;
+  --info-soft: #e9f0fd;
+  --violet: #7a5af5;
+  --violet-soft: #f0ecfe;
+  --side: #f9f9fa;
+  --side-2: #f1f1f3;
+  --side-text: #3f3f46;
+  --side-muted: #8b8b94;
+  --radius: 8px;
+  --shadow-card: none;
+  --shadow-hover: 0 1px 2px rgba(24, 24, 27, 0.06);
+  --shadow-pop: 0 16px 40px -12px rgba(24, 24, 27, 0.22), 0 0 0 1px rgba(24, 24, 27, 0.06);
+  --shadow-brand: none;
 }
 
 @theme inline {
@@ -70,7 +65,7 @@
   --color-side-2: var(--side-2);
   --color-side-text: var(--side-text);
   --color-side-muted: var(--side-muted);
-  --font-sans: "Golos Text Variable", "Golos Text", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans: "Inter Variable", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --radius-md: var(--radius);
   --shadow-card: var(--shadow-card);
   --shadow-hover: var(--shadow-hover);
@@ -80,60 +75,47 @@
 
 html {
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: 13.5px;
   background: var(--canvas);
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  font-feature-settings: "cv11", "ss01", "ss03";
 }
-body {
-  min-height: 100%;
-  background: var(--canvas);
-  color: var(--ink);
-  font-feature-settings: "ss01", "cv02";
-}
-h1, h2, h3 { letter-spacing: -0.015em; }
+body { min-height: 100%; background: var(--canvas); color: var(--ink); }
+h1, h2, h3 { letter-spacing: -0.01em; }
 .tnum { font-variant-numeric: tabular-nums; }
-*:focus-visible {
-  outline: 2px solid var(--brand);
-  outline-offset: 2px;
-  border-radius: 8px;
-}
-::selection { background: #dcd9fb; }
+*:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; border-radius: 6px; }
+::selection { background: #dfe2f7; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
 * { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
 
-/* Карточка-поверхность: единый стиль для секций, таблиц, панелей */
 .card {
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 14px;
-  box-shadow: var(--shadow-card);
+  border-radius: 10px;
 }
-/* Таблицы */
 .table-base th {
   font-weight: 500;
   font-size: 12px;
   color: var(--muted);
   text-align: left;
-  padding: 10px 14px;
+  padding: 8px 12px;
   border-bottom: 1px solid var(--line);
   white-space: nowrap;
-  background: var(--surface-2);
+  background: var(--surface);
 }
-.table-base th:first-child { border-top-left-radius: 14px; }
-.table-base th:last-child { border-top-right-radius: 14px; }
 .table-base td {
-  padding: 11px 14px;
+  padding: 9px 12px;
   border-bottom: 1px solid var(--line);
   vertical-align: middle;
+  font-size: 13px;
 }
 .table-base tr:last-child td { border-bottom: 0; }
-.table-base tbody tr { transition: background-color 0.12s ease; }
-.table-base tbody tr:hover { background: #f8f8ff; }
-/* Печать-штамп для статусов «оплачено/подписано» */
+.table-base tbody tr { transition: background-color 0.1s ease; }
+.table-base tbody tr:hover { background: var(--surface-2); }
 .stamp {
   display: inline-block;
   padding: 2px 8px;
@@ -143,15 +125,8 @@ h1, h2, h3 { letter-spacing: -0.015em; }
   letter-spacing: 0.02em;
   transform: rotate(-4deg);
 }
-/* Градиентная кнопка и бренд-плитка */
-.bg-brand-gradient { background-image: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 100%); }
-.bg-side-gradient { background-image: linear-gradient(180deg, #11152a 0%, #0f1222 60%, #0c0f1d 100%); }
-.bg-mesh {
-  background-color: #0f1222;
-  background-image:
-    radial-gradient(60% 50% at 10% 10%, rgba(109, 91, 245, 0.45) 0%, rgba(109, 91, 245, 0) 70%),
-    radial-gradient(50% 45% at 90% 20%, rgba(37, 99, 235, 0.35) 0%, rgba(37, 99, 235, 0) 70%),
-    radial-gradient(60% 60% at 60% 100%, rgba(15, 159, 110, 0.25) 0%, rgba(15, 159, 110, 0) 70%);
-}
-@keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-.rise { animation: rise 0.22s ease-out both; }
+.bg-brand-gradient { background: var(--brand); }
+.bg-side-gradient { background: var(--side); }
+.bg-mesh { background: #0f1115; }
+@keyframes rise { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.rise { animation: rise 0.16s ease-out both; }

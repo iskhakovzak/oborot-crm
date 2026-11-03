@@ -292,7 +292,7 @@ export async function sendDealDocument(documentId: string): Promise<{ ok: true; 
   }
 }
 
-/** 21. Ссылка на оплату по СБП: создаём и сразу отправляем клиенту в предпочтительный канал */
+/** 21. Ссылка на оплату через Payme/Click: создаём и сразу отправляем клиенту в предпочтительный канал */
 export async function sendPaymentLink(dealId: string, documentId?: string | null): Promise<{ ok: true; url: string; sent: boolean; channel: string | null; sandbox: boolean } | Fail> {
   const user = await requireUser();
   try {
@@ -302,7 +302,7 @@ export async function sendPaymentLink(dealId: string, documentId?: string | null
     if (!amount) return fail("Сумма сделки нулевая — добавьте позиции");
     const purpose = doc ? `Оплата по ${doc.title}` : `Оплата по сделке №${deal.number}`;
     const link = await createPaymentLink({ amount, purpose, dealId, documentId: doc?.id ?? null, companyId: deal.companyId });
-    const text = `${purpose} на сумму ${fmtMoney(amount)}. Оплатить по СБП: ${link.url}`;
+    const text = `${purpose} на сумму ${fmtMoney(amount)}. Оплатить через Payme/Click: ${link.url}`;
     const r = await sendMessage({ channel: "preferred", text, companyId: deal.companyId, contactId: deal.contactId, dealId, userId: user.id });
     await logActivity({ type: "payment", title: r.ok ? `Ссылка на оплату отправлена (${r.channel})` : "Ссылка на оплату создана", body: `${fmtMoney(amount)} · ${link.url}`, dealId, companyId: deal.companyId, userId: user.id, meta: { paymentLinkId: link.id, documentId: doc?.id ?? null } });
     revalidateDeal(dealId, deal.companyId);

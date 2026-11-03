@@ -129,7 +129,7 @@ function UserDialog({ open, onOpenChange, user, roles }: { open: boolean; onOpen
         <form onSubmit={submit} className="grid gap-4 sm:grid-cols-2">
           <Field label="Имя и фамилия"><Input value={v.name} onChange={(e) => setV({ ...v, name: e.target.value })} required autoFocus /></Field>
           <Field label="Email (логин)"><Input type="email" value={v.email} onChange={(e) => setV({ ...v, email: e.target.value })} required /></Field>
-          <Field label="Телефон"><Input value={v.phone ?? ""} onChange={(e) => setV({ ...v, phone: e.target.value })} placeholder="+7 916 000-00-00" /></Field>
+          <Field label="Телефон"><Input value={v.phone ?? ""} onChange={(e) => setV({ ...v, phone: e.target.value })} placeholder="+998 90 123-45-67" /></Field>
           <Field label={user ? "Новый пароль" : "Пароль"} hint={user ? "Оставьте пустым, чтобы не менять" : "Не короче 6 символов"}>
             <Input type="password" autoComplete="new-password" value={v.password ?? ""} onChange={(e) => setV({ ...v, password: e.target.value })} required={!user} minLength={6} />
           </Field>

@@ -63,7 +63,7 @@ export function DealItems({ dealId, items, products, canEdit }: { dealId: string
   return (
     <Section
       title="Позиции"
-      description={items.length ? `${items.length} поз. · НДС в т.ч. ${fmtMoney(vat)}` : "Товары и услуги по сделке — из них формируются счёт, договор и УПД"}
+      description={items.length ? `${items.length} поз. · НДС в т.ч. ${fmtMoney(vat)}` : "Товары и услуги по сделке — из них формируются счёт, договор и ЭСФ"}
       action={canEdit && mode === "none" && (
         <div className="flex gap-2">
           <Button size="sm" variant="secondary" onClick={() => setMode("manual")}><Plus /> Вручную</Button>
@@ -95,7 +95,7 @@ export function DealItems({ dealId, items, products, canEdit }: { dealId: string
             <Input autoFocus placeholder="Наименование" value={manual.name} onChange={(e) => setManual({ ...manual, name: e.target.value })} />
             <Input placeholder="Ед." value={manual.unit} onChange={(e) => setManual({ ...manual, unit: e.target.value })} />
             <Input type="number" min={0.001} placeholder="Кол-во" value={manual.qty} onChange={(e) => setManual({ ...manual, qty: e.target.value })} className="tnum" />
-            <Input type="number" min={0} step="0.01" placeholder="Цена, ₽" value={manual.price} onChange={(e) => setManual({ ...manual, price: e.target.value })} className="tnum" />
+            <Input type="number" min={0} step="0.01" placeholder="Цена, сум" value={manual.price} onChange={(e) => setManual({ ...manual, price: e.target.value })} className="tnum" />
             <div className="flex gap-2">
               <Button onClick={addManual} disabled={pending}>Добавить</Button>
               <Button variant="ghost" onClick={() => setMode("none")}>Отмена</Button>

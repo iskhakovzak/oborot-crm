@@ -1,6 +1,7 @@
 "use client";
 import { useState, useTransition } from "react";
 import { Plus, Pencil, Trash2, Star, Phone, Mail, Send, MessageCircle } from "lucide-react";
+import { InstagramIcon } from "@/components/ui/instagram-icon";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,9 +12,9 @@ import { Avatar } from "@/components/ui/avatar";
 import { phoneFmt } from "@/lib/format";
 import { addContact, updateContact, deleteContact, type ContactInput } from "@/app/(app)/companies/actions";
 
-export type ContactRow = { id: string; name: string; position: string | null; phone: string | null; email: string | null; telegram: string | null; whatsapp: string | null; max: string | null; vk: string | null; isPrimary: boolean; birthday: string | null };
+export type ContactRow = { id: string; name: string; position: string | null; phone: string | null; email: string | null; telegram: string | null; whatsapp: string | null; max: string | null; instagram: string | null; isPrimary: boolean; birthday: string | null };
 
-const EMPTY: ContactInput = { name: "", position: "", phone: "", email: "", telegram: "", whatsapp: "", max: "", vk: "", isPrimary: false, birthday: "" };
+const EMPTY: ContactInput = { name: "", position: "", phone: "", email: "", telegram: "", whatsapp: "", max: "", instagram: "", isPrimary: false, birthday: "" };
 
 export function CompanyContacts({ companyId, contacts, canCreate, canEdit, canDelete, hidden }: { companyId: string; contacts: ContactRow[]; canCreate: boolean; canEdit: boolean; canDelete: boolean; hidden: string[] }) {
   const [pending, start] = useTransition();
@@ -59,11 +60,11 @@ export function CompanyContacts({ companyId, contacts, canCreate, canEdit, canDe
                   {show("telegram") && c.telegram && <span className="inline-flex items-center gap-1"><Send className="size-3.5 text-muted" />Telegram</span>}
                   {show("whatsapp") && c.whatsapp && <span className="inline-flex items-center gap-1"><MessageCircle className="size-3.5 text-muted" />WhatsApp</span>}
                   {c.max && <span className="inline-flex items-center gap-1"><MessageCircle className="size-3.5 text-muted" />MAX</span>}
-                  {c.vk && <span className="inline-flex items-center gap-1"><MessageCircle className="size-3.5 text-muted" />VK</span>}
+                  {c.instagram && <span className="inline-flex items-center gap-1"><InstagramIcon className="size-3.5 text-muted" />Instagram</span>}
                 </div>
               </div>
               <div className="flex shrink-0 items-center gap-0.5">
-                {canEdit && <button type="button" onClick={() => setEditing({ id: c.id, values: { name: c.name, position: c.position ?? "", phone: c.phone ?? "", email: c.email ?? "", telegram: c.telegram ?? "", whatsapp: c.whatsapp ?? "", max: c.max ?? "", vk: c.vk ?? "", isPrimary: c.isPrimary, birthday: c.birthday ?? "" } })} className="rounded-md p-1.5 text-muted hover:bg-black/5 hover:text-ink" aria-label="Изменить"><Pencil className="size-4" /></button>}
+                {canEdit && <button type="button" onClick={() => setEditing({ id: c.id, values: { name: c.name, position: c.position ?? "", phone: c.phone ?? "", email: c.email ?? "", telegram: c.telegram ?? "", whatsapp: c.whatsapp ?? "", max: c.max ?? "", instagram: c.instagram ?? "", isPrimary: c.isPrimary, birthday: c.birthday ?? "" } })} className="rounded-md p-1.5 text-muted hover:bg-black/5 hover:text-ink" aria-label="Изменить"><Pencil className="size-4" /></button>}
                 {canDelete && <button type="button" onClick={() => remove(c)} disabled={pending} className="rounded-md p-1.5 text-muted hover:bg-accent-soft hover:text-accent" aria-label="Удалить"><Trash2 className="size-4" /></button>}
               </div>
             </li>
@@ -79,7 +80,7 @@ export function CompanyContacts({ companyId, contacts, canCreate, canEdit, canDe
                 <Field label="Должность"><Input value={editing.values.position ?? ""} onChange={(e) => set({ position: e.target.value })} placeholder="Директор" /></Field>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <Field label="Телефон"><Input value={editing.values.phone ?? ""} onChange={(e) => set({ phone: e.target.value })} placeholder="+7 916 000-00-00" /></Field>
+                <Field label="Телефон"><Input value={editing.values.phone ?? ""} onChange={(e) => set({ phone: e.target.value })} placeholder="+998 90 123-45-67" /></Field>
                 <Field label="Email"><Input type="email" value={editing.values.email ?? ""} onChange={(e) => set({ email: e.target.value })} /></Field>
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -88,7 +89,7 @@ export function CompanyContacts({ companyId, contacts, canCreate, canEdit, canDe
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <Field label="MAX"><Input value={editing.values.max ?? ""} onChange={(e) => set({ max: e.target.value })} /></Field>
-                <Field label="VK"><Input value={editing.values.vk ?? ""} onChange={(e) => set({ vk: e.target.value })} /></Field>
+                <Field label="Instagram" hint="@username или ID аккаунта"><Input value={editing.values.instagram ?? ""} onChange={(e) => set({ instagram: e.target.value })} /></Field>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <Field label="День рождения"><Input type="date" value={editing.values.birthday ?? ""} onChange={(e) => set({ birthday: e.target.value })} /></Field>

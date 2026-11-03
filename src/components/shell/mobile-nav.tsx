@@ -19,7 +19,7 @@ export function MobileNav({ allowed }: { allowed: Record<string, boolean> }) {
       </DialogPrimitive.Trigger>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="fixed inset-0 z-40 bg-ink/40 lg:hidden" />
-        <DialogPrimitive.Content className="fixed inset-y-0 left-0 z-50 w-[280px] overflow-y-auto bg-surface p-3 shadow-pop outline-none lg:hidden">
+        <DialogPrimitive.Content className="fixed inset-y-0 left-0 z-50 w-[260px] overflow-y-auto bg-side p-2 shadow-pop outline-none lg:hidden">
           <DialogPrimitive.Title className="sr-only">Навигация</DialogPrimitive.Title>
           <div className="mb-3 flex items-center justify-between px-2">
             <span className="text-[15px] font-semibold">Оборот</span>

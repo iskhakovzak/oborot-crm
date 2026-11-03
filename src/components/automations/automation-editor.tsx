@@ -320,10 +320,10 @@ function ActionFields({ a, onChange, users, stages, vars }: { a: ActionDraft; on
         </Field>
       );
     case "send_to_edo":
-      return <p className={cn("text-xs text-muted")}>Документ из события (УПД, акт, счёт) уйдёт контрагенту через подключённый ЭДО-провайдер.</p>;
+      return <p className={cn("text-xs text-muted")}>Документ из события (ЭСФ, акт, счёт) уйдёт контрагенту через подключённый ЭДО-провайдер.</p>;
     case "ai_reply":
       return <p className="text-xs text-muted">ИИ ответит в переписке по базе знаний из настроек ИИ-помощника и передаст менеджеру по правилу передачи.</p>;
     case "sync_finance":
-      return <p className="text-xs text-muted">Оплата или документ из события будут отправлены в подключённый финучёт (1С, Финолог, ПланФакт).</p>;
+      return <p className="text-xs text-muted">Оплата или документ из события будут отправлены в подключённый финучёт (1С для Узбекистана, SmartUp, Hisobchi).</p>;
   }
 }

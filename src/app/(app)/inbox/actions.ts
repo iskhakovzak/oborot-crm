@@ -85,7 +85,7 @@ export async function createDealFromConversation(conversationId: string): Promis
     companyId = newId("cmp");
     await db.insert(schema.companies).values({ id: companyId, name: c.peerName, shortName: c.peerName, status: "lead", source: `Переписка (${c.channel})`, managerId: user.id });
     contactId = newId("cnt");
-    await db.insert(schema.contacts).values({ id: contactId, companyId, name: c.peerName, isPrimary: true, telegram: c.channel === "telegram" ? c.peerAddress : null, whatsapp: c.channel === "whatsapp" ? c.peerAddress : null, vk: c.channel === "vk" ? c.peerAddress : null, max: c.channel === "max" ? c.peerAddress : null, email: c.channel === "email" ? c.peerAddress : null, phone: c.channel === "sms" ? c.peerAddress : null });
+    await db.insert(schema.contacts).values({ id: contactId, companyId, name: c.peerName, isPrimary: true, telegram: c.channel === "telegram" ? c.peerAddress : null, whatsapp: c.channel === "whatsapp" ? c.peerAddress : null, instagram: c.channel === "instagram" ? c.peerAddress : null, max: c.channel === "max" ? c.peerAddress : null, email: c.channel === "email" ? c.peerAddress : null, phone: c.channel === "sms" ? c.peerAddress : null });
     await db.update(schema.conversations).set({ companyId, contactId }).where(eq(schema.conversations.id, c.id));
   }
   const d = await createDealQuick({ title, companyId, contactId, managerId: user.id, source: `Переписка (${c.channel})`, userId: user.id });
@@ -123,7 +123,7 @@ function addressFor(ct: typeof schema.contacts.$inferSelect, channel: Channel): 
   switch (channel) {
     case "telegram": return ct.telegram;
     case "whatsapp": return ct.whatsapp ?? ct.phone?.replace(/\D/g, "") ?? null;
-    case "vk": return ct.vk;
+    case "instagram": return ct.instagram;
     case "max": return ct.max;
     case "email": return ct.email;
     case "sms": return ct.phone;

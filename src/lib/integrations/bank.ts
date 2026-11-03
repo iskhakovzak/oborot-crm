@@ -5,16 +5,30 @@ import { resolve, logEvent } from "./registry";
 
 export type StatementRow = { externalId: string; date: string; amount: number; direction: "in" | "out"; counterpartyName: string; counterpartyInn: string; purpose: string };
 
-/** Загрузка выписки: по API банка или демо-генерация платежей под неоплаченные счета */
+/** Базовые адреса API банков (выписка). Формат ответа у банков разный — приводим к общему виду StatementRow. */
+const BANK_API: Record<string, string> = {
+  kapitalbank: "https://api.kapitalbank.uz/business/v1",
+  hamkorbank: "https://api.hamkorbank.uz/business/v1",
+  uzum: "https://api.uzumbank.uz/business/v1",
+  tbc: "https://api.tbcbank.uz/business/v1",
+};
+type RawTx = { id?: string; transactionId?: string; date?: string; valueDate?: string; amount?: number | string; direction?: string; type?: string; counterpartyName?: string; counterparty?: { name?: string; inn?: string }; counterpartyInn?: string; purpose?: string; details?: string };
+
+/** Загрузка выписки: по API банка (Капиталбанк / Hamkorbank / Uzum / TBC) или демо-генерация платежей под неоплаченные счета */
 export async function fetchStatement(): Promise<{ rows: StatementRow[]; sandbox: boolean; provider: string }> {
   const r = await resolve("bank");
-  if (r.live && r.provider === "tochka" && r.config.token) {
+  const base = BANK_API[r.provider];
+  if (r.live && base && r.config.token && r.config.accountNumber) {
     const since = new Date(Date.now() - 7 * 86400_000).toISOString().slice(0, 10);
-    const res = await fetch(`https://enter.tochka.com/uapi/open-banking/v1.0/accounts/${r.config.accountId}/statements?startDateTime=${since}`, { headers: { Authorization: `Bearer ${r.config.token}` } });
-    const j = (await res.json()) as { Data?: { Statement?: { Transaction?: { transactionId: string; documentProcessDate: string; Amount: { amount: string }; creditDebitIndicator: string; counterpartyName?: string; counterpartyInn?: string; paymentPurpose?: string }[] }[] } };
-    const rows: StatementRow[] = (j.Data?.Statement?.[0]?.Transaction ?? []).map((t) => ({ externalId: t.transactionId, date: t.documentProcessDate, amount: Number(t.Amount.amount), direction: t.creditDebitIndicator === "Credit" ? "in" : "out", counterpartyName: t.counterpartyName ?? "", counterpartyInn: t.counterpartyInn ?? "", purpose: t.paymentPurpose ?? "" }));
-    await logEvent({ kind: "bank.statement", provider: "tochka", direction: "in", payload: { count: rows.length }, integrationId: r.integrationId });
-    return { rows, sandbox: false, provider: "tochka" };
+    const res = await fetch(`${base}/accounts/${r.config.accountNumber}/statement?from=${since}`, { headers: { Authorization: `Bearer ${r.config.token}`, accept: "application/json" } });
+    const j = (await res.json().catch(() => ({}))) as { transactions?: RawTx[]; data?: RawTx[]; items?: RawTx[] };
+    const list = j.transactions ?? j.data ?? j.items ?? [];
+    const rows: StatementRow[] = list.map((t, i) => {
+      const dir = (t.direction ?? t.type ?? "").toLowerCase();
+      return { externalId: t.transactionId ?? t.id ?? `${r.provider}-${since}-${i}`, date: t.date ?? t.valueDate ?? new Date().toISOString(), amount: Math.abs(Number(t.amount ?? 0)), direction: dir === "credit" || dir === "in" || Number(t.amount ?? 0) > 0 ? "in" : "out", counterpartyName: t.counterpartyName ?? t.counterparty?.name ?? "", counterpartyInn: t.counterpartyInn ?? t.counterparty?.inn ?? "", purpose: t.purpose ?? t.details ?? "" };
+    });
+    await logEvent({ kind: "bank.statement", provider: r.provider, direction: "in", payload: { count: rows.length, ok: res.ok }, status: res.ok ? "ok" : "error", integrationId: r.integrationId });
+    return { rows, sandbox: false, provider: r.provider };
   }
   // демо: часть неоплаченных счетов «оплачивается», плюс пара расходов
   const unpaid = await db.select({ d: schema.documents, c: schema.companies }).from(schema.documents).leftJoin(schema.companies, eq(schema.documents.companyId, schema.companies.id)).where(and(eq(schema.documents.type, "invoice"), inArray(schema.documents.status, ["sent", "draft"])));
@@ -24,10 +38,10 @@ export async function fetchStatement(): Promise<{ rows: StatementRow[]; sandbox:
   unpaid.slice(0, 3).forEach(({ d, c }, i) => {
     const ext = `demo-${d.number}`;
     if (existing.has(ext)) return;
-    rows.push({ externalId: ext, date: new Date(today.getTime() - i * 3600_000 * 5).toISOString(), amount: d.amount, direction: "in", counterpartyName: c?.name ?? "Контрагент", counterpartyInn: c?.inn ?? "", purpose: `Оплата по счёту ${d.number} от ${d.createdAt.slice(0, 10)}. В т.ч. НДС 20%` });
+    rows.push({ externalId: ext, date: new Date(today.getTime() - i * 3600_000 * 5).toISOString(), amount: d.amount, direction: "in", counterpartyName: c?.name ?? "Контрагент", counterpartyInn: c?.inn ?? "", purpose: `Оплата по счёту ${d.number} от ${d.createdAt.slice(0, 10)}. В т.ч. НДС 12%` });
   });
   const extOut = `demo-rent-${today.toISOString().slice(0, 10)}`;
-  if (!existing.has(extOut)) rows.push({ externalId: extOut, date: today.toISOString(), amount: 85000, direction: "out", counterpartyName: "ООО «Пресненская набережная»", counterpartyInn: "7703123456", purpose: "Аренда офиса за текущий месяц. Без НДС" });
+  if (!existing.has(extOut)) rows.push({ externalId: extOut, date: today.toISOString(), amount: 12_500_000, direction: "out", counterpartyName: "ООО «Tashkent City Mall»", counterpartyInn: "301234567", purpose: "Аренда офиса за текущий месяц. В т.ч. НДС 12%" });
   await logEvent({ kind: "bank.statement", provider: r.provider, direction: "in", payload: { count: rows.length }, status: "sandbox", integrationId: r.integrationId });
   return { rows, sandbox: true, provider: r.provider };
 }

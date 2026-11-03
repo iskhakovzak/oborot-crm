@@ -14,7 +14,7 @@ type Fail = { error: string };
 const fail = (error: string): Fail => ({ error });
 const msg = (e: unknown) => (e instanceof Error ? e.message : String(e));
 
-const CHANNELS = ["preferred", "telegram", "whatsapp", "max", "vk", "email", "sms"] as const;
+const CHANNELS = ["preferred", "telegram", "whatsapp", "max", "instagram", "email", "sms"] as const;
 const OPS = ["eq", "neq", "gt", "lt", "contains", "in"] as const;
 
 export type AutomationInput = {

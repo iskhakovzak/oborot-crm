@@ -47,7 +47,7 @@ export default async function DocumentPage({ params }: { params: Promise<{ id: s
   const activities = activityRows.filter(({ a }) => (a.meta as { documentId?: string } | null)?.documentId === id);
   const payments = await db.query.payments.findMany({ where: eq(schema.payments.documentId, id), orderBy: desc(schema.payments.paidAt) });
   const payload = (doc.payload ?? {}) as { summary?: string; period?: string; aiSandbox?: boolean; lines?: { name: string; qty: number; unit: string; price: number }[] };
-  const edoProviderName = doc.edoProvider ? ({ diadoc: "Контур.Диадок", sbis: "СБИС" }[doc.edoProvider] ?? doc.edoProvider) : null;
+  const edoProviderName = doc.edoProvider ? ({ didox: "Didox", faktura: "Faktura.uz", diadoc: "Didox", sbis: "Faktura.uz" }[doc.edoProvider] ?? doc.edoProvider) : null;
 
   return (
     <>
@@ -94,7 +94,7 @@ export default async function DocumentPage({ params }: { params: Promise<{ id: s
             <Section title="Оплаты">
               {payments.map((p) => (
                 <Row key={p.id} label={fmtDate(p.paidAt, { day: "numeric", month: "short", year: "numeric" })}>
-                  <span className="tnum font-medium text-good">+{fmtMoney(p.amount)}</span> <span className="text-muted text-xs">{{ sbp: "СБП", bank: "банк", cash: "нал", card: "карта" }[p.method]}</span>
+                  <span className="tnum font-medium text-good">+{fmtMoney(p.amount)}</span> <span className="text-muted text-xs">{{ sbp: "Payme/Click", bank: "банк", cash: "нал", card: "карта" }[p.method]}</span>
                 </Row>
               ))}
             </Section>

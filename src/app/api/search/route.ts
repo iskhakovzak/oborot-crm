@@ -22,11 +22,11 @@ export async function GET(req: Request) {
   if (can(user.actor, "deals", "view")) {
     const num = Number(q.replace(/\D/g, "")) || -1;
     const rows = await db.select().from(schema.deals).where(or(ilike(schema.deals.title, p), eq(schema.deals.number, num))).orderBy(desc(schema.deals.updatedAt)).limit(5);
-    out.push(...rows.map((d) => ({ type: "deal", id: d.id, title: `№${d.number} ${d.title}`, subtitle: `${d.amount.toLocaleString("ru-RU")} ₽`, href: `/deals/${d.id}` })));
+    out.push(...rows.map((d) => ({ type: "deal", id: d.id, title: `№${d.number} ${d.title}`, subtitle: `${d.amount.toLocaleString("ru-RU")} сум`, href: `/deals/${d.id}` })));
   }
   if (can(user.actor, "documents", "view")) {
     const rows = await db.select().from(schema.documents).where(or(ilike(schema.documents.number, p), ilike(schema.documents.title, p))).limit(4);
-    out.push(...rows.map((d) => ({ type: "document", id: d.id, title: d.title, subtitle: `${d.amount.toLocaleString("ru-RU")} ₽`, href: `/documents/${d.id}` })));
+    out.push(...rows.map((d) => ({ type: "document", id: d.id, title: d.title, subtitle: `${d.amount.toLocaleString("ru-RU")} сум`, href: `/documents/${d.id}` })));
   }
   return NextResponse.json(out);
 }

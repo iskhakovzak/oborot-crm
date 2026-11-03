@@ -42,7 +42,7 @@ export const CHANNEL_OPTIONS = [
   { value: "telegram", label: "Telegram" },
   { value: "whatsapp", label: "WhatsApp" },
   { value: "max", label: "MAX" },
-  { value: "vk", label: "ВКонтакте" },
+  { value: "instagram", label: "Instagram" },
   { value: "email", label: "Почта" },
   { value: "sms", label: "SMS" },
 ];

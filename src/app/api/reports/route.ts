@@ -13,7 +13,7 @@ const TYPES = { marketing: "Маркетинг", sales: "Продажи", produc
 type ReportType = keyof typeof TYPES;
 const FILE = { marketing: "маркетинг", sales: "продажи", production: "производство" } as const;
 
-const money = (v: number) => new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 }).format(v) + " ₽";
+const money = (v: number) => new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 }).format(v) + " сум";
 const num = (v: number) => new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 1 }).format(v);
 const pct = (v: number, d = 0) => `${v.toFixed(d)}%`;
 

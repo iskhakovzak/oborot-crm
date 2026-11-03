@@ -81,16 +81,16 @@ export async function linkTransactionAction(p: { txId: string; companyId: string
   return { ok: true, message: tx.direction === "in" ? `Операция разнесена: создан платёж ${fmtMoney(tx.amount)}` : "Операция привязана к контрагенту" };
 }
 
-/** 10 — ссылка на оплату по СБП */
+/** 10 — ссылка на оплату через Payme/Click */
 export async function createPaymentLinkAction(p: { companyId?: string | null; dealId?: string | null; documentId?: string | null; amount: number; purpose: string }): Promise<Result> {
   const user = await requireUser();
   if (!can(user.actor, "payments", "create")) return { ok: false, error: "Нет прав" };
   if (!(p.amount > 0)) return { ok: false, error: "Сумма должна быть больше нуля" };
   const doc = p.documentId ? await db.query.documents.findFirst({ where: eq(schema.documents.id, p.documentId) }) : null;
   const r = await createPaymentLink({ amount: p.amount, purpose: p.purpose || (doc ? `Оплата по счёту ${doc.number}` : "Оплата"), companyId: p.companyId || doc?.companyId || null, dealId: p.dealId || doc?.dealId || null, documentId: doc?.id ?? null });
-  await logActivity({ type: "payment", title: `Создана ссылка на оплату по СБП на ${fmtMoney(p.amount)}`, body: r.url, dealId: p.dealId || doc?.dealId || null, companyId: p.companyId || doc?.companyId || null, userId: user.id, meta: { paymentLinkId: r.id, documentId: doc?.id ?? null } });
+  await logActivity({ type: "payment", title: `Создана ссылка на оплату через Payme/Click на ${fmtMoney(p.amount)}`, body: r.url, dealId: p.dealId || doc?.dealId || null, companyId: p.companyId || doc?.companyId || null, userId: user.id, meta: { paymentLinkId: r.id, documentId: doc?.id ?? null } });
   revalidateFinance(p.dealId, p.companyId);
-  return { ok: true, message: `Ссылка создана${r.sandbox ? " (демо-режим СБП)" : ""}`, id: r.id };
+  return { ok: true, message: `Ссылка создана${r.sandbox ? " (демо-режим Payme/Click)" : ""}`, id: r.id };
 }
 
 export async function sendPaymentLinkAction(linkId: string): Promise<Result> {
@@ -99,7 +99,7 @@ export async function sendPaymentLinkAction(linkId: string): Promise<Result> {
   const link = await db.query.paymentLinks.findFirst({ where: eq(schema.paymentLinks.id, linkId) });
   if (!link) return { ok: false, error: "Ссылка не найдена" };
   const deal = link.dealId ? await db.query.deals.findFirst({ where: eq(schema.deals.id, link.dealId) }) : null;
-  const r = await sendMessage({ channel: "preferred", text: `Ссылка на оплату ${fmtMoney(link.amount)} по СБП: ${link.url}\n${link.purpose}`, companyId: link.companyId, contactId: deal?.contactId, dealId: link.dealId, userId: user.id });
+  const r = await sendMessage({ channel: "preferred", text: `Ссылка на оплату ${fmtMoney(link.amount)} через Payme/Click: ${link.url}\n${link.purpose}`, companyId: link.companyId, contactId: deal?.contactId, dealId: link.dealId, userId: user.id });
   if (!r.ok) return { ok: false, error: r.error ?? "Не удалось отправить" };
   await logActivity({ type: "message", title: `Ссылка на оплату отправлена клиенту (${r.channel})`, dealId: link.dealId, companyId: link.companyId, userId: user.id, meta: { paymentLinkId: link.id } });
   revalidateFinance(link.dealId, link.companyId);

@@ -59,10 +59,10 @@ export function PaymentDialog({ options }: { options: FinanceOptions }) {
               </Field>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Сумма, ₽"><Input type="number" min={1} step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="150 000" className="tnum" /></Field>
+              <Field label="Сумма, сум"><Input type="number" min={1} step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="150 000" className="tnum" /></Field>
               <Field label="Способ">
                 <Select value={method} onChange={(e) => setMethod(e.target.value as typeof method)}>
-                  <option value="bank">Банковский перевод</option><option value="sbp">СБП</option><option value="cash">Наличные</option><option value="card">Карта</option>
+                  <option value="bank">Банковский перевод</option><option value="sbp">Payme/Click</option><option value="cash">Наличные</option><option value="card">Карта</option>
                 </Select>
               </Field>
             </div>

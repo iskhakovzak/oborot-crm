@@ -1,9 +1,10 @@
 import { eq } from "drizzle-orm";
 import { db, schema } from "@/db";
 
+/** Реквизиты компании (Узбекистан): ИНН 9 цифр, ОКЭД, регистрационный номер, МФО банка, р/с 20 цифр, НДС 12% */
 export type CompanyProfile = {
-  name: string; shortName: string; inn: string; kpp: string; ogrn: string; address: string; director: string; directorPosition: string;
-  accountant: string; bankName: string; bik: string; account: string; corrAccount: string; phone: string; email: string; vatPayer: boolean; vatRate: number;
+  name: string; shortName: string; inn: string; oked: string; regNumber: string; address: string; director: string; directorPosition: string;
+  accountant: string; bankName: string; mfo: string; account: string; phone: string; email: string; vatPayer: boolean; vatRate: number;
 };
 export type DistributionSettings = {
   mode: "round_robin" | "least_loaded" | "by_source" | "by_skill";
@@ -22,19 +23,19 @@ export type BookingSettings = { confirmByChannel: "telegram" | "whatsapp" | "ema
 
 const DEFAULTS: { company: CompanyProfile; distribution: DistributionSettings; telegram: TelegramBotSettings; ai: AiSettings; booking: BookingSettings } = {
   company: {
-    name: "ООО «Оборот»", shortName: "Оборот", inn: "7707083893", kpp: "770701001", ogrn: "1027700132195",
-    address: "123112, г. Москва, Пресненская наб., д. 12, этаж 14", director: "Костин Станислав Игоревич", directorPosition: "Генеральный директор",
-    accountant: "Белова Анна Сергеевна", bankName: "АО «ТБанк»", bik: "044525974", account: "40702810110000123456", corrAccount: "30101810145250000974",
-    phone: "+7 495 120-00-00", email: "hello@oborot.ru", vatPayer: true, vatRate: 20,
+    name: "ООО «Oborot Climate»", shortName: "Oborot", inn: "305123456", oked: "43220", regNumber: "1234567",
+    address: "100015, г. Ташкент, Мирабадский район, ул. Шахрисабз, 16", director: "Каримов Алишер Бахтиёрович", directorPosition: "Директор",
+    accountant: "Рашидова Дилноза Фарходовна", bankName: "АКБ «Капиталбанк»", mfo: "00974", account: "20208000900123456001",
+    phone: "+998 71 200-00-00", email: "hello@oborot.uz", vatPayer: true, vatRate: 12,
   },
   distribution: { mode: "round_robin", managerIds: [], sourceRules: [], skillRules: [], lastIndex: 0, notifyManager: true },
   telegram: { enabled: true, webhookSecret: "", allowedUserIds: [], ownerChatId: "" },
   ai: {
-    model: "claude-opus-5-5", assistantName: "Мария", tone: "дружелюбно и по делу, на «вы»",
+    model: "claude-opus-5-5", assistantName: "Малика", tone: "дружелюбно и по делу, на «вы»",
     chatAutoReply: true, chatHandoffRule: "если клиент просит менеджера, спорит о цене или задаёт вопрос вне базы знаний — передать менеджеру",
-    callsEnabled: true, callGreeting: "Здравствуйте! Компания Оборот, меня зовут Мария. Чем могу помочь?",
+    callsEnabled: true, callGreeting: "Здравствуйте! Компания Oborot, меня зовут Малика. Чем могу помочь?",
     callScript: "Выясни, что нужно клиенту, уточни имя и компанию, предложи записаться на консультацию или оформить заявку. Если вопрос срочный — переведи на менеджера.",
-    knowledge: "Мы продаём и устанавливаем климатическое оборудование для бизнеса: кондиционеры, вентиляцию, тепловые завесы. Доставка по России 2–7 дней, монтаж своими бригадами, гарантия 3 года. Работаем по договору, оплата по счёту или по СБП, с НДС.",
+    knowledge: "Мы продаём и устанавливаем климатическое оборудование для бизнеса в Ташкенте и по всему Узбекистану: кондиционеры, вентиляцию, тепловые завесы. Доставка по Ташкенту 1–2 дня, по регионам 3–5 дней, монтаж своими бригадами, гарантия 3 года. Работаем по договору, оплата по счёту (перечислением) или через Payme/Click, цены в сумах с НДС 12%. Выставляем ЭСФ через Didox.",
     maxAutoReplies: 5,
   },
   booking: { confirmByChannel: "telegram", createLead: true, defaultPipelineId: null },

@@ -19,7 +19,7 @@ import { addDealNote } from "../actions";
 
 export const dynamic = "force-dynamic";
 
-const CHANNEL: Record<string, string> = { telegram: "Telegram", whatsapp: "WhatsApp", vk: "VK", max: "MAX", email: "Email", sms: "SMS", web: "Сайт" };
+const CHANNEL: Record<string, string> = { telegram: "Telegram", whatsapp: "WhatsApp", instagram: "Instagram", max: "MAX", email: "Email", sms: "SMS", web: "Сайт" };
 const CALL_STATUS: Record<string, string> = { queued: "в очереди", ringing: "идёт вызов", answered: "ответили", missed: "пропущен", busy: "занято", completed: "завершён", ai_handled: "принял ИИ" };
 
 export default async function DealPage({ params }: { params: Promise<{ id: string }> }) {

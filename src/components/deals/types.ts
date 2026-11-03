@@ -21,7 +21,7 @@ export type KanbanDeal = {
 
 export type Option = { id: string; name: string };
 
-export const SOURCES = ["Сайт", "Яндекс Директ", "VK Реклама", "Авито", "Telegram-канал", "Instagram", "Рекомендация", "Холодный звонок", "Выставка", "Входящий звонок", "Другое"];
+export const SOURCES = ["Сайт", "Яндекс Директ", "Google Ads", "OLX", "Telegram-канал", "Instagram", "Рекомендация", "Холодный звонок", "Выставка", "Входящий звонок", "Другое"];
 
 export function daysSince(iso: string | null | undefined) {
   if (!iso) return 0;

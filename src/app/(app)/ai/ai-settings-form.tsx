@@ -40,7 +40,7 @@ export function AiSettingsForm({ settings, canEdit }: { settings: AiSettings; ca
         </div>
       </Section>
 
-      <Section title={<span className="inline-flex items-center gap-2"><MessageSquareText className="size-4 text-muted" /> Переписки</span>} description="Пункт 23: ИИ отвечает в Telegram, WhatsApp, MAX, ВКонтакте и почте">
+      <Section title={<span className="inline-flex items-center gap-2"><MessageSquareText className="size-4 text-muted" /> Переписки</span>} description="Пункт 23: ИИ отвечает в Telegram, WhatsApp, MAX, Instagram и почте">
         <div className="space-y-4">
           <label className="flex items-center justify-between gap-4 rounded-[10px] border border-line px-3.5 py-3">
             <span>

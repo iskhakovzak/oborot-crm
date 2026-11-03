@@ -10,7 +10,7 @@ import { handleIncomingCall, resolvePeer } from "@/lib/calls";
 
 export const dynamic = "force-dynamic";
 
-const PROVIDERS = ["telegram", "whatsapp", "vk", "max", "email", "telephony"] as const;
+const PROVIDERS = ["telegram", "whatsapp", "instagram", "max", "email", "telephony"] as const;
 type Provider = (typeof PROVIDERS)[number];
 type Json = Record<string, unknown>;
 type Inbound = { address: string; name: string; text: string; externalId?: string; attachments?: { name: string; url: string }[] };
@@ -26,7 +26,7 @@ async function readBody(req: Request): Promise<Json> {
     if (!raw) return {};
     if (ct.includes("form")) {
       const params = Object.fromEntries(new URLSearchParams(raw)) as Record<string, string>;
-      // Mango Office присылает поле json со вложенным JSON
+      // Некоторые АТС присылают поле json со вложенным JSON
       if (params.json) { try { return { ...params, ...(JSON.parse(params.json) as Json) }; } catch { return params; } }
       return params;
     }
@@ -61,12 +61,16 @@ function normalize(provider: Provider, b: Json): Inbound | null {
       const file = get(b, "messageData.fileMessageData") as Json | undefined;
       return { address: chatId.replace(/@.*$/, ""), name: str(get(b, "senderData.senderName") ?? get(b, "senderData.chatName")) || chatId.replace(/@.*$/, ""), text: text || (file ? `[файл] ${str(file.fileName)}` : ""), externalId: str(b.idMessage) || undefined, attachments: file?.downloadUrl ? [{ name: str(file.fileName) || "файл", url: str(file.downloadUrl) }] : [] };
     }
-    case "vk": {
-      if (b.type !== "message_new") return null;
-      const m = (get(b, "object.message") ?? b.object) as Json | undefined;
-      if (!m) return null;
-      const peer = str(m.peer_id ?? m.from_id ?? m.user_id);
-      return { address: peer, name: `ВКонтакте id${peer}`, text: str(m.text ?? m.body), externalId: str(m.conversation_message_id ?? m.id) || undefined };
+    case "instagram": {
+      // Meta Graph API (Instagram Messaging): entry[].messaging[] { sender, recipient, message }
+      const entries = Array.isArray(b.entry) ? (b.entry as Json[]) : [];
+      const msgs = entries.flatMap((e) => (Array.isArray(e.messaging) ? (e.messaging as Json[]) : []));
+      const ev = msgs.find((m) => m.message && !get(m, "message.is_echo")) ?? null;
+      if (!ev) return null;
+      const peer = str(get(ev, "sender.id"));
+      if (!peer) return null;
+      const atts = Array.isArray(get(ev, "message.attachments")) ? (get(ev, "message.attachments") as Json[]).filter((a) => get(a, "payload.url")).map((a) => ({ name: str(a.type) || "вложение", url: str(get(a, "payload.url")) })) : [];
+      return { address: peer, name: str(get(ev, "sender.username")) || `Instagram ${peer}`, text: str(get(ev, "message.text")) || (atts.length ? `[вложение] ${atts[0].name}` : ""), externalId: str(get(ev, "message.mid")) || undefined, attachments: atts };
     }
     case "max": {
       if (b.update_type && b.update_type !== "message_created") return null;
@@ -93,11 +97,11 @@ function normalize(provider: Provider, b: Json): Inbound | null {
   }
 }
 
-/** Входящий звонок из АТС (Mango, Zadarma, UIS или универсальный формат) */
+/** Входящий звонок из АТС (OnlinePBX, Sipuni или универсальный формат) */
 async function telephony(b: Json) {
   const event = str(b.event ?? b.call_state ?? b.type ?? b.state).toLowerCase();
   const direction = str(b.direction ?? (b.location === "ivr" ? "in" : "")).toLowerCase();
-  // Zadarma: NOTIFY_START (входящий), NOTIFY_END; Mango: call_state Appeared/Connected/Disconnected
+  // Sipuni: NOTIFY_START (входящий), NOTIFY_END; OnlinePBX: call_state Appeared/Connected/Disconnected
   const isIncoming = /notify_start|appeared|incoming|ringing|new_call/.test(event) || direction === "in" || direction === "inbound" || (!event && !direction);
   if (/notify_end|disconnected|hangup|end/.test(event) && !isIncoming) return { ok: true, skipped: "end-of-call" };
   if (!isIncoming) return { ok: true, skipped: "outgoing" };
@@ -120,15 +124,12 @@ export async function POST(req: Request, ctx: RouteContext<"/api/webhooks/[provi
   const body = await readBody(req);
   await logEvent({ kind: "webhook.receive", provider: p, direction: "in", payload: body });
 
-  if (p === "vk") {
-    const r = await resolve("messenger", "vk");
-    if (body.type === "confirmation") {
-      const ok = !r.config.groupId || str(body.group_id) === r.config.groupId;
-      await logEvent({ kind: "webhook.confirmation", provider: "vk", direction: "out", payload: { groupId: body.group_id, ok }, status: ok ? "ok" : "error", integrationId: r.integrationId });
-      return new Response(ok ? r.config.confirmationCode || r.config.confirmation || "ok" : "forbidden", { status: ok ? 200 : 403, headers: { "content-type": "text/plain" } });
-    }
-    if (r.config.groupId && body.group_id != null && str(body.group_id) !== r.config.groupId) return new Response("ok");
-    if (r.config.secret && body.secret !== r.config.secret) return new Response("ok");
+  if (p === "instagram") {
+    const r = await resolve("messenger", "instagram");
+    // Meta присылает события и для других объектов (page, user) — обрабатываем только Instagram
+    if (body.object && body.object !== "instagram") return new Response("ok");
+    const entries = Array.isArray(body.entry) ? (body.entry as Json[]) : [];
+    if (r.config.accountId && entries.length && !entries.some((e) => str(e.id) === r.config.accountId)) return new Response("ok");
   }
 
   if (p === "telephony") {
@@ -139,18 +140,28 @@ export async function POST(req: Request, ctx: RouteContext<"/api/webhooks/[provi
   const inbound = normalize(p, body);
   if (!inbound || !inbound.address) {
     const res = { ok: true, skipped: true };
-    return p === "vk" ? new Response("ok") : NextResponse.json(res);
+    return p === "instagram" ? new Response("ok") : NextResponse.json(res);
   }
   const channel: Channel = p;
   const got = await receiveMessage({ channel, address: inbound.address, name: inbound.name, text: inbound.text || "[пустое сообщение]", externalId: inbound.externalId, attachments: inbound.attachments });
   const conv = await db.query.conversations.findFirst({ where: eq(schema.conversations.id, got.conversationId) });
   const runs = await emit("message.received", { conversationId: got.conversationId, companyId: got.companyId, contactId: got.contactId, dealId: conv?.dealId ?? null, text: inbound.text });
-  if (p === "vk") return new Response("ok");
+  if (p === "instagram") return new Response("ok");
   return NextResponse.json({ ok: true, conversationId: got.conversationId, messageId: got.messageId, automations: runs.map((x) => ({ status: x.status, log: x.log })) });
 }
 
-export async function GET(_req: Request, ctx: RouteContext<"/api/webhooks/[provider]">) {
+export async function GET(req: Request, ctx: RouteContext<"/api/webhooks/[provider]">) {
   const { provider } = await ctx.params;
   if (!PROVIDERS.includes(provider as Provider)) return NextResponse.json({ ok: false, error: "unknown provider" }, { status: 404 });
+  if (provider === "instagram") {
+    // Проверка вебхука Meta: hub.mode=subscribe&hub.verify_token=…&hub.challenge=…
+    const sp = new URL(req.url).searchParams;
+    if (sp.get("hub.mode") === "subscribe") {
+      const r = await resolve("messenger", "instagram");
+      const ok = !r.config.verifyToken || sp.get("hub.verify_token") === r.config.verifyToken;
+      await logEvent({ kind: "webhook.confirmation", provider: "instagram", direction: "out", payload: { ok }, status: ok ? "ok" : "error", integrationId: r.integrationId });
+      return new Response(ok ? sp.get("hub.challenge") ?? "" : "forbidden", { status: ok ? 200 : 403, headers: { "content-type": "text/plain" } });
+    }
+  }
   return NextResponse.json({ ok: true, provider, method: "POST", hint: "Укажите этот адрес в настройках вебхука провайдера" });
 }

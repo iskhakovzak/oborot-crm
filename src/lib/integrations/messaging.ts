@@ -38,8 +38,8 @@ export async function preferredChannel(contactId?: string | null, companyId?: st
   }
   if (contact.telegram) return { channel: "telegram", address: contact.telegram, name: contact.name };
   if (contact.whatsapp) return { channel: "whatsapp", address: contact.whatsapp, name: contact.name };
+  if (contact.instagram) return { channel: "instagram", address: contact.instagram, name: contact.name };
   if (contact.max) return { channel: "max", address: contact.max, name: contact.name };
-  if (contact.vk) return { channel: "vk", address: contact.vk, name: contact.name };
   if (contact.email) return { channel: "email", address: contact.email, name: contact.name };
   if (contact.phone) return { channel: "sms", address: contact.phone, name: contact.name };
   return null;
@@ -99,12 +99,12 @@ async function deliverMessenger(channel: Channel, address: string, text: string)
       await logEvent({ kind: "message.send", provider: "whatsapp", direction: "out", payload: { to: chatId, text, response: j }, status: j.idMessage ? "ok" : "error", integrationId: r.integrationId });
       return { ok: !!j.idMessage, sandbox: false, externalId: j.idMessage };
     }
-    if (r.live && channel === "vk" && r.config.groupToken) {
-      const params = new URLSearchParams({ access_token: r.config.groupToken, v: "5.199", peer_id: address, message: text, random_id: String(Date.now()) });
-      const res = await fetch(`https://api.vk.com/method/messages.send?${params}`);
-      const j = (await res.json()) as { response?: number; error?: { error_msg: string } };
-      await logEvent({ kind: "message.send", provider: "vk", direction: "out", payload: { to: address, text, response: j }, status: j.error ? "error" : "ok", integrationId: r.integrationId });
-      return { ok: !j.error, sandbox: false, externalId: j.response ? String(j.response) : undefined, error: j.error?.error_msg };
+    if (r.live && channel === "instagram" && r.config.pageToken && r.config.igAccountId) {
+      // Instagram Direct через Meta Graph API: адрес — IGSID пользователя из вебхука
+      const res = await fetch(`https://graph.facebook.com/v19.0/${r.config.igAccountId}/messages?access_token=${encodeURIComponent(r.config.pageToken)}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ recipient: { id: address }, message: { text } }) });
+      const j = (await res.json()) as { message_id?: string; recipient_id?: string; error?: { message: string } };
+      await logEvent({ kind: "message.send", provider: "instagram", direction: "out", payload: { to: address, text, response: j }, status: j.error ? "error" : "ok", integrationId: r.integrationId });
+      return { ok: !j.error, sandbox: false, externalId: j.message_id, error: j.error?.message };
     }
     if (r.live && channel === "max" && r.config.botToken) {
       const res = await fetch(`https://botapi.max.ru/messages?chat_id=${encodeURIComponent(address)}`, { method: "POST", headers: { "content-type": "application/json", Authorization: r.config.botToken }, body: JSON.stringify({ text }) });
@@ -124,7 +124,7 @@ async function deliverMessenger(channel: Channel, address: string, text: string)
 export async function receiveMessage(p: { channel: Channel; address: string; name: string; text: string; externalId?: string; attachments?: { name: string; url: string }[] }) {
   // пробуем найти контакт по адресу
   const contact = await db.query.contacts.findFirst({
-    where: (c, { or, eq }) => or(eq(c.telegram, p.address), eq(c.whatsapp, p.address), eq(c.vk, p.address), eq(c.max, p.address), eq(c.email, p.address), eq(c.phone, p.address)),
+    where: (c, { or, eq }) => or(eq(c.telegram, p.address), eq(c.whatsapp, p.address), eq(c.instagram, p.address), eq(c.max, p.address), eq(c.email, p.address), eq(c.phone, p.address)),
   });
   const conv = await findOrCreateConversation({ channel: p.channel, address: p.address, name: contact?.name ?? p.name, companyId: contact?.companyId ?? null, contactId: contact?.id ?? null, externalId: p.externalId });
   const msgId = newId("msg");

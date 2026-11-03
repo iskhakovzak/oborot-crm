@@ -8,7 +8,7 @@ import { nextNumber, docNumber } from "@/lib/counters";
 import { getSetting, appUrl } from "@/lib/settings";
 import { logActivity } from "@/lib/activity";
 import { emit } from "@/lib/events";
-import { renderInvoice, renderContract, renderUpd, renderAct, renderKp, renderClientReport, type Party, type Line, totals, money, dateRu } from "./pdf";
+import { renderInvoice, renderContract, renderUpd, renderAct, renderKp, renderClientReport, type Party, type Line, totals, money, dateRu, DEFAULT_VAT } from "./pdf";
 import { fmtMoney, fmtDate } from "@/lib/format";
 
 function storageDir() {
@@ -17,22 +17,23 @@ function storageDir() {
 }
 const STORAGE = storageDir();
 
-const TITLES: Record<DocumentType, string> = { invoice: "Счёт", contract: "Договор", upd: "УПД", act: "Акт", kp: "Коммерческое предложение", report: "Отчёт для клиента" };
-const PREFIX: Record<DocumentType, string> = { invoice: "СЧ", contract: "Д", upd: "УПД", act: "АКТ", kp: "КП", report: "ОТЧ" };
+/** Тип «upd» — это ЭСФ (электронная счёт-фактура), ключ сохранён для совместимости */
+export const TITLES: Record<DocumentType, string> = { invoice: "Счёт", contract: "Договор", upd: "ЭСФ", act: "Акт", kp: "Коммерческое предложение", report: "Отчёт для клиента" };
+export const PREFIX: Record<DocumentType, string> = { invoice: "СЧ", contract: "Д", upd: "ЭСФ", act: "АКТ", kp: "КП", report: "ОТЧ" };
 
 export async function sellerParty(): Promise<Party> {
   const c = await getSetting("company");
-  return { name: c.name, inn: c.inn, kpp: c.kpp, address: c.address, bankName: c.bankName, bik: c.bik, account: c.account, corrAccount: c.corrAccount, director: c.director, directorPosition: c.directorPosition, phone: c.phone, email: c.email };
+  return { name: c.name, inn: c.inn, oked: c.oked, regNumber: c.regNumber, address: c.address, bankName: c.bankName, mfo: c.mfo, account: c.account, director: c.director, directorPosition: c.directorPosition, phone: c.phone, email: c.email };
 }
 export function buyerParty(c: typeof schema.companies.$inferSelect | null | undefined): Party {
-  return { name: c?.name ?? "Покупатель", inn: c?.inn ?? "", kpp: c?.kpp ?? undefined, address: c?.legalAddress ?? c?.address ?? "", bankName: c?.bankName ?? undefined, bik: c?.bik ?? undefined, account: c?.account ?? undefined, corrAccount: c?.corrAccount ?? undefined, director: c?.director ?? undefined, directorPosition: c?.directorPosition ?? undefined };
+  return { name: c?.name ?? "Покупатель", inn: c?.inn ?? "", oked: c?.oked ?? undefined, regNumber: c?.regNumber ?? undefined, address: c?.legalAddress ?? c?.address ?? "", bankName: c?.bankName ?? undefined, mfo: c?.mfo ?? undefined, account: c?.account ?? undefined, director: c?.director ?? undefined, directorPosition: c?.directorPosition ?? undefined };
 }
 
 export async function dealLines(dealId: string): Promise<Line[]> {
   const items = await db.query.dealItems.findMany({ where: eq(schema.dealItems.dealId, dealId) });
   if (items.length) return items.map((i) => ({ name: i.name, unit: i.unit, qty: i.qty, price: i.price, discount: i.discount, vatRate: i.vatRate }));
   const deal = await db.query.deals.findFirst({ where: eq(schema.deals.id, dealId) });
-  return [{ name: deal?.title ?? "Товары и услуги по сделке", unit: "усл", qty: 1, price: deal?.amount ?? 0, vatRate: 20 }];
+  return [{ name: deal?.title ?? "Товары и услуги по сделке", unit: "усл", qty: 1, price: deal?.amount ?? 0, vatRate: DEFAULT_VAT }];
 }
 
 /** 6, 7, 8, 22 — генерация документа по сделке в один клик */
@@ -63,7 +64,7 @@ export async function createDocument(p: { type: DocumentType; dealId?: string | 
   try { fs.writeFileSync(filePath, bytes); } catch { /* файл не критичен: PDF перерисуется из payload */ }
   const title = p.title ?? `${TITLES[p.type]} ${number}`;
   await db.insert(schema.documents).values({ id, type: p.type, number, title, dealId: p.dealId ?? null, companyId, amount: t.sum, status: "draft", filePath, payload: { seller, buyer, lines, totals: t, date }, createdBy: p.userId ?? null });
-  await logActivity({ type: "document", title: `${TITLES[p.type]} ${number} сформирован`, body: `${lines.length} поз., ${fmtMoney(t.sum)}`, dealId: p.dealId, companyId, userId: p.userId, meta: { documentId: id } });
+  await logActivity({ type: "document", title: `${TITLES[p.type]} ${number} ${p.type === "upd" ? "сформирована" : "сформирован"}`, body: `${lines.length} поз., ${fmtMoney(t.sum)}`, dealId: p.dealId, companyId, userId: p.userId, meta: { documentId: id } });
   if (p.type === "invoice") await emit("invoice.created", { dealId: p.dealId, companyId, documentId: id, amount: t.sum, userId: p.userId, contactId: deal?.contactId });
   if (p.type === "upd") await emit("upd.created", { dealId: p.dealId, companyId, documentId: id, amount: t.sum, userId: p.userId, contactId: deal?.contactId });
   return { id, number, title, amount: t.sum, filePath };

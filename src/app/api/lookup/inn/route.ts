@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { lookupCompanyByInn, validateInn } from "@/lib/integrations/company-data";
 
-/** 4. Автозаполнение карточки клиента по ИНН (DaData или демо-данные) */
+/** 4. Автозаполнение карточки клиента по ИНН (реестр ЮЛ soliq.uz или демо-данные) */
 export async function GET(req: Request) {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "Требуется авторизация" }, { status: 401 });

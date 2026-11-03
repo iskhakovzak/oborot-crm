@@ -1,5 +1,6 @@
 import { and, eq, gte, inArray, lte } from "drizzle-orm";
 import { db, schema } from "@/db";
+import { startOfDayTz, tzDay } from "@/lib/format";
 
 /**
  * 13–15. Аналитика по маркетингу, продажам и производству «за 1 клик».
@@ -10,17 +11,14 @@ export type Period = { from: Date; to: Date };
 
 export function periodDays(days: number): Period {
   const to = new Date();
-  const from = new Date(to.getTime() - days * 86400_000);
-  from.setHours(0, 0, 0, 0);
+  const from = startOfDayTz(new Date(to.getTime() - days * 86400_000));
   return { from, to };
 }
 
-/** Понедельник недели, 00:00 */
+/** Понедельник недели, 00:00 по Ташкенту */
 export function weekStart(d: Date) {
-  const x = new Date(d);
-  x.setHours(0, 0, 0, 0);
-  x.setDate(x.getDate() - ((x.getDay() + 6) % 7));
-  return x;
+  const x = startOfDayTz(d);
+  return new Date(x.getTime() - ((tzDay(x) + 6) % 7) * 86400_000);
 }
 function monthStart(d: Date) {
   const x = new Date(d.getFullYear(), d.getMonth(), 1);

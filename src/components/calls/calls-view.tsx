@@ -196,7 +196,7 @@ function PeerPicker({ contacts, contactId, setContactId, phone, setPhone }: { co
           {contacts.map((c) => <option key={c.id} value={c.id}>{c.name}{c.company ? ` — ${c.company}` : ""} · {phoneFmt(c.phone)}</option>)}
         </Select>
       </Field>
-      <Field label="Номер телефона"><Input value={phone} onChange={(e) => { setPhone(e.target.value); if (contactId) setContactId(""); }} placeholder="+7 900 000-00-00" inputMode="tel" /></Field>
+      <Field label="Номер телефона"><Input value={phone} onChange={(e) => { setPhone(e.target.value); if (contactId) setContactId(""); }} placeholder="+998 90 123-45-67" inputMode="tel" /></Field>
     </>
   );
 }
@@ -211,7 +211,7 @@ function CallDialog({ open, onOpenChange, contacts }: { open: boolean; onOpenCha
       const r = await callAction({ phone, contactId: contactId || null });
       if (!r.ok) { toast.error(r.error); return; }
       onOpenChange(false);
-      toast.success("Звонок запущен", { description: r.sandbox ? "Демо-режим: подключите Mango Office или Zadarma в Интеграциях." : "Сначала зазвонит ваш телефон, затем — клиента." });
+      toast.success("Звонок запущен", { description: r.sandbox ? "Демо-режим: подключите OnlinePBX или Sipuni в Интеграциях." : "Сначала зазвонит ваш телефон, затем — клиента." });
       router.refresh();
     });
   return (

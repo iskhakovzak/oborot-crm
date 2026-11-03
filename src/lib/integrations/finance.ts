@@ -3,16 +3,22 @@ import { db, schema } from "@/db";
 import { newId } from "@/lib/utils";
 import { resolve, logEvent } from "./registry";
 
-/** Синхронизация CRM ↔ финучёт (1С / Финолог / ПланФакт / МойСклад). Пушим оплаты, счета и контрагентов. */
+/** Синхронизация CRM ↔ финучёт (1С:Бухгалтерия для Узбекистана / SmartUp / Hisobchi). Пушим оплаты, счета и контрагентов. */
 export async function syncToFinance(entity: "payment" | "document" | "company", entityId: string) {
   const r = await resolve("finance");
   let ok = true, message = "";
   try {
-    if (r.live && r.provider === "finolog" && r.config.apiToken && entity === "payment") {
+    if (r.live && r.provider === "smartup" && r.config.apiToken && entity === "payment") {
       const p = await db.query.payments.findFirst({ where: eq(schema.payments.id, entityId) });
       if (p) {
-        const res = await fetch(`https://api.finolog.ru/v1/biz/${r.config.bizId}/transaction`, { method: "POST", headers: { "content-type": "application/json", "Api-Token": r.config.apiToken }, body: JSON.stringify({ value: p.direction === "in" ? p.amount : -p.amount, date: p.paidAt.slice(0, 10), description: p.purpose ?? "Оплата из CRM" }) });
-        ok = res.ok; message = ok ? "Передано в Финолог" : `Финолог ответил ${res.status}`;
+        const res = await fetch(`https://smartup.online/b/api/v1/${r.config.projectCode ?? "crm"}/payments`, { method: "POST", headers: { "content-type": "application/json", Authorization: `Bearer ${r.config.apiToken}` }, body: JSON.stringify({ amount: p.direction === "in" ? p.amount : -p.amount, currency: "UZS", date: p.paidAt.slice(0, 10), note: p.purpose ?? "Оплата из CRM", external_id: p.id }) });
+        ok = res.ok; message = ok ? "Передано в SmartUp" : `SmartUp ответил ${res.status}`;
+      }
+    } else if (r.live && r.provider === "hisobchi" && r.config.apiKey && entity === "payment") {
+      const p = await db.query.payments.findFirst({ where: eq(schema.payments.id, entityId) });
+      if (p) {
+        const res = await fetch("https://api.hisobchi.uz/v1/transactions", { method: "POST", headers: { "content-type": "application/json", "X-Api-Key": r.config.apiKey }, body: JSON.stringify({ amount: p.direction === "in" ? p.amount : -p.amount, date: p.paidAt.slice(0, 10), description: p.purpose ?? "Оплата из CRM" }) });
+        ok = res.ok; message = ok ? "Передано в Hisobchi" : `Hisobchi ответил ${res.status}`;
       }
     } else if (r.live && r.provider === "onec" && r.config.url) {
       const res = await fetch(`${r.config.url.replace(/\/$/, "")}/Catalog_Контрагенты?$top=1&$format=json`, { headers: { Authorization: "Basic " + Buffer.from(`${r.config.login}:${r.config.password}`).toString("base64") } });

@@ -9,7 +9,7 @@ import { audit } from "@/lib/activity";
 import { previewSegment, sendCampaign } from "@/lib/campaigns";
 import type { CampaignChannel, Segment } from "@/components/campaigns/constants";
 
-const CHANNELS: CampaignChannel[] = ["email", "telegram", "whatsapp", "max", "vk", "sms"];
+const CHANNELS: CampaignChannel[] = ["email", "telegram", "whatsapp", "max", "instagram", "sms"];
 
 export type CampaignInput = { id?: string; name: string; channel: CampaignChannel; subject?: string; body: string; segment: Segment };
 

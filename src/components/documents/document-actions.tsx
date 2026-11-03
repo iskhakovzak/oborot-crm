@@ -50,7 +50,7 @@ export function MarkPaidDialog({ doc, open, onOpenChange, onConfirm, pending }: 
           <Field label="Способ оплаты">
             <Select value={method} onChange={(e) => setMethod(e.target.value as "bank" | "sbp")}>
               <option value="bank">Банковский перевод</option>
-              <option value="sbp">СБП</option>
+              <option value="sbp">Payme/Click</option>
             </Select>
           </Field>
           <div className="flex justify-end gap-2">

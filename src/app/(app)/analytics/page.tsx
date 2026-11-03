@@ -144,7 +144,7 @@ async function MarketingTab({ data }: { data: MarketingReport }) {
 const EXPORT_TONE: Record<string, Tone> = { sent: "good", sandbox: "info", queued: "warn", error: "accent" };
 const EXPORT_LABEL: Record<string, string> = { sent: "Отправлено", sandbox: "Демо", queued: "В очереди", error: "Ошибка" };
 
-/** 27. Передача лидов и продаж в Яндекс Метрику */
+/** 27. Передача лидов и продаж в Яндекс Метрику / Google Analytics */
 async function MetrikaBlock() {
   const r = await resolve("analytics");
   const rows = await db

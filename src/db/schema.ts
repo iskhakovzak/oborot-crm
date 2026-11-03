@@ -66,17 +66,18 @@ export const companies = pgTable(
     name: text("name").notNull(),
     shortName: text("short_name"),
     inn: text("inn"),
-    kpp: text("kpp"),
-    ogrn: text("ogrn"),
-    okved: text("okved"),
+    /** ОКЭД — код вида деятельности (5 цифр) */
+    oked: text("oked"),
+    /** регистрационный номер в реестре ЮЛ */
+    regNumber: text("reg_number"),
     legalAddress: text("legal_address"),
     address: text("address"),
     director: text("director"),
     directorPosition: text("director_position"),
     bankName: text("bank_name"),
-    bik: text("bik"),
+    /** МФО банка (5 цифр) */
+    mfo: text("mfo"),
     account: text("account"),
-    corrAccount: text("corr_account"),
     email: text("email"),
     phone: text("phone"),
     website: text("website"),
@@ -103,7 +104,7 @@ export const contacts = pgTable("contacts", {
   email: text("email"),
   telegram: text("telegram"),
   whatsapp: text("whatsapp"),
-  vk: text("vk"),
+  instagram: text("instagram"),
   max: text("max"),
   isPrimary: boolean("is_primary").notNull().default(false),
   birthday: text("birthday"),
@@ -169,7 +170,7 @@ export const products = pgTable("products", {
   unit: text("unit").notNull().default("шт"),
   price: doublePrecision("price").notNull().default(0),
   cost: doublePrecision("cost").notNull().default(0),
-  vatRate: integer("vat_rate").notNull().default(20),
+  vatRate: integer("vat_rate").notNull().default(12),
   stock: doublePrecision("stock").notNull().default(0),
   weightKg: doublePrecision("weight_kg"),
   imageUrl: text("image_url"),
@@ -187,11 +188,12 @@ export const dealItems = pgTable("deal_items", {
   qty: doublePrecision("qty").notNull().default(1),
   price: doublePrecision("price").notNull().default(0),
   discount: doublePrecision("discount").notNull().default(0),
-  vatRate: integer("vat_rate").notNull().default(20),
+  vatRate: integer("vat_rate").notNull().default(12),
 });
 
 // ───────────────────────────── Документы и деньги ─────────────────────────────
 
+/** upd — ЭСФ (электронная счёт-фактура); ключ оставлен для совместимости */
 export type DocumentType = "invoice" | "contract" | "upd" | "act" | "kp" | "report";
 
 export const documents = pgTable(
@@ -244,6 +246,7 @@ export const payments = pgTable(
     paymentLinkId: text("payment_link_id").references(() => paymentLinks.id),
     amount: doublePrecision("amount").notNull(),
     direction: text("direction").$type<"in" | "out">().notNull().default("in"),
+    /** sbp — оплата по платёжной ссылке (Payme / Click / Uzum) */
     method: text("method").$type<"sbp" | "bank" | "cash" | "card">().notNull().default("bank"),
     purpose: text("purpose"),
     externalId: text("external_id"),
@@ -324,7 +327,7 @@ export const activities = pgTable(
 
 // ───────────────────────────── Омниканальные переписки ─────────────────────────────
 
-export type Channel = "telegram" | "whatsapp" | "vk" | "max" | "email" | "sms" | "web";
+export type Channel = "telegram" | "whatsapp" | "instagram" | "max" | "email" | "sms" | "web";
 
 export const conversations = pgTable(
   "conversations",
@@ -495,6 +498,7 @@ export type IntegrationKind =
   | "email"
   | "sms"
   | "bank"
+  /** платёжные ссылки: Payme / Click / Uzum (исторически kind «sbp») */
   | "sbp"
   | "edo"
   | "finance"
@@ -533,7 +537,7 @@ export const integrationEvents = pgTable("integration_events", {
 export const campaigns = pgTable("campaigns", {
   id: id(),
   name: text("name").notNull(),
-  channel: text("channel").$type<"email" | "telegram" | "whatsapp" | "max" | "vk" | "sms">().notNull(),
+  channel: text("channel").$type<"email" | "telegram" | "whatsapp" | "max" | "instagram" | "sms">().notNull(),
   subject: text("subject"),
   body: text("body").notNull(),
   segment: json<{ status?: string[]; tags?: string[]; managerIds?: string[]; source?: string[] }>("segment").notNull().default({}),

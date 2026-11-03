@@ -5,6 +5,7 @@ import type { EventPayload } from "@/lib/events";
 import { newId } from "@/lib/utils";
 import { buildContext, render } from "./templates";
 import { logActivity } from "@/lib/activity";
+import { fmtMoney } from "@/lib/format";
 
 type Ctx = Awaited<ReturnType<typeof buildContext>>;
 
@@ -101,8 +102,8 @@ export async function runAction(a: AutomationAction, p: EventPayload, ctx: Ctx):
       if (!amount) return "Ссылка на оплату: нулевая сумма";
       const link = await createPaymentLink({ amount, purpose: `Оплата по сделке №${ctx.deal.number}`, dealId: p.dealId, documentId: p.documentId, companyId: p.companyId });
       const { sendMessage } = await import("@/lib/integrations/messaging");
-      const r = await sendMessage({ channel: a.channel, text: `Ссылка на оплату по СБП: ${link.url}\nСумма: ${amount.toLocaleString("ru-RU")} ₽`, companyId: p.companyId, contactId: p.contactId, dealId: p.dealId, isAutomation: true });
-      return r.ok ? `Ссылка СБП отправлена (${r.channel})` : `Ссылка создана, но не отправлена: ${r.error}`;
+      const r = await sendMessage({ channel: a.channel, text: `Ссылка на оплату (Payme/Click): ${link.url}\nСумма: ${fmtMoney(amount)}`, companyId: p.companyId, contactId: p.contactId, dealId: p.dealId, isAutomation: true });
+      return r.ok ? `Ссылка на оплату отправлена (${r.channel})` : `Ссылка создана, но не отправлена: ${r.error}`;
     }
     case "send_to_edo": {
       const { sendToEdo } = await import("@/lib/integrations/edo");
@@ -163,8 +164,8 @@ export const ACTION_LABELS: Record<AutomationAction["type"], string> = {
   call_client: "Автоматический звонок клиенту",
   create_task: "Поставить задачу сотруднику",
   send_invoice: "Выставить и отправить счёт",
-  send_payment_link: "Отправить ссылку на оплату (СБП)",
-  send_to_edo: "Отправить документ в ЭДО",
+  send_payment_link: "Отправить ссылку на оплату (Payme/Click)",
+  send_to_edo: "Отправить документ в ЭДО (Didox)",
   handoff: "Передать в отгрузку / услуги / производство",
   notify_user: "Уведомить сотрудника",
   metrika_goal: "Передать конверсию в Метрику",
@@ -179,7 +180,7 @@ export const EVENT_LABELS: Record<AutomationEvent, string> = {
   "deal.lost": "Сделка проиграна",
   "lead.created": "Поступила заявка",
   "invoice.created": "Выставлен счёт",
-  "upd.created": "Сформирован УПД",
+  "upd.created": "Сформирована ЭСФ",
   "payment.received": "Поступила оплата",
   "booking.created": "Клиент записался в календарь",
   "message.received": "Входящее сообщение от клиента",

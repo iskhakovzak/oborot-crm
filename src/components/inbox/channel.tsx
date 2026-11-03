@@ -1,11 +1,12 @@
-import { Send, MessageCircle, AtSign, MessageSquare, Mail, Smartphone, Globe } from "lucide-react";
+import { Send, MessageCircle, MessageSquare, Mail, Smartphone, Globe } from "lucide-react";
+import { InstagramIcon } from "@/components/ui/instagram-icon";
 import type { Channel } from "@/db/schema";
 import { cn } from "@/lib/utils";
 
 export const CHANNELS: Record<Channel, { label: string; color: string; icon: React.ComponentType<{ className?: string }> }> = {
   telegram: { label: "Telegram", color: "#2aabee", icon: Send },
   whatsapp: { label: "WhatsApp", color: "#25d366", icon: MessageCircle },
-  vk: { label: "ВКонтакте", color: "#0077ff", icon: AtSign },
+  instagram: { label: "Instagram", color: "#E1306C", icon: InstagramIcon },
   max: { label: "MAX", color: "#7b3fe4", icon: MessageSquare },
   email: { label: "Почта", color: "#b96a00", icon: Mail },
   sms: { label: "SMS", color: "#4b5260", icon: Smartphone },

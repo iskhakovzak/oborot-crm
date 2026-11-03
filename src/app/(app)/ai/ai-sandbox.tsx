@@ -9,12 +9,12 @@ import { Input, Textarea, Field } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { testReply, testCall } from "./actions";
 
-const SAMPLES = ["Здравствуйте! Сколько стоит кондиционер в офис 25 м² с установкой?", "Когда сможете доставить в Казань?", "Мне нужен менеджер, хочу обсудить скидку на 10 кондиционеров", "У вас есть гарантия?"];
+const SAMPLES = ["Здравствуйте! Сколько стоит кондиционер в офис 25 м² с установкой?", "Когда сможете доставить в Самарканд?", "Мне нужен менеджер, хочу обсудить скидку на 10 кондиционеров", "У вас есть гарантия?"];
 
 export function AiSandbox({ assistantName, live }: { assistantName: string; live: boolean }) {
   const [text, setText] = useState(SAMPLES[0]);
   const [reply, setReply] = useState<{ reply: string; handoff: boolean; sandbox: boolean } | null>(null);
-  const [phone, setPhone] = useState("+7 900 123-45-67");
+  const [phone, setPhone] = useState("+998 90 123-45-67");
   const [call, setCall] = useState<{ transcript: string; summary: string; nextStep: string; createLead: boolean; sandbox: boolean } | null>(null);
   const [busyReply, startReply] = useTransition();
   const [busyCall, startCall] = useTransition();

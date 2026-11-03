@@ -14,7 +14,7 @@ import { loadTodayTasks, teamUserIds } from "./tasks/queries";
 
 export const dynamic = "force-dynamic";
 
-const CHANNEL: Record<string, string> = { telegram: "Telegram", whatsapp: "WhatsApp", vk: "VK", max: "MAX", email: "Почта", sms: "SMS", web: "Сайт" };
+const CHANNEL: Record<string, string> = { telegram: "Telegram", whatsapp: "WhatsApp", instagram: "Instagram", max: "MAX", email: "Почта", sms: "SMS", web: "Сайт" };
 
 function greeting(d: Date) {
   const h = d.getHours();
@@ -203,7 +203,7 @@ export default async function Dashboard() {
                     <div className="truncate">{companyName ?? "Контрагент"}</div>
                     <div className="truncate text-xs text-muted">{p.purpose ?? "Оплата"}</div>
                   </div>
-                  <Badge tone="neutral">{p.method === "sbp" ? "СБП" : p.method === "bank" ? "банк" : p.method === "card" ? "карта" : "наличные"}</Badge>
+                  <Badge tone="neutral">{p.method === "sbp" ? "Payme/Click" : p.method === "bank" ? "банк" : p.method === "card" ? "карта" : "наличные"}</Badge>
                   <div className="w-[110px] text-right text-good tnum">+{fmtMoney(p.amount)}</div>
                   <div className="w-[80px] text-right text-xs text-muted">{relTime(p.paidAt)}</div>
                 </Row>

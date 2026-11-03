@@ -33,7 +33,7 @@ export function CreatePaymentLinkDialog({ options }: { options: FinanceOptions }
     <>
       <Button onClick={() => setOpen(true)}><Plus /> Создать ссылку</Button>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent title="Ссылка на оплату по СБП" description="Клиент оплачивает по QR или ссылке; статус обновится автоматически.">
+        <DialogContent title="Ссылка на оплату через Payme/Click" description="Клиент оплачивает по QR или ссылке; статус обновится автоматически.">
           <div className="space-y-4">
             <Field label="Клиент">
               <Select value={companyId} onChange={(e) => { setCompanyId(e.target.value); setDealId(""); setDocumentId(""); }}>
@@ -44,7 +44,7 @@ export function CreatePaymentLinkDialog({ options }: { options: FinanceOptions }
               <Field label="Сделка"><Select value={dealId} onChange={(e) => pickDeal(e.target.value)}><option value="">—</option>{deals.map((d) => <option key={d.id} value={d.id}>№{d.number} · {d.title}</option>)}</Select></Field>
               <Field label="Счёт"><Select value={documentId} onChange={(e) => pickInvoice(e.target.value)}><option value="">—</option>{invoices.map((i) => <option key={i.id} value={i.id}>{i.number} · {fmtMoney(i.amount)}</option>)}</Select></Field>
             </div>
-            <Field label="Сумма, ₽"><Input type="number" min={1} step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} className="tnum" /></Field>
+            <Field label="Сумма, сум"><Input type="number" min={1} step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} className="tnum" /></Field>
             <Field label="Назначение"><Input value={purpose} onChange={(e) => setPurpose(e.target.value)} placeholder="Оплата по счёту …" /></Field>
             <div className="flex justify-end gap-2">
               <Button variant="secondary" onClick={() => setOpen(false)}>Отмена</Button>

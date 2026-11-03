@@ -68,12 +68,12 @@ export async function draftReply(conversationId: string): Promise<{ text: string
   const ai = await getSetting("ai");
   const handoff = /менеджер|скидк|дорого|жалоб|договор/.test(last);
   const text = /цен|стоим|сколько/.test(last)
-    ? `Здравствуйте! Это ${ai.assistantName}. Стоимость зависит от площади и модели: например, сплит-система на 25 м² с монтажом — от 38 490 ₽. Подскажите площадь помещения и город, и я подготовлю точный расчёт в течение 10 минут.`
+    ? `Здравствуйте! Это ${ai.assistantName}. Стоимость зависит от площади и модели: например, сплит-система на 25 м² с монтажом — от 5 750 000 сум. Подскажите площадь помещения и город, и я подготовлю точный расчёт в течение 10 минут.`
     : /срок|когда|доставк/.test(last)
-      ? `Доставка по России занимает 2–7 дней, монтаж наши бригады выполняют на следующий день после доставки. Могу зафиксировать удобную дату — какой день вам подходит?`
+      ? `Доставка по Ташкенту занимает 1–2 дня, по регионам 3–5 дней, монтаж наши бригады выполняют на следующий день после доставки. Могу зафиксировать удобную дату — какой день вам подходит?`
       : handoff
         ? `Поняла вас. Передаю диалог менеджеру — он свяжется с вами в течение 15 минут в рабочее время.`
-        : `Здравствуйте! Это ${ai.assistantName} из компании Оборот. Подскажите, пожалуйста, какое оборудование вас интересует и для какого помещения — подберу варианты и предложу расчёт.`;
+        : `Здравствуйте! Это ${ai.assistantName} из компании Oborot. Подскажите, пожалуйста, какое оборудование вас интересует и для какого помещения — подберу варианты и предложу расчёт.`;
   return { text, handoff, sandbox: true };
 }
 
@@ -88,8 +88,8 @@ export async function handleIncomingCallAi(p: { phone: string; contactName?: str
   }
   const who = p.contactName ?? "Клиент";
   return {
-    transcript: `ИИ: ${ai.callGreeting}\n${who}: Здравствуйте, нужен кондиционер в офис 40 метров, и чтобы с установкой.\nИИ: Подойдёт сплит-система 12 000 BTU, с монтажом от 52 990 ₽. Монтаж возможен в течение 3 дней. Как к вам обращаться и в какой город доставить?\n${who}: ${who}, Москва, район Хамовники.\nИИ: Записала. Менеджер пришлёт точный расчёт в Telegram или WhatsApp в течение часа. Куда удобнее?\n${who}: В Telegram.\nИИ: Отлично, отправим в Telegram. Спасибо за звонок!`,
-    summary: `Запрос: сплит-система для офиса 40 м² с монтажом, Москва (Хамовники). Клиент ждёт расчёт в Telegram.`,
+    transcript: `ИИ: ${ai.callGreeting}\n${who}: Здравствуйте, нужен кондиционер в офис 40 метров, и чтобы с установкой.\nИИ: Подойдёт сплит-система 12 000 BTU, с монтажом от 7 950 000 сум. Монтаж возможен в течение 3 дней. Как к вам обращаться и в какой город доставить?\n${who}: ${who}, Ташкент, Юнусабадский район.\nИИ: Записала. Менеджер пришлёт точный расчёт в Telegram или WhatsApp в течение часа. Куда удобнее?\n${who}: В Telegram.\nИИ: Отлично, отправим в Telegram. Спасибо за звонок!`,
+    summary: `Запрос: сплит-система для офиса 40 м² с монтажом, Ташкент (Юнусабад). Клиент ждёт расчёт в Telegram.`,
     nextStep: "Отправить КП с расчётом в Telegram в течение часа",
     createLead: true,
     sandbox: true,
@@ -120,7 +120,8 @@ export async function parseBotCommand(text: string): Promise<{ intent: BotIntent
 {"intent":"my_tasks"}
 {"intent":"find","query":string}
 {"intent":"note","deal":string,"text":string}
-{"intent":"unknown","text":string}`;
+{"intent":"unknown","text":string}
+Суммы — в узбекских сумах (число без валюты; «5 млн» = 5000000, «300 тыс» = 300000). ИНН в Узбекистане — 9 цифр.`;
   const r = await ask(system, text, { json: true, maxTokens: 400 });
   if (!r.sandbox) {
     const j = extractJson<BotIntent>(r.text);
@@ -132,8 +133,8 @@ export async function parseBotCommand(text: string): Promise<{ intent: BotIntent
 export function heuristicIntent(raw: string): BotIntent {
   const t = raw.trim();
   const l = t.toLowerCase();
-  const amount = l.match(/(\d[\d\s]{2,})\s*(₽|руб|р\b|к\b|тыс)/);
-  const num = amount ? Number(amount[1].replace(/\s/g, "")) * (/к\b|тыс/.test(amount[2]) ? 1000 : 1) : undefined;
+  const amount = l.match(/(\d[\d\s]{2,})\s*(сум\w*|uzs|₽|руб|р\b|к\b|тыс|млн)/);
+  const num = amount ? Number(amount[1].replace(/\s/g, "")) * (/^(к\b|тыс)/.test(amount[2]) ? 1000 : /^млн/.test(amount[2]) ? 1_000_000 : 1) : undefined;
   if (/^(\/?stats|статист|продажи|выручк|сколько продал)/.test(l)) return { intent: "stats", period: /недел/.test(l) ? "week" : /месяц/.test(l) ? "month" : "today" };
   if (/^(\/?tasks|мои задачи|что у меня|задачи на сегодня)/.test(l)) return { intent: "my_tasks" };
   if (/^(найди|найти|покажи|\/find)\s+/.test(l)) return { intent: "find", query: t.replace(/^(найди|найти|покажи|\/find)\s+/i, "") };
@@ -147,11 +148,11 @@ export function heuristicIntent(raw: string): BotIntent {
   }
   if (/(сделк|заказ|лид)/.test(l) && /(созда|добав|нов|заведи)/.test(l)) {
     const company = t.match(/(?:с|для|от|клиент[ау]?)\s+([«"]?[А-ЯЁA-Z][^,]+?[»"]?)(?:\s+на\s|\s*,|$)/)?.[1]?.replace(/[«»"]/g, "");
-    const title = t.replace(/^(создай|добавь|заведи|новая|новый)\s+(сделку|заказ|лид)\s*/i, "").replace(/\s+на\s+\d[\d\s]*\s*(₽|руб\w*|к|тыс\w*)/i, "").trim();
+    const title = t.replace(/^(создай|добавь|заведи|новая|новый)\s+(сделку|заказ|лид)\s*/i, "").replace(/\s+на\s+\d[\d\s]*\s*(сум\w*|uzs|₽|руб\w*|к|тыс\w*|млн)/i, "").trim();
     return { intent: "create_deal", title: title || "Новая сделка", company, amount: num };
   }
   if (/(клиент|компани|контрагент)/.test(l) && /(созда|добав|заведи|нов)/.test(l)) {
-    const inn = t.match(/\b(\d{10}|\d{12})\b/)?.[1];
+    const inn = t.match(/\b(\d{9})\b/)?.[1];
     const name = t.replace(/^(создай|добавь|заведи)\s+(клиента|компанию|контрагента)\s*/i, "").replace(/\s*инн\s*\d+/i, "").trim();
     return { intent: "create_company", name: name || "Новый клиент", inn };
   }

@@ -65,15 +65,14 @@ export function CompanyHeader({ company, users, hidden, readonly, canEdit, canRe
   }
 
   const req: [string, string | null | undefined][] = [
-    ...(show("inn") ? [["ИНН / КПП", [company.inn, company.kpp].filter(Boolean).join(" / ")] as [string, string]] : []),
-    ["ОГРН", company.ogrn], ["ОКВЭД", company.okved], ["Руководитель", [company.directorPosition, company.director].filter(Boolean).join(": ")],
+    ...(show("inn") ? [["ИНН", company.inn ?? ""] as [string, string]] : []),
+    ["Рег. номер", company.regNumber], ["ОКЭД", company.oked], ["Руководитель", [company.directorPosition, company.director].filter(Boolean).join(": ")],
     ["Юр. адрес", company.legalAddress], ["Факт. адрес", company.address],
     ...(show("phone") ? [["Телефон", phoneFmt(company.phone)] as [string, string]] : []),
     ...(show("email") ? [["Email", company.email] as [string, string]] : []),
     ["Сайт", company.website],
-    ...(show("bankName") ? [["Банк", [company.bankName, company.bik ? `БИК ${company.bik}` : ""].filter(Boolean).join(", ")] as [string, string]] : []),
+    ...(show("bankName") ? [["Банк", [company.bankName, company.mfo ? `МФО ${company.mfo}` : ""].filter(Boolean).join(", ")] as [string, string]] : []),
     ...(show("account") ? [["Р/с", company.account] as [string, string]] : []),
-    ["К/с", company.corrAccount],
   ];
 
   return (
@@ -112,7 +111,7 @@ export function CompanyHeader({ company, users, hidden, readonly, canEdit, canRe
           {req.map(([k, v]) => (
             <div key={k} className="flex gap-3">
               <dt className="w-28 shrink-0 text-muted">{k}</dt>
-              <dd className={cn("min-w-0 break-words", /ИНН|ОГРН|ОКВЭД|Р\/с|К\/с|Телефон/.test(k) && "tnum", !v && "text-muted")}>{v && v !== "—" ? v : "—"}</dd>
+              <dd className={cn("min-w-0 break-words", /ИНН|Рег\. номер|ОКЭД|Р\/с|Телефон/.test(k) && "tnum", !v && "text-muted")}>{v && v !== "—" ? v : "—"}</dd>
             </div>
           ))}
         </dl>

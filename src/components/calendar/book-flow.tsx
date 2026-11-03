@@ -16,9 +16,10 @@ type Props = {
 type Done = { bookingId: string; startsAt: string; endsAt: string };
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+const TZ = "Asia/Tashkent";
 const fmtDay = (date: string) => cap(new Date(`${date}T12:00:00`).toLocaleDateString("ru-RU", { weekday: "short", day: "numeric", month: "short" }).replace(/\./g, ""));
-const fmtDayLong = (iso: string) => cap(new Date(iso).toLocaleDateString("ru-RU", { weekday: "long", day: "numeric", month: "long" }));
-const fmtTime = (iso: string) => new Date(iso).toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
+const fmtDayLong = (iso: string) => cap(new Date(iso).toLocaleDateString("ru-RU", { timeZone: TZ, weekday: "long", day: "numeric", month: "long" }));
+const fmtTime = (iso: string) => new Date(iso).toLocaleTimeString("ru-RU", { timeZone: TZ, hour: "2-digit", minute: "2-digit" });
 const icsDate = (iso: string) => new Date(iso).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
 
 export function BookFlow({ slug, type, slots: initialSlots, company }: Props) {
@@ -62,7 +63,7 @@ export function BookFlow({ slug, type, slots: initialSlots, company }: Props) {
         <h1 className="text-[20px] font-semibold leading-snug tracking-[-0.01em]">{type.name}</h1>
         {type.description && <p className="mt-1 text-[14px] leading-relaxed text-ink-2">{type.description}</p>}
         <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[13px] text-ink-2">
-          <span className="inline-flex items-center gap-1.5"><Clock className="size-4 text-muted" />{type.durationMin} мин</span>
+          <span className="inline-flex items-center gap-1.5"><Clock className="size-4 text-muted" />{type.durationMin} мин · время Ташкента (UTC+5)</span>
           <span className="inline-flex items-center gap-1.5"><MapPin className="size-4 text-muted" />{type.location}</span>
           <span className="inline-flex items-center gap-1.5"><Avatar name={type.userName} color={type.userColor} size={18} />{type.userName}</span>
         </div>
@@ -130,7 +131,7 @@ export function BookFlow({ slug, type, slots: initialSlots, company }: Props) {
               <button type="button" onClick={() => setTime(null)} className="text-[13px] text-ink-2 hover:text-ink">Изменить</button>
             </div>
             <Field label="Ваше имя"><Input className="h-11 text-[15px]" value={form.name} onChange={(e) => set("name", e.target.value)} required autoComplete="name" placeholder="Иван Петров" /></Field>
-            <Field label="Телефон"><Input className="h-11 text-[15px]" type="tel" inputMode="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} required autoComplete="tel" placeholder="+7 900 000-00-00" /></Field>
+            <Field label="Телефон"><Input className="h-11 text-[15px]" type="tel" inputMode="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} required autoComplete="tel" placeholder="+998 90 123-45-67" /></Field>
             <Field label="Email" hint="Пришлём подтверждение и напоминание"><Input className="h-11 text-[15px]" type="email" inputMode="email" value={form.email} onChange={(e) => set("email", e.target.value)} autoComplete="email" placeholder="ivan@company.ru" /></Field>
             <Field label="Компания (необязательно)"><Input className="h-11 text-[15px]" value={form.company} onChange={(e) => set("company", e.target.value)} autoComplete="organization" placeholder="ООО «Ромашка»" /></Field>
             <Field label="Комментарий"><Textarea value={form.comment} onChange={(e) => set("comment", e.target.value)} rows={3} placeholder="Что хотите обсудить, адрес объекта" /></Field>

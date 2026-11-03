@@ -11,7 +11,7 @@ import { createProduct, updateProduct, describeProduct, type ProductInput } from
 export type ProductRow = { id: string; sku: string | null; barcode: string | null; name: string; description: string | null; category: string | null; brand: string | null; unit: string; price: number; cost: number | null; vatRate: number; stock: number; weightKg: number | null; attributes: Record<string, string>; isActive: boolean };
 
 type Form = { name: string; sku: string; barcode: string; description: string; category: string; brand: string; unit: string; price: string; cost: string; vatRate: string; stock: string; weightKg: string; attrs: { k: string; v: string }[]; isActive: boolean };
-const EMPTY: Form = { name: "", sku: "", barcode: "", description: "", category: "", brand: "", unit: "шт", price: "", cost: "", vatRate: "20", stock: "0", weightKg: "", attrs: [], isActive: true };
+const EMPTY: Form = { name: "", sku: "", barcode: "", description: "", category: "", brand: "", unit: "шт", price: "", cost: "", vatRate: "12", stock: "0", weightKg: "", attrs: [], isActive: true };
 
 function fromRow(p: ProductRow): Form {
   return { name: p.name, sku: p.sku ?? "", barcode: p.barcode ?? "", description: p.description ?? "", category: p.category ?? "", brand: p.brand ?? "", unit: p.unit, price: String(p.price), cost: p.cost == null ? "" : String(p.cost), vatRate: String(p.vatRate), stock: String(p.stock), weightKg: p.weightKg == null ? "" : String(p.weightKg), attrs: Object.entries(p.attributes ?? {}).map(([k, v]) => ({ k, v })), isActive: p.isActive };
@@ -109,11 +109,11 @@ export function ProductDialog({ product, categories, hideCost, openByParam, trig
               <Field label="Единица"><Input value={form.unit} onChange={(e) => set({ unit: e.target.value })} placeholder="шт" /></Field>
             </div>
             <div className={`grid gap-3 ${hideCost ? "md:grid-cols-4" : "md:grid-cols-5"}`}>
-              <Field label="Цена, ₽"><Input type="number" min={0} step="0.01" value={form.price} onChange={(e) => set({ price: e.target.value })} className="tnum" /></Field>
-              {!hideCost && <Field label="Себестоимость, ₽"><Input type="number" min={0} step="0.01" value={form.cost} onChange={(e) => set({ cost: e.target.value })} className="tnum" /></Field>}
+              <Field label="Цена, сум"><Input type="number" min={0} step="0.01" value={form.price} onChange={(e) => set({ price: e.target.value })} className="tnum" /></Field>
+              {!hideCost && <Field label="Себестоимость, сум"><Input type="number" min={0} step="0.01" value={form.cost} onChange={(e) => set({ cost: e.target.value })} className="tnum" /></Field>}
               <Field label="НДС">
                 <Select value={form.vatRate} onChange={(e) => set({ vatRate: e.target.value })}>
-                  <option value="20">20%</option><option value="10">10%</option><option value="0">Без НДС</option>
+                  {!["12", "0"].includes(form.vatRate) && <option value={form.vatRate}>{form.vatRate}%</option>}<option value="12">12%</option><option value="0">Без НДС</option>
                 </Select>
               </Field>
               <Field label="Остаток"><Input type="number" step="1" value={form.stock} onChange={(e) => set({ stock: e.target.value })} className="tnum" /></Field>

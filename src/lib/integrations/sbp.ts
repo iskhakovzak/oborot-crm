@@ -4,28 +4,49 @@ import { newId } from "@/lib/utils";
 import { appUrl } from "@/lib/settings";
 import { resolve, logEvent } from "./registry";
 
-/** Ссылка на оплату по СБП. С подключённым банком — реальный QR от банка, иначе демо-страница оплаты внутри CRM. */
+/**
+ * Платёжные ссылки Узбекистана (kind «sbp» сохранён в типах для совместимости).
+ * Payme — ссылка на checkout.paycom.uz с base64-параметрами (m=merchant; ac.order_id=…; a=сумма в тийинах).
+ * Click — ссылка на my.click.uz/services/pay с service_id, merchant_id, amount и transaction_param.
+ * Uzum Bank — через API (при наличии ключа); иначе, как и без интеграций, — демо-страница оплаты внутри CRM /pay/<id>.
+ * QR-код всегда кодирует ту же ссылку.
+ */
+export function paymeCheckoutUrl(p: { merchantId: string; amount: number; orderId: string; purpose?: string }) {
+  const params = `m=${p.merchantId};ac.order_id=${p.orderId};a=${Math.round(p.amount * 100)}${p.purpose ? `;c=${encodeURIComponent(p.purpose.slice(0, 120))}` : ""}`;
+  return `https://checkout.paycom.uz/${Buffer.from(params, "utf8").toString("base64")}`;
+}
+export function clickPayUrl(p: { serviceId: string; merchantId: string; amount: number; transactionParam: string; returnUrl?: string }) {
+  const q = new URLSearchParams({ service_id: p.serviceId, merchant_id: p.merchantId, amount: p.amount.toFixed(2), transaction_param: p.transactionParam });
+  if (p.returnUrl) q.set("return_url", p.returnUrl);
+  return `https://my.click.uz/services/pay?${q}`;
+}
+
 export async function createPaymentLink(p: { amount: number; purpose: string; dealId?: string | null; documentId?: string | null; companyId?: string | null; ttlHours?: number }) {
   const r = await resolve("sbp");
   const id = newId("pay");
   const expiresAt = new Date(Date.now() + (p.ttlHours ?? 72) * 3600_000).toISOString();
   let url = appUrl(`/pay/${id}`);
-  let qrPayload = `https://qr.nspk.ru/${id.replace(/[^a-zA-Z0-9]/g, "").toUpperCase().slice(0, 32)}?type=02&bank=100000000004&sum=${Math.round(p.amount * 100)}&cur=RUB&crc=DEMO`;
+  let qrPayload = url;
   let externalId: string | null = null;
   try {
-    if (r.live && r.provider === "tbank" && r.config.terminalKey) {
-      const { createHash } = await import("node:crypto");
-      const body: Record<string, string | number> = { TerminalKey: r.config.terminalKey, Amount: Math.round(p.amount * 100), OrderId: id, Description: p.purpose.slice(0, 250) };
-      const token = createHash("sha256").update(Object.entries({ ...body, Password: r.config.password }).sort(([a], [b]) => a.localeCompare(b)).map(([, v]) => String(v)).join("")).digest("hex");
-      const res = await fetch("https://securepay.tinkoff.ru/v2/Init", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...body, Token: token, PayType: "O", DATA: { QR: "true" } }) });
-      const j = (await res.json()) as { Success?: boolean; PaymentURL?: string; PaymentId?: string; Message?: string };
-      if (j.Success && j.PaymentURL) { url = j.PaymentURL; qrPayload = j.PaymentURL; externalId = j.PaymentId ?? null; }
-      await logEvent({ kind: "sbp.create", provider: "tbank", direction: "out", payload: { amount: p.amount, response: j }, status: j.Success ? "ok" : "error", integrationId: r.integrationId });
-    } else if (r.live && r.provider === "tochka" && r.config.token) {
-      const res = await fetch("https://enter.tochka.com/uapi/sbp/v1.0/qr-code/merchant/" + r.config.merchantId, { method: "POST", headers: { "content-type": "application/json", Authorization: `Bearer ${r.config.token}` }, body: JSON.stringify({ Data: { amount: Math.round(p.amount * 100), currency: "RUB", paymentPurpose: p.purpose, qrcType: "02", ttl: (p.ttlHours ?? 72) * 60 } }) });
-      const j = (await res.json()) as { Data?: { payload?: string; qrcId?: string } };
-      if (j.Data?.payload) { qrPayload = j.Data.payload; url = j.Data.payload; externalId = j.Data.qrcId ?? null; }
-      await logEvent({ kind: "sbp.create", provider: "tochka", direction: "out", payload: { amount: p.amount, response: j }, integrationId: r.integrationId });
+    if (r.live && r.provider === "payme" && r.config.merchantId) {
+      // Payme: ссылка формируется локально, факт оплаты приходит вебхуком Merchant API (CheckPerformTransaction / PerformTransaction)
+      url = paymeCheckoutUrl({ merchantId: r.config.merchantId, amount: p.amount, orderId: id, purpose: p.purpose });
+      qrPayload = url;
+      externalId = id;
+      await logEvent({ kind: "sbp.create", provider: "payme", direction: "out", payload: { amount: p.amount, orderId: id, url }, integrationId: r.integrationId });
+    } else if (r.live && r.provider === "click" && r.config.serviceId && r.config.merchantId) {
+      // Click: ссылка формируется локально, оплата подтверждается вебхуками Prepare/Complete с подписью secret
+      url = clickPayUrl({ serviceId: r.config.serviceId, merchantId: r.config.merchantId, amount: p.amount, transactionParam: id, returnUrl: appUrl(`/pay/${id}`) });
+      qrPayload = url;
+      externalId = id;
+      await logEvent({ kind: "sbp.create", provider: "click", direction: "out", payload: { amount: p.amount, transactionParam: id, url }, integrationId: r.integrationId });
+    } else if (r.live && r.provider === "uzum" && r.config.apiKey) {
+      const res = await fetch("https://api.uzumbank.uz/api/v1/payment-link", { method: "POST", headers: { "content-type": "application/json", Authorization: `Bearer ${r.config.apiKey}` }, body: JSON.stringify({ amount: Math.round(p.amount * 100), currency: "UZS", orderId: id, description: p.purpose.slice(0, 250), expiresAt }) });
+      const j = (await res.json().catch(() => ({}))) as { url?: string; paymentUrl?: string; id?: string; paymentId?: string; message?: string };
+      const link = j.url ?? j.paymentUrl;
+      if (res.ok && link) { url = link; qrPayload = link; externalId = j.id ?? j.paymentId ?? null; }
+      await logEvent({ kind: "sbp.create", provider: "uzum", direction: "out", payload: { amount: p.amount, response: j }, status: res.ok && link ? "ok" : "error", integrationId: r.integrationId });
     } else {
       await logEvent({ kind: "sbp.create", provider: r.provider, direction: "out", payload: { amount: p.amount, purpose: p.purpose, url }, status: "sandbox", integrationId: r.integrationId });
     }

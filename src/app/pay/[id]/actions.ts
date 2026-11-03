@@ -14,7 +14,7 @@ export async function findPaymentLink(id: string) {
   return db.query.paymentLinks.findFirst({ where: ilike(schema.paymentLinks.url, `%/pay/${id}`) });
 }
 
-/** Демо-оплата по ссылке СБП (в бою это вебхук банка): платёж → баланс → счёт оплачен → событие payment.received */
+/** Демо-оплата по ссылке Payme/Click (в бою это вебхук банка): платёж → баланс → счёт оплачен → событие payment.received */
 export async function markPaymentLinkPaid(id: string): Promise<{ ok: boolean; error?: string }> {
   const link = await findPaymentLink(id);
   if (!link) return { ok: false, error: "Ссылка не найдена" };
@@ -32,7 +32,7 @@ export async function markPaymentLinkPaid(id: string): Promise<{ ok: boolean; er
     if (c) await db.update(schema.companies).set({ balance: Math.round(((c.balance ?? 0) + link.amount) * 100) / 100, updatedAt: paidAt }).where(eq(schema.companies.id, c.id));
   }
   if (link.documentId) await db.update(schema.documents).set({ status: "paid" }).where(eq(schema.documents.id, link.documentId));
-  await logActivity({ type: "payment", title: `Оплата ${fmtMoney(link.amount)} по СБП`, body: link.purpose, dealId: link.dealId, companyId: link.companyId, meta: { paymentId, paymentLinkId: link.id, documentId: link.documentId } });
+  await logActivity({ type: "payment", title: `Оплата ${fmtMoney(link.amount)} через Payme/Click`, body: link.purpose, dealId: link.dealId, companyId: link.companyId, meta: { paymentId, paymentLinkId: link.id, documentId: link.documentId } });
   await emit("payment.received", { paymentId, dealId: link.dealId, companyId: link.companyId, documentId: link.documentId, amount: link.amount });
   revalidatePath(`/pay/${id}`);
   revalidatePath("/finance");

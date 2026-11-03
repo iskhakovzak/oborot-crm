@@ -12,47 +12,48 @@ export type ProviderDef = {
   docsUrl?: string;
 };
 
-/** Каталог провайдеров. Без ключей любой провайдер работает в демо-режиме (sandbox) — все действия логируются и видны в журнале интеграций. */
+/** Каталог провайдеров (Узбекистан). Без ключей любой провайдер работает в демо-режиме (sandbox) — все действия логируются и видны в журнале интеграций. */
 export const CATALOG: ProviderDef[] = [
-  // 1. Мессенджеры
-  { kind: "messenger", provider: "telegram", name: "Telegram", description: "Переписка с клиентами через Bot API: входящие попадают в «Переписки», ответы уходят из CRM.", fields: [{ key: "botToken", label: "Токен бота", secret: true, placeholder: "123456:ABC…" }] },
+  // 1. Мессенджеры — Telegram главный канал в Узбекистане
+  { kind: "messenger", provider: "telegram", name: "Telegram", description: "Главный канал общения с клиентами в Узбекистане. Переписка через Bot API: входящие попадают в «Переписки», ответы уходят из CRM.", fields: [{ key: "botToken", label: "Токен бота", secret: true, placeholder: "123456:ABC…" }] },
   { kind: "messenger", provider: "whatsapp", name: "WhatsApp (Green API)", description: "Официальный шлюз WhatsApp через Green API: отправка и приём сообщений.", fields: [{ key: "instanceId", label: "ID инстанса" }, { key: "apiToken", label: "API-токен", secret: true }] },
-  { kind: "messenger", provider: "vk", name: "ВКонтакте", description: "Сообщения сообщества ВКонтакте.", fields: [{ key: "groupToken", label: "Ключ доступа сообщества", secret: true }, { key: "groupId", label: "ID сообщества" }] },
-  { kind: "messenger", provider: "max", name: "MAX", description: "Мессенджер MAX (VK): бот для общения с клиентами.", fields: [{ key: "botToken", label: "Токен бота", secret: true }] },
+  { kind: "messenger", provider: "instagram", name: "Instagram Direct", description: "Сообщения бизнес-аккаунта Instagram через Meta Graph API: заявки из Direct попадают в «Переписки».", fields: [{ key: "pageToken", label: "Page access token", secret: true }, { key: "igAccountId", label: "ID бизнес-аккаунта Instagram" }] },
+  { kind: "messenger", provider: "max", name: "MAX", description: "Мессенджер MAX: бот для общения с клиентами.", fields: [{ key: "botToken", label: "Токен бота", secret: true }] },
   // 2. Телефония
-  { kind: "telephony", provider: "mango", name: "Mango Office", description: "Исходящие звонки из карточки, входящие с записью разговора и ИИ-приёмом.", fields: [{ key: "apiKey", label: "Уникальный код", secret: true }, { key: "apiSalt", label: "Ключ для создания подписи", secret: true }, { key: "fromExtension", label: "Внутренний номер по умолчанию" }] },
-  { kind: "telephony", provider: "zadarma", name: "Zadarma", description: "Виртуальная АТС Zadarma: callback-звонки и вебхуки входящих.", fields: [{ key: "userKey", label: "Ключ", secret: true }, { key: "secretKey", label: "Секрет", secret: true }] },
-  { kind: "telephony", provider: "uis", name: "UIS / CoMagic", description: "Телефония и коллтрекинг UIS.", fields: [{ key: "accessToken", label: "Access token", secret: true }] },
+  { kind: "telephony", provider: "onlinepbx", name: "OnlinePBX", description: "Виртуальная АТС OnlinePBX: исходящие звонки из карточки, входящие с записью разговора и ИИ-приёмом.", fields: [{ key: "domain", label: "Домен АТС", placeholder: "company.onpbx.ru" }, { key: "apiKey", label: "API-ключ", secret: true }, { key: "fromExtension", label: "Внутренний номер по умолчанию" }] },
+  { kind: "telephony", provider: "zadarma", name: "Zadarma", description: "Виртуальная АТС Zadarma с узбекскими номерами: callback-звонки и вебхуки входящих.", fields: [{ key: "userKey", label: "Ключ", secret: true }, { key: "secretKey", label: "Секрет", secret: true }] },
+  { kind: "telephony", provider: "sipuni", name: "Sipuni", description: "Телефония Sipuni: звонки из CRM и запись разговоров.", fields: [{ key: "user", label: "Пользователь" }, { key: "secret", label: "Секрет", secret: true }] },
   // 3. Почта
-  { kind: "email", provider: "smtp", name: "Почта (SMTP/IMAP)", description: "Отправка писем, счетов и рассылок с вашего домена; входящие письма попадают в переписки.", fields: [{ key: "host", label: "SMTP-хост", placeholder: "smtp.yandex.ru" }, { key: "port", label: "Порт", placeholder: "465" }, { key: "user", label: "Логин" }, { key: "pass", label: "Пароль", secret: true }, { key: "from", label: "От кого", placeholder: "Оборот <sales@oborot.ru>" }, { key: "imapHost", label: "IMAP-хост (входящие)", placeholder: "imap.yandex.ru" }] },
+  { kind: "email", provider: "smtp", name: "Почта (SMTP/IMAP)", description: "Отправка писем, счетов и рассылок с вашего домена; входящие письма попадают в переписки.", fields: [{ key: "host", label: "SMTP-хост", placeholder: "smtp.gmail.com" }, { key: "port", label: "Порт", placeholder: "465" }, { key: "user", label: "Логин" }, { key: "pass", label: "Пароль", secret: true }, { key: "from", label: "От кого", placeholder: "Oborot <sales@oborot.uz>" }, { key: "imapHost", label: "IMAP-хост (входящие)", placeholder: "imap.gmail.com" }] },
   // 4-5. Данные
-  { kind: "company_data", provider: "dadata", name: "DaData (ЕГРЮЛ/ЕГРИП)", description: "Автозаполнение карточки клиента по ИНН: название, адрес, руководитель, ОГРН, банк по БИК.", fields: [{ key: "token", label: "API-ключ", secret: true }] },
+  { kind: "company_data", provider: "soliq", name: "Реестр ЮЛ (soliq.uz)", description: "Автозаполнение карточки клиента по ИНН (9 цифр): название, адрес, руководитель, ОКЭД, банк по МФО. Публичного API у реестра нет — используется встроенный справочник и генератор.", fields: [{ key: "token", label: "API-ключ (если есть доступ)", secret: true, hint: "Без ключа используется встроенный демонстрационный справочник" }] },
   { kind: "product_data", provider: "barcode", name: "База штрихкодов", description: "Автозаполнение товара по штрихкоду или артикулу: название, бренд, категория, вес.", fields: [{ key: "apiKey", label: "API-ключ", secret: true, hint: "Без ключа используется встроенная база и ИИ-описание" }] },
   // 9. ЭДО
-  { kind: "edo", provider: "diadoc", name: "Контур.Диадок", description: "Автоотправка УПД и актов контрагенту в ЭДО, статусы подписания в карточке.", fields: [{ key: "apiClientId", label: "API Client ID", secret: true }, { key: "login", label: "Логин" }, { key: "password", label: "Пароль", secret: true }, { key: "boxId", label: "ID ящика" }] },
-  { kind: "edo", provider: "sbis", name: "СБИС", description: "Электронный документооборот СБИС.", fields: [{ key: "login", label: "Логин" }, { key: "password", label: "Пароль", secret: true }] },
-  // 10-11. Платежи и банк
-  { kind: "sbp", provider: "tbank", name: "Т-Банк: СБП", description: "Ссылки и QR на оплату по СБП, уведомления об оплате.", fields: [{ key: "terminalKey", label: "Terminal key" }, { key: "password", label: "Пароль терминала", secret: true }] },
-  { kind: "sbp", provider: "tochka", name: "Точка: СБП", description: "Платёжные ссылки и QR СБП через API Точки.", fields: [{ key: "token", label: "JWT-токен", secret: true }, { key: "merchantId", label: "ID мерчанта" }] },
-  { kind: "bank", provider: "tochka", name: "Точка: выписка", description: "Загрузка выписки и автоматическая разноска платежей по счетам и клиентам.", fields: [{ key: "token", label: "JWT-токен", secret: true }, { key: "accountId", label: "Счёт" }] },
-  { kind: "bank", provider: "tbank", name: "Т-Банк: выписка", description: "Выписка по расчётному счёту через Open API.", fields: [{ key: "token", label: "Токен", secret: true }, { key: "accountNumber", label: "Номер счёта" }] },
-  { kind: "bank", provider: "modulbank", name: "Модульбанк", description: "Выписка Модульбанка.", fields: [{ key: "token", label: "Токен", secret: true }] },
+  { kind: "edo", provider: "didox", name: "Didox", description: "Оператор ЭДО didox.uz: автоотправка ЭСФ и актов контрагенту, статусы подписания в карточке.", fields: [{ key: "token", label: "API-токен", secret: true, placeholder: "didox_…" }] },
+  { kind: "edo", provider: "faktura", name: "Faktura.uz", description: "Электронный документооборот Faktura.uz: ЭСФ, акты, договоры.", fields: [{ key: "login", label: "Логин" }, { key: "password", label: "Пароль", secret: true }] },
+  // 10-11. Платёжные ссылки и банк
+  { kind: "sbp", provider: "payme", name: "Payme Business", description: "Ссылки и QR на оплату через Payme (checkout.paycom.uz), уведомления об оплате.", fields: [{ key: "merchantId", label: "Merchant ID" }, { key: "key", label: "Ключ мерчанта", secret: true }] },
+  { kind: "sbp", provider: "click", name: "Click", description: "Платёжные ссылки Click (my.click.uz): service_id, merchant_id и секретный ключ из кабинета мерчанта.", fields: [{ key: "serviceId", label: "Service ID" }, { key: "merchantId", label: "Merchant ID" }, { key: "secret", label: "Секретный ключ", secret: true }] },
+  { kind: "sbp", provider: "uzum", name: "Uzum Bank: оплата", description: "Платёжные ссылки Uzum Bank (Uzum Nasiya / карты) через API.", fields: [{ key: "apiKey", label: "API-ключ", secret: true }] },
+  { kind: "bank", provider: "kapitalbank", name: "Капиталбанк: выписка", description: "Загрузка выписки по р/с в Капиталбанке и автоматическая разноска платежей по счетам и клиентам.", fields: [{ key: "token", label: "Токен", secret: true }, { key: "accountNumber", label: "Номер счёта (20 цифр)" }] },
+  { kind: "bank", provider: "hamkorbank", name: "Hamkorbank: выписка", description: "Выписка по расчётному счёту Hamkorbank через API для бизнеса.", fields: [{ key: "token", label: "Токен", secret: true }, { key: "accountNumber", label: "Номер счёта (20 цифр)" }] },
+  { kind: "bank", provider: "uzum", name: "Uzum Bank: выписка", description: "Выписка по счёту в Uzum Bank.", fields: [{ key: "token", label: "Токен", secret: true }, { key: "accountNumber", label: "Номер счёта (20 цифр)" }] },
+  { kind: "bank", provider: "tbc", name: "TBC Bank: выписка", description: "Выписка по счёту в TBC Bank Uzbekistan.", fields: [{ key: "token", label: "Токен", secret: true }, { key: "accountNumber", label: "Номер счёта (20 цифр)" }] },
   // 12. Финучёт
-  { kind: "finance", provider: "onec", name: "1С:Бухгалтерия", description: "Двусторонняя синхронизация контрагентов, счетов и оплат с 1С через OData.", fields: [{ key: "url", label: "Адрес OData", placeholder: "https://1c.company.ru/base/odata/standard.odata" }, { key: "login", label: "Логин" }, { key: "password", label: "Пароль", secret: true }] },
-  { kind: "finance", provider: "finolog", name: "Финолог", description: "Передача оплат и счетов в управленческий учёт Финолог.", fields: [{ key: "apiToken", label: "API-токен", secret: true }, { key: "bizId", label: "ID бизнеса" }] },
-  { kind: "finance", provider: "planfact", name: "ПланФакт", description: "Синхронизация с ПланФакт.", fields: [{ key: "apiKey", label: "API-ключ", secret: true }] },
-  { kind: "finance", provider: "moysklad", name: "МойСклад", description: "Товары, остатки и отгрузки из МоегоСклада.", fields: [{ key: "token", label: "Токен", secret: true }] },
+  { kind: "finance", provider: "onec", name: "1С:Бухгалтерия для Узбекистана", description: "Двусторонняя синхронизация контрагентов, счетов и оплат с 1С:Бухгалтерия 8 для Узбекистана через OData.", fields: [{ key: "url", label: "Адрес OData", placeholder: "https://1c.company.uz/base/odata/standard.odata" }, { key: "login", label: "Логин" }, { key: "password", label: "Пароль", secret: true }] },
+  { kind: "finance", provider: "smartup", name: "SmartUp", description: "Передача оплат, счетов и контрагентов в SmartUp ERP.", fields: [{ key: "apiToken", label: "API-токен", secret: true }, { key: "projectCode", label: "Код проекта" }] },
+  { kind: "finance", provider: "hisobchi", name: "Hisobchi", description: "Синхронизация с онлайн-бухгалтерией Hisobchi.", fields: [{ key: "apiKey", label: "API-ключ", secret: true }] },
   // 16-17. SMS
-  { kind: "sms", provider: "smsru", name: "SMS.ru", description: "Отправка SMS клиентам: подтверждения, напоминания, ссылки на оплату.", fields: [{ key: "apiId", label: "api_id", secret: true }, { key: "from", label: "Имя отправителя" }] },
-  { kind: "sms", provider: "smsc", name: "SMSC.ru", description: "SMS-шлюз SMSC.", fields: [{ key: "login", label: "Логин" }, { key: "password", label: "Пароль", secret: true }] },
+  { kind: "sms", provider: "eskiz", name: "Eskiz.uz", description: "SMS-шлюз Eskiz: подтверждения, напоминания и ссылки на оплату клиентам по всему Узбекистану.", fields: [{ key: "email", label: "Email аккаунта" }, { key: "password", label: "Пароль", secret: true }, { key: "from", label: "Имя отправителя", placeholder: "4546", hint: "По умолчанию 4546" }] },
+  { kind: "sms", provider: "playmobile", name: "Playmobile", description: "SMS-шлюз Playmobile (send.smsxabar.uz).", fields: [{ key: "login", label: "Логин" }, { key: "password", label: "Пароль", secret: true }, { key: "originator", label: "Имя отправителя", placeholder: "3700", hint: "По умолчанию 3700" }] },
   // 27. Аналитика
-  { kind: "analytics", provider: "yandex_metrika", name: "Яндекс Метрика", description: "Передача лидов и продаж как офлайн-конверсий по ClientID — сквозная аналитика рекламы.", fields: [{ key: "counterId", label: "Номер счётчика" }, { key: "oauthToken", label: "OAuth-токен", secret: true }, { key: "goalLead", label: "Цель «лид»", placeholder: "crm_lead" }, { key: "goalSale", label: "Цель «продажа»", placeholder: "crm_sale" }] },
+  { kind: "analytics", provider: "yandex_metrika", name: "Яндекс Метрика", description: "Передача лидов и продаж как офлайн-конверсий по ClientID — сквозная аналитика Яндекс Директа.", fields: [{ key: "counterId", label: "Номер счётчика" }, { key: "oauthToken", label: "OAuth-токен", secret: true }, { key: "goalLead", label: "Цель «лид»", placeholder: "crm_lead" }, { key: "goalSale", label: "Цель «продажа»", placeholder: "crm_sale" }] },
+  { kind: "analytics", provider: "ga4", name: "Google Analytics 4", description: "Передача лидов и продаж в GA4 через Measurement Protocol — сквозная аналитика Google Ads и Instagram.", fields: [{ key: "measurementId", label: "Measurement ID", placeholder: "G-XXXXXXX" }, { key: "apiSecret", label: "API secret", secret: true }, { key: "goalLead", label: "Событие «лид»", placeholder: "generate_lead" }, { key: "goalSale", label: "Событие «продажа»", placeholder: "purchase" }] },
   { kind: "analytics", provider: "roistat", name: "Roistat", description: "Передача сделок и статусов в Roistat.", fields: [{ key: "projectId", label: "ID проекта" }, { key: "apiKey", label: "API-ключ", secret: true }] },
-  { kind: "analytics", provider: "calltouch", name: "Calltouch", description: "Сделки и звонки в Calltouch.", fields: [{ key: "siteId", label: "Site ID" }, { key: "token", label: "Токен", secret: true }] },
   // 23-24. ИИ
   { kind: "ai", provider: "anthropic", name: "Claude (Anthropic)", description: "ИИ-ответы клиентам, приём входящих звонков, разбор команд Telegram-бота, описания товаров.", fields: [{ key: "apiKey", label: "API-ключ", secret: true, hint: "Можно задать переменной ANTHROPIC_API_KEY" }] },
   // 20. Telegram-бот команды
-  { kind: "telegram_bot", provider: "telegram", name: "Telegram-бот для сотрудников", description: "Любые действия в CRM командой из Telegram: «создай сделку», «поставь задачу Ивану», «покажи продажи за неделю».", fields: [{ key: "botToken", label: "Токен бота", secret: true, hint: "Можно задать переменной TELEGRAM_BOT_TOKEN" }] },
+  { kind: "telegram_bot", provider: "telegram", name: "Telegram-бот для сотрудников", description: "Любые действия в CRM командой из Telegram: «создай сделку», «поставь задачу Жасуру», «покажи продажи за неделю».", fields: [{ key: "botToken", label: "Токен бота", secret: true, hint: "Можно задать переменной TELEGRAM_BOT_TOKEN" }] },
 ];
 
 export type Resolved = { provider: string; name: string; config: Record<string, string>; live: boolean; integrationId: string | null };
@@ -60,7 +61,10 @@ export type Resolved = { provider: string; name: string; config: Record<string, 
 const ENV_FALLBACK: Partial<Record<IntegrationKind, () => Record<string, string> | null>> = {
   ai: () => (process.env.ANTHROPIC_API_KEY ? { apiKey: process.env.ANTHROPIC_API_KEY } : null),
   telegram_bot: () => (process.env.TELEGRAM_BOT_TOKEN ? { botToken: process.env.TELEGRAM_BOT_TOKEN } : null),
-  company_data: () => (process.env.DADATA_TOKEN ? { token: process.env.DADATA_TOKEN } : null),
+  company_data: () => (process.env.SOLIQ_TOKEN ? { token: process.env.SOLIQ_TOKEN } : null),
+  sms: () => (process.env.ESKIZ_EMAIL && process.env.ESKIZ_PASSWORD ? { email: process.env.ESKIZ_EMAIL, password: process.env.ESKIZ_PASSWORD, from: process.env.ESKIZ_FROM ?? "" } : null),
+  sbp: () => (process.env.PAYME_MERCHANT_ID && process.env.PAYME_KEY ? { merchantId: process.env.PAYME_MERCHANT_ID, key: process.env.PAYME_KEY } : null),
+  edo: () => (process.env.DIDOX_TOKEN ? { token: process.env.DIDOX_TOKEN } : null),
   email: () => (process.env.SMTP_HOST ? { host: process.env.SMTP_HOST, port: process.env.SMTP_PORT ?? "465", user: process.env.SMTP_USER ?? "", pass: process.env.SMTP_PASS ?? "", from: process.env.SMTP_FROM ?? "" } : null),
 };
 

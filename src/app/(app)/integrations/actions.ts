@@ -116,15 +116,15 @@ export async function testIntegration(kind: IntegrationKind, provider: string): 
       }
       case "sbp": {
         const { createPaymentLink } = await import("@/lib/integrations/sbp");
-        const link = await createPaymentLink({ amount: 10, purpose: "Тест интеграции СБП", ttlHours: 1 });
-        lines.push(`Ссылка на оплату 10 ₽ создана${link.sandbox ? " (демо-страница CRM)" : " банком"}`, link.url);
+        const link = await createPaymentLink({ amount: 10, purpose: "Тест интеграции Payme/Click", ttlHours: 1 });
+        lines.push(`Ссылка на оплату 10 сум создана${link.sandbox ? " (демо-страница CRM)" : " банком"}`, link.url);
         break;
       }
       case "bank": {
         const { fetchStatement } = await import("@/lib/integrations/bank");
         const st = await fetchStatement();
         lines.push(`Выписка получена: ${st.rows.length} операций${st.sandbox ? " (демо-данные под неоплаченные счета)" : ""}`);
-        if (st.rows[0]) lines.push(`Первая: ${st.rows[0].counterpartyName} — ${st.rows[0].amount.toLocaleString("ru-RU")} ₽`);
+        if (st.rows[0]) lines.push(`Первая: ${st.rows[0].counterpartyName} — ${st.rows[0].amount.toLocaleString("ru-RU")} сум`);
         break;
       }
       case "ai": {

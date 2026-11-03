@@ -19,7 +19,7 @@ function addressFor(channel: CampaignChannel, contact: typeof schema.contacts.$i
     case "telegram": return contact?.telegram ?? null;
     case "whatsapp": return contact?.whatsapp ?? null;
     case "max": return contact?.max ?? null;
-    case "vk": return contact?.vk ?? null;
+    case "instagram": return contact?.instagram ?? null;
     case "email": return contact?.email ?? company.email ?? null;
     case "sms": return contact?.phone ?? company.phone ?? null;
   }

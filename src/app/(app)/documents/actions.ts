@@ -58,7 +58,7 @@ export async function sendDocumentAction(id: string): Promise<Result> {
   const r = await sendDocument(id, "preferred", user.id);
   revalidateDoc(id, doc.dealId, doc.companyId);
   if (!r.ok) return { ok: false, error: r.error ?? "Не удалось отправить" };
-  const ch = r.channel ? { telegram: "Telegram", whatsapp: "WhatsApp", vk: "ВКонтакте", max: "MAX", email: "email", sms: "SMS", web: "чат" }[r.channel] : "клиенту";
+  const ch = r.channel ? { telegram: "Telegram", whatsapp: "WhatsApp", instagram: "Instagram", max: "MAX", email: "email", sms: "SMS", web: "чат" }[r.channel] : "клиенту";
   return { ok: true, message: `${doc.title} отправлен через ${ch}${r.sandbox ? " (демо-режим)" : ""}` };
 }
 
@@ -68,7 +68,7 @@ export async function sendToEdoAction(id: string): Promise<Result> {
   if (!can(user.actor, "documents", "edit")) return { ok: false, error: "Нет прав" };
   const doc = await db.query.documents.findFirst({ where: eq(schema.documents.id, id) });
   if (!doc) return { ok: false, error: "Документ не найден" };
-  if (!["upd", "act", "contract"].includes(doc.type)) return { ok: false, error: "В ЭДО отправляются УПД, акты и договоры" };
+  if (!["upd", "act", "contract"].includes(doc.type)) return { ok: false, error: "В ЭДО отправляются ЭСФ, акты и договоры" };
   try {
     const r = await sendToEdo(id, user.id);
     revalidateDoc(id, doc.dealId, doc.companyId);
@@ -106,7 +106,7 @@ export async function markPaidAction(id: string, method: "bank" | "sbp" = "bank"
     if (company) await db.update(schema.companies).set({ balance: Math.round(((company.balance ?? 0) + doc.amount) * 100) / 100, updatedAt: new Date().toISOString() }).where(eq(schema.companies.id, company.id));
   }
   await db.update(schema.documents).set({ status: "paid" }).where(eq(schema.documents.id, id));
-  await logActivity({ type: "payment", title: `Оплата ${fmtMoney(doc.amount)} по счёту ${doc.number}`, body: method === "sbp" ? "Способ: СБП" : "Способ: банковский перевод", dealId: doc.dealId, companyId: doc.companyId, userId: user.id, meta: { documentId: id, paymentId } });
+  await logActivity({ type: "payment", title: `Оплата ${fmtMoney(doc.amount)} по счёту ${doc.number}`, body: method === "sbp" ? "Способ: Payme/Click" : "Способ: банковский перевод", dealId: doc.dealId, companyId: doc.companyId, userId: user.id, meta: { documentId: id, paymentId } });
   await emit("payment.received", { paymentId, dealId: doc.dealId, companyId: doc.companyId, documentId: id, amount: doc.amount, userId: user.id });
   revalidateDoc(id, doc.dealId, doc.companyId);
   return { ok: true, message: `Счёт ${doc.number} отмечен оплаченным на ${fmtMoney(doc.amount)}` };

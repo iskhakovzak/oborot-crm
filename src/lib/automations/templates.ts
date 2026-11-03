@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db, schema } from "@/db";
-import { fmtMoney, fmtDateLong } from "@/lib/format";
+import { fmtMoney, fmtDateLong, fmtTime } from "@/lib/format";
 
 export type TemplateContext = {
   client: { name: string; shortName: string; inn: string; phone: string; email: string };
@@ -34,7 +34,7 @@ export async function buildContext(p: { dealId?: string | null; companyId?: stri
     invoice: { number: doc?.number ?? "", amount: fmtMoney(doc?.amount), link: doc ? appUrl(`/api/documents/${doc.id}/pdf`) : "" },
     payment: { amount: fmtMoney(payment?.amount), date: fmtDateLong(payment?.paidAt) },
     company: { name: profile.shortName, phone: profile.phone, email: profile.email },
-    booking: { date: booking ? fmtDateLong(booking.startsAt) : "", time: booking ? new Date(booking.startsAt).toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" }) : "", title: booking?.title ?? "" },
+    booking: { date: booking ? fmtDateLong(booking.startsAt) : "", time: booking ? fmtTime(booking.startsAt) : "", title: booking?.title ?? "" },
     link: { pay: p.payUrl ?? "", booking: appUrl("/book") },
   };
 }

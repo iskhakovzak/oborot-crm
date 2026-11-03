@@ -80,13 +80,13 @@ export function NewDealDialog({ pipelines, companies, users, defaultPipelineId, 
                   <Input name="newCompanyName" required placeholder="ООО «Ромашка»" />
                 </Field>
               ) : (
-                <Field label="Сумма, ₽">
+                <Field label="Сумма, сум">
                   <Input name="amount" type="number" min={0} step="0.01" placeholder="0" className="tnum" />
                 </Field>
               )}
             </div>
             {companyId === "__new" && (
-              <Field label="Сумма, ₽">
+              <Field label="Сумма, сум">
                 <Input name="amount" type="number" min={0} step="0.01" placeholder="0" className="tnum" />
               </Field>
             )}

@@ -66,14 +66,14 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
   }
 
   const users = await db.select({ id: schema.users.id, name: schema.users.name, color: schema.users.color }).from(schema.users).where(eq(schema.users.isActive, true)).orderBy(asc(schema.users.name));
-  const contacts = (await db.select({ id: schema.contacts.id, name: schema.contacts.name, company: schema.companies.name, telegram: schema.contacts.telegram, whatsapp: schema.contacts.whatsapp, vk: schema.contacts.vk, max: schema.contacts.max, email: schema.contacts.email, phone: schema.contacts.phone }).from(schema.contacts).leftJoin(schema.companies, eq(schema.contacts.companyId, schema.companies.id)).orderBy(asc(schema.contacts.name))).map((c) => ({
+  const contacts = (await db.select({ id: schema.contacts.id, name: schema.contacts.name, company: schema.companies.name, telegram: schema.contacts.telegram, whatsapp: schema.contacts.whatsapp, instagram: schema.contacts.instagram, max: schema.contacts.max, email: schema.contacts.email, phone: schema.contacts.phone }).from(schema.contacts).leftJoin(schema.companies, eq(schema.contacts.companyId, schema.companies.id)).orderBy(asc(schema.contacts.name))).map((c) => ({
     id: c.id, name: c.name, company: c.company,
-    channels: (["telegram", "whatsapp", "vk", "max", "email", "sms"] as Channel[]).filter((ch) => (ch === "telegram" ? c.telegram : ch === "whatsapp" ? c.whatsapp ?? c.phone : ch === "vk" ? c.vk : ch === "max" ? c.max : ch === "email" ? c.email : c.phone)),
+    channels: (["telegram", "whatsapp", "instagram", "max", "email", "sms"] as Channel[]).filter((ch) => (ch === "telegram" ? c.telegram : ch === "whatsapp" ? c.whatsapp ?? c.phone : ch === "instagram" ? c.instagram : ch === "max" ? c.max : ch === "email" ? c.email : c.phone)),
   }));
 
   return (
     <div className="flex h-[calc(100vh-5.5rem)] min-h-[560px] flex-col">
-      <PageHeader title="Переписки" description="Telegram, WhatsApp, MAX, ВКонтакте, почта и SMS — в одном окне. ИИ отвечает сам, пока менеджер занят." className="mb-4" />
+      <PageHeader title="Переписки" description="Telegram, WhatsApp, MAX, Instagram, почта и SMS — в одном окне. ИИ отвечает сам, пока менеджер занят." className="mb-4" />
       <InboxView
         conversations={list}
         counts={counts}

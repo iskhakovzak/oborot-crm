@@ -25,12 +25,12 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         <div className="max-w-[34ch]">
           <h1 className="text-[40px] font-semibold leading-[1.1] tracking-[-0.02em]">Заявка, счёт, отгрузка, оплата — в одном обороте.</h1>
           <p className="mt-5 text-[15px] leading-relaxed text-white/70">
-            Мессенджеры, телефония, банк, ЭДО, Яндекс Метрика и ИИ подключены к одной базе клиентов. Менеджер работает в сделке, остальное система делает сама.
+            Мессенджеры, телефония, банк, ЭДО, оплата через Payme и Click, Яндекс Метрика, Google Analytics и ИИ подключены к одной базе клиентов. Менеджер в Ташкенте или Самарканде работает в сделке, остальное система делает сама.
           </p>
         </div>
         <div className="grid grid-cols-3 gap-6 text-[13px] text-white/60">
           <div><div className="text-2xl font-semibold text-white tnum">30</div>автоматизаций из коробки</div>
-          <div><div className="text-2xl font-semibold text-white tnum">1 клик</div>до счёта, договора и УПД</div>
+          <div><div className="text-2xl font-semibold text-white tnum">1 клик</div>до счёта, договора и ЭСФ</div>
           <div><div className="text-2xl font-semibold text-white tnum">24/7</div>ИИ отвечает и принимает звонки</div>
         </div>
       </div>

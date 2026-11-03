@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
 import { db, schema } from "@/db";
 
-/** Атомарный сквозной номер: сделки, счета, договоры, УПД, заказы в производство */
+/** Атомарный сквозной номер: сделки, счета, договоры, ЭСФ, заказы в производство */
 export async function nextNumber(key: "deal" | "invoice" | "contract" | "upd" | "act" | "kp" | "production" | "report"): Promise<number> {
   await db.insert(schema.counters).values({ key, value: 1 }).onConflictDoUpdate({ target: schema.counters.key, set: { value: sql`${schema.counters.value} + 1` } });
   const row = await db.query.counters.findFirst({ where: (c, { eq }) => eq(c.key, key) });

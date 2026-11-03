@@ -51,7 +51,7 @@ export async function testCall(phone: string): Promise<R<{ transcript: string; s
   const user = await requireUser();
   if (!can(user.actor, "settings", "view") && !can(user.actor, "calls", "view")) return { ok: false, error: "Нет доступа" };
   const ai = await getSetting("ai");
-  const r = await handleIncomingCallAi({ phone: phone.trim() || "+7 900 000-00-00", contactName: `Тестовый клиент`, companyName: null });
+  const r = await handleIncomingCallAi({ phone: phone.trim() || "+998 90 000-00-00", contactName: `Тестовый клиент`, companyName: null });
   if (!r.transcript) return { ok: false, error: `${ai.assistantName} не смогла обработать звонок` };
   return { ok: true, ...r };
 }

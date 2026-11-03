@@ -26,32 +26,31 @@ export function CompanyForm({ initial, canEdit }: { initial: CompanyProfile; can
 
   return (
     <form onSubmit={submit} className="space-y-4">
-      <Section title="Реквизиты продавца" description="Подставляются в счета, договоры, УПД, акты и КП">
+      <Section title="Реквизиты продавца" description="Подставляются в счета, договоры, ЭСФ, акты и КП">
         <fieldset disabled={!canEdit} className="grid gap-4 sm:grid-cols-2">
           <Field label="Полное название" className="sm:col-span-2"><Input value={v.name} onChange={set("name")} required /></Field>
           <Field label="Короткое название" hint="Используется в сообщениях клиентам: {{company.name}}"><Input value={v.shortName} onChange={set("shortName")} /></Field>
           <Field label="ИНН"><Input value={v.inn} onChange={set("inn")} inputMode="numeric" /></Field>
-          <Field label="КПП"><Input value={v.kpp} onChange={set("kpp")} inputMode="numeric" /></Field>
-          <Field label="ОГРН"><Input value={v.ogrn} onChange={set("ogrn")} inputMode="numeric" /></Field>
-          <Field label="Юридический адрес" className="sm:col-span-2"><Input value={v.address} onChange={set("address")} /></Field>
+          <Field label="ОКЭД"><Input value={v.oked} onChange={set("oked")} inputMode="numeric" placeholder="46.90" /></Field>
+          <Field label="Рег. номер"><Input value={v.regNumber} onChange={set("regNumber")} inputMode="numeric" /></Field>
+          <Field label="Юридический адрес" className="sm:col-span-2"><Input value={v.address} onChange={set("address")} placeholder="г. Ташкент, ул. Амира Темура, 1" /></Field>
           <Field label="Руководитель"><Input value={v.director} onChange={set("director")} /></Field>
           <Field label="Должность руководителя"><Input value={v.directorPosition} onChange={set("directorPosition")} /></Field>
           <Field label="Главный бухгалтер"><Input value={v.accountant} onChange={set("accountant")} /></Field>
-          <Field label="Телефон"><Input value={v.phone} onChange={set("phone")} /></Field>
+          <Field label="Телефон"><Input value={v.phone} onChange={set("phone")} placeholder="+998 71 200-00-00" /></Field>
           <Field label="Email"><Input value={v.email} onChange={set("email")} type="email" /></Field>
         </fieldset>
       </Section>
       <Section title="Банк и НДС">
         <fieldset disabled={!canEdit} className="grid gap-4 sm:grid-cols-2">
           <Field label="Банк" className="sm:col-span-2"><Input value={v.bankName} onChange={set("bankName")} /></Field>
-          <Field label="БИК"><Input value={v.bik} onChange={set("bik")} inputMode="numeric" /></Field>
-          <Field label="Расчётный счёт"><Input value={v.account} onChange={set("account")} inputMode="numeric" /></Field>
-          <Field label="Корр. счёт"><Input value={v.corrAccount} onChange={set("corrAccount")} inputMode="numeric" /></Field>
+          <Field label="МФО" hint="5 цифр"><Input value={v.mfo} onChange={set("mfo")} inputMode="numeric" placeholder="01088" /></Field>
+          <Field label="Расчётный счёт" hint="20 цифр"><Input value={v.account} onChange={set("account")} inputMode="numeric" /></Field>
           <div className="grid grid-cols-2 gap-3">
             <Field label="Плательщик НДС">
               <Select value={v.vatPayer ? "1" : "0"} onChange={(e) => setV((x) => ({ ...x, vatPayer: e.target.value === "1" }))}>
                 <option value="1">Да</option>
-                <option value="0">Нет (УСН)</option>
+                <option value="0">Нет (оборотный налог)</option>
               </Select>
             </Field>
             <Field label="Ставка НДС, %"><Input type="number" min={0} max={100} value={v.vatRate} onChange={(e) => setV((x) => ({ ...x, vatRate: Number(e.target.value) }))} disabled={!v.vatPayer} /></Field>

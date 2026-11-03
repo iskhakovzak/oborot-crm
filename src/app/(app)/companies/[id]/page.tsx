@@ -19,11 +19,11 @@ import { addCompanyNote } from "../actions";
 
 export const dynamic = "force-dynamic";
 
-const CHANNEL: Record<string, string> = { telegram: "Telegram", whatsapp: "WhatsApp", vk: "VK", max: "MAX", email: "Email", sms: "SMS", web: "Сайт" };
+const CHANNEL: Record<string, string> = { telegram: "Telegram", whatsapp: "WhatsApp", instagram: "Instagram", max: "MAX", email: "Email", sms: "SMS", web: "Сайт" };
 const CALL_STATUS: Record<string, string> = { queued: "в очереди", ringing: "идёт вызов", answered: "ответили", missed: "пропущен", busy: "занято", completed: "завершён", ai_handled: "принял ИИ" };
 const DOC_STATUS: Record<string, [string, Tone]> = { draft: ["Черновик", "neutral"], sent: ["Отправлен", "info"], signed: ["Подписан", "good"], paid: ["Оплачен", "good"], cancelled: ["Отменён", "accent"] };
 const EDO: Record<string, string> = { queued: "ЭДО: в очереди", sent: "ЭДО: отправлен", delivered: "ЭДО: доставлен", signed: "ЭДО: подписан", rejected: "ЭДО: отклонён" };
-const METHOD: Record<string, string> = { sbp: "СБП", bank: "Банк", cash: "Наличные", card: "Карта" };
+const METHOD: Record<string, string> = { sbp: "Payme/Click", bank: "Банк", cash: "Наличные", card: "Карта" };
 
 export default async function CompanyPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -66,7 +66,7 @@ export default async function CompanyPage({ params }: { params: Promise<{ id: st
         <Link href="/companies" className="inline-flex items-center gap-1 hover:text-ink"><ArrowLeft className="size-3.5" /> Клиенты</Link>
       </div>
       <CompanyHeader
-        company={{ id: c.id, name: c.name, shortName: s(c.shortName), inn: s(c.inn), kpp: s(c.kpp), ogrn: s(c.ogrn), okved: s(c.okved), legalAddress: s(c.legalAddress), address: s(c.address), director: s(c.director), directorPosition: s(c.directorPosition), bankName: hidden.includes("bankName") ? "" : s(c.bankName), bik: s(c.bik), account: hidden.includes("account") ? "" : s(c.account), corrAccount: s(c.corrAccount), email: s(c.email), phone: s(c.phone), website: s(c.website), industry: s(c.industry), status: c.status, source: s(c.source), managerId: s(c.managerId), tags: (c.tags ?? []).join(", "), notes: hidden.includes("notes") ? "" : s(c.notes), balance: hidden.includes("balance") ? 0 : c.balance, tagsList: c.tags ?? [], managerName: row.managerName, managerColor: row.managerColor, createdAt: c.createdAt }}
+        company={{ id: c.id, name: c.name, shortName: s(c.shortName), inn: s(c.inn), oked: s(c.oked), regNumber: s(c.regNumber), legalAddress: s(c.legalAddress), address: s(c.address), director: s(c.director), directorPosition: s(c.directorPosition), bankName: hidden.includes("bankName") ? "" : s(c.bankName), mfo: s(c.mfo), account: hidden.includes("account") ? "" : s(c.account), email: s(c.email), phone: s(c.phone), website: s(c.website), industry: s(c.industry), status: c.status, source: s(c.source), managerId: s(c.managerId), tags: (c.tags ?? []).join(", "), notes: hidden.includes("notes") ? "" : s(c.notes), balance: hidden.includes("balance") ? 0 : c.balance, tagsList: c.tags ?? [], managerName: row.managerName, managerColor: row.managerColor, createdAt: c.createdAt }}
         users={users}
         hidden={hidden}
         readonly={readonly}

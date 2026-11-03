@@ -9,7 +9,10 @@ const MUTED = rgb(0.54, 0.57, 0.63);
 const LINE = rgb(0.89, 0.9, 0.92);
 const ACCENT = rgb(0.78, 0.06, 0.18);
 
-export type Party = { name: string; inn: string; kpp?: string; address: string; bankName?: string; bik?: string; account?: string; corrAccount?: string; director?: string; directorPosition?: string; phone?: string; email?: string };
+/** Реквизиты стороны (Узбекистан): ИНН 9 цифр, ОКЭД, регистрационный номер, банк с МФО и р/с */
+export type Party = { name: string; inn: string; oked?: string; regNumber?: string; address: string; bankName?: string; mfo?: string; account?: string; director?: string; directorPosition?: string; phone?: string; email?: string };
+/** Ставка НДС по умолчанию (Узбекистан) */
+export const DEFAULT_VAT = 12;
 export type Line = { name: string; unit: string; qty: number; price: number; discount?: number; vatRate?: number };
 
 export class Pdf {
@@ -118,15 +121,15 @@ export class Pdf {
   async bytes() { return Buffer.from(await this.doc.save()); }
 }
 
-export const money = (v: number) => new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v) + " ₽";
-export const dateRu = (iso: string) => new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "long", year: "numeric" }).format(new Date(iso));
+export const money = (v: number) => new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v) + " сум";
+export const dateRu = (iso: string) => new Intl.DateTimeFormat("ru-RU", { timeZone: "Asia/Tashkent", day: "numeric", month: "long", year: "numeric" }).format(new Date(iso));
 
 export function totals(lines: Line[]) {
   let sum = 0, vat = 0;
   for (const l of lines) {
     const s = l.qty * l.price * (1 - (l.discount ?? 0) / 100);
     sum += s;
-    const rate = l.vatRate ?? 20;
+    const rate = l.vatRate ?? DEFAULT_VAT;
     vat += rate ? s - s / (1 + rate / 100) : 0;
   }
   return { sum, vat, net: sum - vat };
@@ -139,13 +142,14 @@ export function amountInWords(n: number): string {
   const hundreds = ["", "сто", "двести", "триста", "четыреста", "пятьсот", "шестьсот", "семьсот", "восемьсот", "девятьсот"];
   const forms = (k: number, f: [string, string, string]) => { const m10 = k % 10, m100 = k % 100; return m10 === 1 && m100 !== 11 ? f[0] : m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20) ? f[1] : f[2]; };
   const triad = (k: number, fem: boolean) => { const h = Math.floor(k / 100), t = Math.floor((k % 100) / 10), o = k % 10; let s = hundreds[h]; if (k % 100 < 20) s += (s ? " " : "") + (fem && o && o < 3 ? onesF[o] : ones[k % 100]); else s += (s ? " " : "") + tens[t] + (o ? " " + (fem && o < 3 ? onesF[o] : ones[o]) : ""); return s.trim(); };
-  const rub = Math.floor(n), kop = Math.round((n - rub) * 100);
+  const sum = Math.floor(n), tiyin = Math.round((n - sum) * 100);
   const parts: string[] = [];
-  const mln = Math.floor(rub / 1_000_000), th = Math.floor((rub % 1_000_000) / 1000), rest = rub % 1000;
+  const mlrd = Math.floor(sum / 1_000_000_000), mln = Math.floor((sum % 1_000_000_000) / 1_000_000), th = Math.floor((sum % 1_000_000) / 1000), rest = sum % 1000;
+  if (mlrd) parts.push(triad(mlrd, false) + " " + forms(mlrd, ["миллиард", "миллиарда", "миллиардов"]));
   if (mln) parts.push(triad(mln, false) + " " + forms(mln, ["миллион", "миллиона", "миллионов"]));
   if (th) parts.push(triad(th, true) + " " + forms(th, ["тысяча", "тысячи", "тысяч"]));
   if (rest || !parts.length) parts.push(triad(rest, false));
-  const s = parts.join(" ").trim() + " " + forms(rub, ["рубль", "рубля", "рублей"]) + ` ${String(kop).padStart(2, "0")} ${forms(kop, ["копейка", "копейки", "копеек"])}`;
+  const s = parts.join(" ").trim() + " " + forms(sum, ["сум", "сума", "сумов"]) + ` ${String(tiyin).padStart(2, "0")} ${forms(tiyin, ["тийин", "тийина", "тийинов"])}`;
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
@@ -154,18 +158,18 @@ export function amountInWords(n: number): string {
 export async function renderInvoice(p: { number: string; date: string; seller: Party; buyer: Party; lines: Line[]; dueDays?: number; paid?: boolean }) {
   const pdf = await Pdf.create();
   const t = totals(p.lines);
-  pdf.text(`${p.seller.bankName ?? ""}  БИК ${p.seller.bik ?? ""}`, { size: 9, color: MUTED });
-  pdf.kv([["Банк получателя", p.seller.bankName ?? ""], ["Корр. счёт", p.seller.corrAccount ?? ""], ["Расчётный счёт", p.seller.account ?? ""], ["Получатель", `${p.seller.name}, ИНН ${p.seller.inn}${p.seller.kpp ? `, КПП ${p.seller.kpp}` : ""}`]], { labelW: 120 });
+  pdf.text(`${p.seller.bankName ?? ""}  МФО ${p.seller.mfo ?? ""}`, { size: 9, color: MUTED });
+  pdf.kv([["Банк получателя", p.seller.bankName ?? ""], ["МФО", p.seller.mfo ?? ""], ["Расчётный счёт", p.seller.account ?? ""], ["Получатель", `${p.seller.name}, ИНН ${p.seller.inn}${p.seller.oked ? `, ОКЭД ${p.seller.oked}` : ""}`]], { labelW: 120 });
   pdf.gap(10); pdf.rule(INK, 1.2); pdf.gap(4);
   pdf.heading(`Счёт на оплату № ${p.number} от ${dateRu(p.date)}`, p.dueDays ? `Оплатить до ${dateRu(new Date(new Date(p.date).getTime() + p.dueDays * 86400_000).toISOString())}` : undefined);
   if (p.paid) pdf.stamp("ОПЛАЧЕНО");
-  pdf.kv([["Поставщик", `${p.seller.name}, ИНН ${p.seller.inn}, ${p.seller.address}`], ["Покупатель", `${p.buyer.name}, ИНН ${p.buyer.inn}${p.buyer.kpp ? `, КПП ${p.buyer.kpp}` : ""}, ${p.buyer.address}`]], { labelW: 90 });
+  pdf.kv([["Поставщик", `${p.seller.name}, ИНН ${p.seller.inn}${p.seller.oked ? `, ОКЭД ${p.seller.oked}` : ""}, ${p.seller.address}`], ["Покупатель", `${p.buyer.name}, ИНН ${p.buyer.inn}${p.buyer.oked ? `, ОКЭД ${p.buyer.oked}` : ""}, ${p.buyer.address}`]], { labelW: 90 });
   pdf.gap(10);
-  pdf.table([{ title: "№", w: 28 }, { title: "Наименование", w: 243 }, { title: "Кол-во", w: 52, align: "right" }, { title: "Ед.", w: 36 }, { title: "Цена", w: 70, align: "right" }, { title: "Сумма", w: 70, align: "right" }],
+  pdf.table([{ title: "№", w: 28 }, { title: "Наименование", w: 203 }, { title: "Кол-во", w: 52, align: "right" }, { title: "Ед.", w: 36 }, { title: "Цена", w: 90, align: "right" }, { title: "Сумма", w: 90, align: "right" }],
     p.lines.map((l, i) => [String(i + 1), l.name, String(l.qty), l.unit, money(l.price), money(l.qty * l.price * (1 - (l.discount ?? 0) / 100))]), { zebra: true });
   pdf.gap(8);
   pdf.text(`Итого: ${money(t.sum)}`, { align: "right", bold: true, size: 11 });
-  pdf.text(`В том числе НДС: ${money(t.vat)}`, { align: "right", size: 9.5, color: MUTED });
+  pdf.text(`В том числе НДС ${DEFAULT_VAT}%: ${money(t.vat)}`, { align: "right", size: 9.5, color: MUTED });
   pdf.gap(6);
   pdf.text(`Всего наименований ${p.lines.length}, на сумму ${money(t.sum)}`, { size: 9.5 });
   pdf.text(amountInWords(t.sum), { size: 9.5, bold: true });
@@ -180,27 +184,27 @@ export async function renderInvoice(p: { number: string; date: string; seller: P
 export async function renderContract(p: { number: string; date: string; seller: Party; buyer: Party; lines: Line[]; subject: string; deliveryDays?: number; signed?: boolean }) {
   const pdf = await Pdf.create();
   const t = totals(p.lines);
-  pdf.heading(`Договор поставки № ${p.number}`, `г. Москва, ${dateRu(p.date)}`);
+  pdf.heading(`Договор поставки № ${p.number}`, `г. Ташкент, ${dateRu(p.date)}`);
   if (p.signed) pdf.stamp("ПОДПИСАНО");
   pdf.text(`${p.seller.name}, именуемое в дальнейшем «Поставщик», в лице ${p.seller.directorPosition?.toLowerCase() ?? "руководителя"} ${p.seller.director ?? ""}, действующего на основании Устава, с одной стороны, и ${p.buyer.name}, именуемое в дальнейшем «Покупатель», в лице ${p.buyer.directorPosition?.toLowerCase() ?? "руководителя"} ${p.buyer.director ?? "уполномоченного представителя"}, действующего на основании Устава, с другой стороны, заключили настоящий Договор о нижеследующем.`, { size: 9.5 });
   const sections: [string, string][] = [
-    ["1. Предмет договора", `1.1. Поставщик обязуется передать в собственность Покупателя, а Покупатель — принять и оплатить ${p.subject} (далее — Товар) в ассортименте, количестве и по ценам, указанным в Спецификации (Приложение № 1).\n1.2. Общая стоимость Товара составляет ${money(t.sum)}, в том числе НДС ${money(t.vat)}.`],
-    ["2. Порядок поставки", `2.1. Срок поставки — ${p.deliveryDays ?? 7} рабочих дней с момента поступления оплаты.\n2.2. Поставка осуществляется силами Поставщика по адресу: ${p.buyer.address}.\n2.3. Право собственности и риски переходят к Покупателю с момента подписания универсального передаточного документа (УПД).`],
-    ["3. Порядок расчётов", `3.1. Покупатель оплачивает Товар в размере 100% на основании счёта в течение 5 банковских дней.\n3.2. Оплата производится безналичным переводом или через Систему быстрых платежей по ссылке Поставщика.`],
+    ["1. Предмет договора", `1.1. Поставщик обязуется передать в собственность Покупателя, а Покупатель — принять и оплатить ${p.subject} (далее — Товар) в ассортименте, количестве и по ценам, указанным в Спецификации (Приложение № 1).\n1.2. Общая стоимость Товара составляет ${money(t.sum)}, в том числе НДС ${DEFAULT_VAT}% — ${money(t.vat)}. Все расчёты по Договору производятся в сумах Республики Узбекистан.`],
+    ["2. Порядок поставки", `2.1. Срок поставки — ${p.deliveryDays ?? 7} рабочих дней с момента поступления оплаты.\n2.2. Поставка осуществляется силами Поставщика по адресу: ${p.buyer.address}.\n2.3. Право собственности и риски переходят к Покупателю с момента подписания электронной счёт-фактуры (ЭСФ) и товарно-транспортной накладной.`],
+    ["3. Порядок расчётов", `3.1. Покупатель оплачивает Товар в размере 100% на основании счёта в течение 5 банковских дней.\n3.2. Оплата производится перечислением на расчётный счёт Поставщика или через платёжные сервисы Payme / Click по ссылке Поставщика.`],
     ["4. Гарантия и ответственность", `4.1. Гарантийный срок на Товар — 36 месяцев с даты поставки.\n4.2. За просрочку поставки Поставщик уплачивает пени 0,1% от стоимости непоставленного Товара за каждый день, но не более 10%.\n4.3. Стороны освобождаются от ответственности при наступлении обстоятельств непреодолимой силы.`],
-    ["5. Электронный документооборот", `5.1. Стороны признают юридическую силу документов, подписанных квалифицированной электронной подписью и переданных через оператора ЭДО.`],
-    ["6. Прочие условия", `6.1. Договор вступает в силу с момента подписания и действует до полного исполнения обязательств.\n6.2. Споры разрешаются в Арбитражном суде г. Москвы.`],
+    ["5. Электронный документооборот", `5.1. Стороны признают юридическую силу документов, подписанных электронной цифровой подписью и переданных через оператора ЭДО (Didox, Faktura.uz).`],
+    ["6. Прочие условия", `6.1. Договор вступает в силу с момента подписания и действует до полного исполнения обязательств.\n6.2. Споры разрешаются в Ташкентском межрайонном экономическом суде.`],
   ];
   for (const [h, body] of sections) { pdf.gap(6); pdf.text(h, { bold: true, size: 10.5 }); pdf.text(body, { size: 9.5 }); }
   pdf.gap(10); pdf.text("Приложение № 1. Спецификация", { bold: true, size: 10.5 }); pdf.gap(4);
-  pdf.table([{ title: "№", w: 28 }, { title: "Наименование", w: 263 }, { title: "Кол-во", w: 52, align: "right" }, { title: "Цена", w: 78, align: "right" }, { title: "Сумма", w: 78, align: "right" }], p.lines.map((l, i) => [String(i + 1), l.name, `${l.qty} ${l.unit}`, money(l.price), money(l.qty * l.price * (1 - (l.discount ?? 0) / 100))]), { zebra: true });
+  pdf.table([{ title: "№", w: 28 }, { title: "Наименование", w: 233 }, { title: "Кол-во", w: 52, align: "right" }, { title: "Цена", w: 93, align: "right" }, { title: "Сумма", w: 93, align: "right" }], p.lines.map((l, i) => [String(i + 1), l.name, `${l.qty} ${l.unit}`, money(l.price), money(l.qty * l.price * (1 - (l.discount ?? 0) / 100))]), { zebra: true });
   pdf.gap(14); pdf.text("7. Реквизиты и подписи сторон", { bold: true, size: 10.5 }); pdf.gap(4);
   const half = (pdf.W - 2 * pdf.M) / 2 - 10;
   const y0 = pdf.y;
   const party = (x: number, title: string, pt: Party) => {
     pdf.y = y0;
     pdf.text(title, { x, bold: true, size: 9.5, maxWidth: half });
-    pdf.text(`${pt.name}\nИНН ${pt.inn}${pt.kpp ? ` КПП ${pt.kpp}` : ""}\n${pt.address}\n${pt.bankName ? `${pt.bankName}, БИК ${pt.bik}\nр/с ${pt.account}\nк/с ${pt.corrAccount}` : ""}`, { x, size: 8.5, maxWidth: half });
+    pdf.text(`${pt.name}\nИНН ${pt.inn}${pt.oked ? ` ОКЭД ${pt.oked}` : ""}${pt.regNumber ? `\nРег. № ${pt.regNumber}` : ""}\n${pt.address}\n${pt.bankName ? `${pt.bankName}, МФО ${pt.mfo ?? ""}\nр/с ${pt.account ?? ""}` : ""}`, { x, size: 8.5, maxWidth: half });
     pdf.gap(18);
     pdf.text(`__________________ ${pt.director ?? ""}`, { x, size: 9, maxWidth: half });
     return pdf.y;
@@ -215,25 +219,27 @@ export async function renderContract(p: { number: string; date: string; seller: 
 export async function renderUpd(p: { number: string; date: string; seller: Party; buyer: Party; lines: Line[]; contractNumber?: string; signed?: boolean }) {
   const pdf = await Pdf.create();
   const t = totals(p.lines);
-  pdf.text("Универсальный передаточный документ · статус 1 (счёт-фактура и передаточный документ)", { size: 8.5, color: MUTED });
-  pdf.heading(`УПД № ${p.number} от ${dateRu(p.date)}`, p.contractNumber ? `Основание: договор № ${p.contractNumber}` : undefined);
+  pdf.text("Электронная счёт-фактура (ЭСФ) · к договору поставки / акту выполненных работ", { size: 8.5, color: MUTED });
+  pdf.heading(`Счёт-фактура № ${p.number} от ${dateRu(p.date)}`, p.contractNumber ? `Основание: договор № ${p.contractNumber}` : undefined);
   if (p.signed) pdf.stamp("ПОДПИСАНО В ЭДО");
-  pdf.kv([["Продавец", `${p.seller.name}, ИНН/КПП ${p.seller.inn}/${p.seller.kpp ?? "—"}, ${p.seller.address}`], ["Грузоотправитель", "он же"], ["Покупатель", `${p.buyer.name}, ИНН/КПП ${p.buyer.inn}/${p.buyer.kpp ?? "—"}, ${p.buyer.address}`], ["Грузополучатель", p.buyer.address], ["Валюта", "Российский рубль, 643"]], { labelW: 110 });
+  pdf.kv([["Поставщик", `${p.seller.name}, ИНН ${p.seller.inn}${p.seller.oked ? `, ОКЭД ${p.seller.oked}` : ""}, ${p.seller.address}`], ["Банк поставщика", p.seller.bankName ? `${p.seller.bankName}, МФО ${p.seller.mfo ?? ""}, р/с ${p.seller.account ?? ""}` : ""], ["Покупатель", `${p.buyer.name}, ИНН ${p.buyer.inn}${p.buyer.oked ? `, ОКЭД ${p.buyer.oked}` : ""}, ${p.buyer.address}`], ["Банк покупателя", p.buyer.bankName ? `${p.buyer.bankName}, МФО ${p.buyer.mfo ?? ""}, р/с ${p.buyer.account ?? ""}` : ""], ["Валюта", "Узбекский сум, UZS (860)"]], { labelW: 110 });
   pdf.gap(10);
-  pdf.table([{ title: "№", w: 24 }, { title: "Наименование товара (работ, услуг)", w: 175 }, { title: "Ед.", w: 34 }, { title: "Кол-во", w: 46, align: "right" }, { title: "Цена без НДС", w: 72, align: "right" }, { title: "Ставка", w: 44, align: "right" }, { title: "Сумма с НДС", w: 104, align: "right" }],
-    p.lines.map((l, i) => { const rate = l.vatRate ?? 20; const s = l.qty * l.price * (1 - (l.discount ?? 0) / 100); return [String(i + 1), l.name, l.unit, String(l.qty), money(l.price / (1 + rate / 100)), rate ? `${rate}%` : "без НДС", money(s)]; }), { size: 8.5, zebra: true });
+  pdf.table([{ title: "№", w: 24 }, { title: "Наименование товара (работ, услуг)", w: 155 }, { title: "Ед.", w: 34 }, { title: "Кол-во", w: 46, align: "right" }, { title: "Цена без НДС", w: 92, align: "right" }, { title: "Ставка", w: 44, align: "right" }, { title: "Сумма с НДС", w: 104, align: "right" }],
+    p.lines.map((l, i) => { const rate = l.vatRate ?? DEFAULT_VAT; const s = l.qty * l.price * (1 - (l.discount ?? 0) / 100); return [String(i + 1), l.name, l.unit, String(l.qty), money(l.price / (1 + rate / 100)), rate ? `${rate}%` : "без НДС", money(s)]; }), { size: 8.5, zebra: true });
   pdf.gap(8);
   pdf.text(`Всего к оплате: ${money(t.sum)}`, { align: "right", bold: true, size: 11 });
-  pdf.text(`в том числе НДС: ${money(t.vat)} · без НДС: ${money(t.net)}`, { align: "right", size: 9, color: MUTED });
+  pdf.text(`в том числе НДС ${DEFAULT_VAT}%: ${money(t.vat)} · без НДС: ${money(t.net)}`, { align: "right", size: 9, color: MUTED });
   pdf.gap(6);
   pdf.text(amountInWords(t.sum), { size: 9.5, bold: true });
   pdf.gap(18);
-  pdf.text(`Товар (груз) передал / услуги сдал: ${p.seller.directorPosition ?? ""} ______________ ${p.seller.director ?? ""}`, { size: 9 });
+  pdf.text(`Руководитель: ______________ ${p.seller.director ?? ""}`, { size: 9 });
   pdf.gap(10);
-  pdf.text(`Товар (груз) получил / услуги принял: ______________ ${p.buyer.director ?? ""}`, { size: 9 });
+  pdf.text(`Главный бухгалтер: ______________`, { size: 9 });
+  pdf.gap(10);
+  pdf.text(`Товар получил / услуги принял (Покупатель): ______________ ${p.buyer.director ?? ""}`, { size: 9 });
   pdf.gap(10);
   pdf.text(`Дата получения: «____» ____________ ${new Date(p.date).getFullYear()} г.`, { size: 9, color: MUTED });
-  pdf.footer(`УПД № ${p.number} · сформирован в Оборот CRM`);
+  pdf.footer(`ЭСФ № ${p.number} · сформирована в Оборот CRM`);
   return pdf.bytes();
 }
 
@@ -244,9 +250,9 @@ export async function renderAct(p: { number: string; date: string; seller: Party
   if (p.signed) pdf.stamp("ПОДПИСАНО");
   pdf.kv([["Исполнитель", `${p.seller.name}, ИНН ${p.seller.inn}`], ["Заказчик", `${p.buyer.name}, ИНН ${p.buyer.inn}`]], { labelW: 90 });
   pdf.gap(8);
-  pdf.table([{ title: "№", w: 28 }, { title: "Работы / услуги", w: 283 }, { title: "Кол-во", w: 52, align: "right" }, { title: "Цена", w: 68, align: "right" }, { title: "Сумма", w: 68, align: "right" }], p.lines.map((l, i) => [String(i + 1), l.name, `${l.qty} ${l.unit}`, money(l.price), money(l.qty * l.price)]), { zebra: true });
+  pdf.table([{ title: "№", w: 28 }, { title: "Работы / услуги", w: 243 }, { title: "Кол-во", w: 52, align: "right" }, { title: "Цена", w: 88, align: "right" }, { title: "Сумма", w: 88, align: "right" }], p.lines.map((l, i) => [String(i + 1), l.name, `${l.qty} ${l.unit}`, money(l.price), money(l.qty * l.price)]), { zebra: true });
   pdf.gap(8);
-  pdf.text(`Итого: ${money(t.sum)}, в т.ч. НДС ${money(t.vat)}`, { align: "right", bold: true });
+  pdf.text(`Итого: ${money(t.sum)}, в т.ч. НДС ${DEFAULT_VAT}% ${money(t.vat)}`, { align: "right", bold: true });
   pdf.gap(8);
   pdf.text("Вышеперечисленные работы выполнены полностью и в срок. Заказчик претензий по объёму, качеству и срокам не имеет.", { size: 9.5 });
   pdf.gap(24);
@@ -262,12 +268,12 @@ export async function renderKp(p: { number: string; date: string; seller: Party;
   pdf.heading(`Коммерческое предложение № ${p.number}`, `${dateRu(p.date)} · для ${p.buyer.name}`);
   pdf.text(p.intro ?? "Подготовили решение под вашу задачу. Цены включают доставку, монтаж и пусконаладку; гарантия — 3 года на оборудование и 2 года на работы.", { size: 10 });
   pdf.gap(10);
-  pdf.table([{ title: "№", w: 28 }, { title: "Позиция", w: 263 }, { title: "Кол-во", w: 52, align: "right" }, { title: "Цена", w: 78, align: "right" }, { title: "Сумма", w: 78, align: "right" }], p.lines.map((l, i) => [String(i + 1), l.name, `${l.qty} ${l.unit}`, money(l.price), money(l.qty * l.price * (1 - (l.discount ?? 0) / 100))]), { zebra: true });
+  pdf.table([{ title: "№", w: 28 }, { title: "Позиция", w: 233 }, { title: "Кол-во", w: 52, align: "right" }, { title: "Цена", w: 93, align: "right" }, { title: "Сумма", w: 93, align: "right" }], p.lines.map((l, i) => [String(i + 1), l.name, `${l.qty} ${l.unit}`, money(l.price), money(l.qty * l.price * (1 - (l.discount ?? 0) / 100))]), { zebra: true });
   pdf.gap(8);
-  pdf.text(`Итого с НДС: ${money(t.sum)}`, { align: "right", bold: true, size: 12 });
+  pdf.text(`Итого с НДС ${DEFAULT_VAT}%: ${money(t.sum)}`, { align: "right", bold: true, size: 12 });
   pdf.gap(12);
   pdf.text("Условия", { bold: true, size: 10.5 });
-  pdf.text(`Срок поставки: 2–7 рабочих дней. Оплата: 100% по счёту или по СБП. Предложение действительно ${p.validDays ?? 14} дней.`, { size: 9.5 });
+  pdf.text(`Срок поставки: по Ташкенту 1–2 дня, по регионам 3–5 дней. Оплата: 100% по счёту или через Payme / Click. Цены в сумах с НДС ${DEFAULT_VAT}%. Предложение действительно ${p.validDays ?? 14} дней.`, { size: 9.5 });
   pdf.gap(14);
   pdf.text(`Ваш менеджер: ${p.manager}${p.managerPhone ? `, ${p.managerPhone}` : ""}`, { size: 10, bold: true });
   pdf.footer(`${p.seller.name} · ${p.seller.phone ?? ""} · ${p.seller.email ?? ""}`);

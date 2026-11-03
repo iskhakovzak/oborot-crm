@@ -22,7 +22,7 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Финансы" };
 
 const TABS = [
-  { key: "payments", label: "Оплаты" }, { key: "bank", label: "Банк" }, { key: "sbp", label: "Ссылки СБП" }, { key: "finance", label: "Финучёт" }, { key: "balances", label: "Балансы" },
+  { key: "payments", label: "Оплаты" }, { key: "bank", label: "Банк" }, { key: "sbp", label: "Ссылки на оплату" }, { key: "finance", label: "Финучёт" }, { key: "balances", label: "Балансы" },
 ];
 const LINK_STATUS: Record<string, { label: string; tone: "good" | "info" | "neutral" | "accent" }> = { active: { label: "Активна", tone: "info" }, paid: { label: "Оплачена", tone: "good" }, expired: { label: "Истекла", tone: "neutral" }, cancelled: { label: "Отменена", tone: "accent" } };
 
@@ -77,7 +77,7 @@ export default async function FinancePage({ searchParams }: { searchParams: Prom
 
   return (
     <>
-      <PageHeader title="Финансы" description="Оплаты, выписка банка с авторазноской, ссылки СБП и синхронизация с финучётом." actions={canCreate ? <PaymentDialog options={options} /> : undefined} />
+      <PageHeader title="Финансы" description="Оплаты, выписка банка с авторазноской, ссылки Payme/Click и синхронизация с финучётом." actions={canCreate ? <PaymentDialog options={options} /> : undefined} />
       <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Stat label="Поступления за 30 дней" value={fmtMoney(monthIn)} tone="good" sub={plural(incoming.filter((x) => x.p.paidAt >= monthAgo).length, "платёж", "платежа", "платежей")} />
         <Stat label="За 7 дней" value={fmtMoney(weekIn)} sub={plural(incoming.filter((x) => x.p.paidAt >= weekAgo).length, "платёж", "платежа", "платежей")} />
@@ -193,9 +193,9 @@ async function SbpTab({ options, canCreate, canEdit, status }: { options: Financ
     .orderBy(desc(schema.paymentLinks.createdAt)).limit(200);
   const now = new Date().toISOString();
   return (
-    <Section title="Ссылки на оплату по СБП" description={status} action={canCreate ? <CreatePaymentLinkDialog options={options} /> : undefined} className="[&>div:last-child]:p-0">
+    <Section title="Ссылки на оплату через Payme/Click" description={status} action={canCreate ? <CreatePaymentLinkDialog options={options} /> : undefined} className="[&>div:last-child]:p-0">
       {rows.length === 0 ? (
-        <div className="p-5"><EmptyState icon={<QrCode />} title="Ссылок пока нет" description="Создайте ссылку — клиент оплатит по QR в приложении банка." /></div>
+        <div className="p-5"><EmptyState icon={<QrCode />} title="Ссылок пока нет" description="Создайте ссылку — клиент оплатит по QR или ссылке в Payme либо Click." /></div>
       ) : (
         <div className="overflow-x-auto">
           <table className="table-base w-full text-sm">

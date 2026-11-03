@@ -11,7 +11,7 @@ export const CAMPAIGN_STATUS: Record<string, { label: string; tone: Tone }> = {
   sending: { label: "Отправляется", tone: "info" },
   sent: { label: "Отправлена", tone: "good" },
 };
-export const CHANNEL_TONE: Record<string, Tone> = { email: "info", telegram: "info", whatsapp: "good", max: "violet", vk: "info", sms: "warn" };
+export const CHANNEL_TONE: Record<string, Tone> = { email: "info", telegram: "info", whatsapp: "good", max: "violet", instagram: "accent", sms: "warn" };
 
 export function segmentSummary(s: Segment, managers: Map<string, string>) {
   const parts: string[] = [];

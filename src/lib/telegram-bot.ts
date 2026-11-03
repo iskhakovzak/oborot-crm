@@ -8,6 +8,7 @@ import { parseBotCommand, type BotIntent } from "./integrations/ai";
 import { createDocument, sendDocument } from "./documents/service";
 import { fmtMoney, fmtDateTime, plural } from "./format";
 import { can, type Actor } from "./permissions";
+import { startOfDayTz } from "@/lib/format";
 
 export type BotUser = { id: string; name: string };
 export type CommandResult = { ok: boolean; text: string; intent: BotIntent["intent"]; status: "ok" | "error" | "unknown"; sandbox: boolean };
@@ -97,7 +98,7 @@ async function findUser(name: string) {
 
 function periodSince(period: "today" | "week" | "month") {
   const d = new Date();
-  if (period === "today") d.setHours(0, 0, 0, 0);
+  if (period === "today") return startOfDayTz(d).toISOString();
   else if (period === "week") d.setDate(d.getDate() - 7);
   else d.setMonth(d.getMonth() - 1);
   return d.toISOString();
@@ -111,7 +112,7 @@ function cleanDealTitle(title: string, company?: string) {
     const esc = company.replace(/[«»"]/g, "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     t = t.replace(new RegExp(`\\s+(?:для|с|от|клиент[ау]?)\\s+[«"]?${esc}[»"]?`, "i"), "");
   }
-  t = t.replace(/\s+на\s+\d[\d\s]*\s*(₽|руб\w*|р|к|тыс\w*)?\.?$/i, "").replace(/[,\s]+$/, "").trim();
+  t = t.replace(/\s+на\s+\d[\d\s]*\s*(сум\w*|uzs|₽|руб\w*|р|к|тыс\w*|млн)?\.?$/i, "").replace(/[,\s]+$/, "").trim();
   return t || "Новая сделка";
 }
 
@@ -216,7 +217,7 @@ async function run(intent: BotIntent, user: BotUser, actor: Actor): Promise<{ ok
   }
 }
 
-/** Дополняет встроенный разбор (без ключа ИИ): кириллица в \w не входит, суммы без «₽», хвосты в названиях */
+/** Дополняет встроенный разбор (без ключа ИИ): кириллица в \w не входит, суммы без «сум», хвосты в названиях */
 function refineIntent(text: string, intent: BotIntent): BotIntent {
   const l = text.toLowerCase();
   if (intent.intent === "unknown") {
@@ -227,8 +228,8 @@ function refineIntent(text: string, intent: BotIntent): BotIntent {
     if (/^(мои задачи|задачи|что у меня)/.test(l)) return { intent: "my_tasks" };
   }
   if (intent.intent === "create_deal" && intent.amount == null) {
-    const m = text.match(/\sна\s+(\d[\d\s]{2,})\s*(₽|руб[а-яё]*|р|к|тыс[а-яё]*)?\.?\s*$/i);
-    if (m) return { ...intent, amount: Number(m[1].replace(/\s/g, "")) * (/^(к|тыс)/i.test(m[2] ?? "") ? 1000 : 1) };
+    const m = text.match(/\sна\s+(\d[\d\s]{2,})\s*(сум[а-яё]*|uzs|₽|руб[а-яё]*|р|к|тыс[а-яё]*|млн)?\.?\s*$/i);
+    if (m) return { ...intent, amount: Number(m[1].replace(/\s/g, "")) * (/^(к|тыс)/i.test(m[2] ?? "") ? 1000 : /^млн/i.test(m[2] ?? "") ? 1_000_000 : 1) };
   }
   if (intent.intent === "create_task" && intent.assignee) {
     const title = intent.title.replace(new RegExp(`^(на|для)\\s+${intent.assignee}\\s+`, "i"), "").trim();

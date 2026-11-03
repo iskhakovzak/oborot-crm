@@ -1,7 +1,7 @@
 import QRCode from "qrcode";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
-import { CheckCircle2, Clock, ShieldCheck, Smartphone, XCircle } from "lucide-react";
+import { CheckCircle2, Clock, ShieldCheck, XCircle } from "lucide-react";
 import { db, schema } from "@/db";
 import { getSetting } from "@/lib/settings";
 import { fmtMoneyFull, fmtDateTime } from "@/lib/format";
@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { findPaymentLink, markPaymentLinkPaid } from "./actions";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Оплата по СБП" };
+export const metadata = { title: "Оплата через Payme или Click" };
 
 export default async function PayPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string }> }) {
   const { id } = await params;
@@ -63,18 +63,23 @@ export default async function PayPage({ params, searchParams }: { params: Promis
                 <div className="px-7 py-6">
                   <div className="mx-auto w-full max-w-[280px] rounded-[14px] border border-line bg-white p-3">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={qr!} alt="QR-код СБП" className="block w-full" width={440} height={440} />
+                    <img src={qr!} alt="QR-код Payme/Click" className="block w-full" width={440} height={440} />
                   </div>
-                  <p className="mt-3 text-center text-[13px] text-muted">Отсканируйте QR в приложении банка или нажмите кнопку на телефоне</p>
+                  <p className="mt-3 text-center text-[13px] text-muted">Отсканируйте QR в приложении Payme или Click, либо нажмите кнопку на телефоне</p>
                   <div className="mt-5 space-y-2">
-                    <Button size="lg" className="w-full" asChild><a href={link!.qrPayload}><Smartphone /> Открыть в приложении банка</a></Button>
+                    <Button size="lg" className="w-full bg-[#00c2b3] text-white hover:bg-[#00a99c]" asChild>
+                      <a href={link!.qrPayload}><span className="rounded-[5px] bg-white/20 px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-wide">Payme</span> Оплатить через Payme</a>
+                    </Button>
+                    <Button size="lg" className="w-full bg-[#0f9af0] text-white hover:bg-[#0b85d1]" asChild>
+                      <a href={link!.qrPayload}><span className="rounded-[5px] bg-white/20 px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-wide">Click</span> Оплатить через Click</a>
+                    </Button>
                     <form action={simulate}>
                       <Button type="submit" size="lg" variant="secondary" className="w-full">Имитировать оплату (демо)</Button>
                     </form>
                   </div>
                   {sp.error && <div className="mt-3 rounded-[8px] bg-accent-soft px-3 py-2 text-center text-[13px] text-accent">{sp.error}</div>}
                   <div className="mt-5 flex items-center justify-between text-xs text-muted">
-                    <span className="inline-flex items-center gap-1"><ShieldCheck className="size-3.5" /> Система быстрых платежей</span>
+                    <span className="inline-flex items-center gap-1"><ShieldCheck className="size-3.5" /> Безопасная оплата через Payme и Click</span>
                     {link!.expiresAt && <span className="inline-flex items-center gap-1"><Clock className="size-3.5" /> до {fmtDateTime(link!.expiresAt)}</span>}
                   </div>
                 </div>

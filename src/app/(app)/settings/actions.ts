@@ -30,7 +30,7 @@ export async function saveCompany(input: Partial<CompanyProfile>): Promise<{ ok:
     const name = String(input.name ?? "").trim();
     if (!name) return fail("Укажите название компании");
     const patch: Partial<CompanyProfile> = {};
-    for (const k of ["name", "shortName", "inn", "kpp", "ogrn", "address", "director", "directorPosition", "accountant", "bankName", "bik", "account", "corrAccount", "phone", "email"] as const) {
+    for (const k of ["name", "shortName", "inn", "oked", "regNumber", "address", "director", "directorPosition", "accountant", "bankName", "mfo", "account", "phone", "email"] as const) {
       if (input[k] !== undefined) patch[k] = String(input[k] ?? "").trim();
     }
     if (input.vatPayer !== undefined) patch.vatPayer = !!input.vatPayer;

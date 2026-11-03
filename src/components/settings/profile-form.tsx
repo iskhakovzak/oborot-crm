@@ -42,7 +42,7 @@ export function ProfileForm({ user }: { user: { name: string; email: string; pho
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Имя и фамилия"><Input value={name} onChange={(e) => setName(e.target.value)} required /></Field>
-          <Field label="Телефон"><Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+7 916 000-00-00" /></Field>
+          <Field label="Телефон"><Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+998 90 123-45-67" /></Field>
         </div>
       </Section>
       <Section title="Смена пароля" description="Оставьте поля пустыми, если пароль менять не нужно">

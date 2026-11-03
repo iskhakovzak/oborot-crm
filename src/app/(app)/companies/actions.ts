@@ -41,13 +41,13 @@ function revalidateCompany(id: string) {
 }
 
 export type CompanyInput = Partial<{
-  name: string; shortName: string | null; inn: string | null; kpp: string | null; ogrn: string | null; okved: string | null; legalAddress: string | null; address: string | null;
-  director: string | null; directorPosition: string | null; bankName: string | null; bik: string | null; account: string | null; corrAccount: string | null;
+  name: string; shortName: string | null; inn: string | null; oked: string | null; regNumber: string | null; legalAddress: string | null; address: string | null;
+  director: string | null; directorPosition: string | null; bankName: string | null; mfo: string | null; account: string | null;
   email: string | null; phone: string | null; website: string | null; industry: string | null; status: "lead" | "client" | "partner" | "archived"; source: string | null;
   managerId: string | null; tags: string[]; notes: string | null; balance: number;
 }>;
 
-const FIELDS = ["name", "shortName", "inn", "kpp", "ogrn", "okved", "legalAddress", "address", "director", "directorPosition", "bankName", "bik", "account", "corrAccount", "email", "phone", "website", "industry", "status", "source", "managerId", "tags", "notes", "balance"] as const;
+const FIELDS = ["name", "shortName", "inn", "oked", "regNumber", "legalAddress", "address", "director", "directorPosition", "bankName", "mfo", "account", "email", "phone", "website", "industry", "status", "source", "managerId", "tags", "notes", "balance"] as const;
 
 function sanitize(user: SessionUser, input: CompanyInput, forCreate: boolean): Record<string, unknown> {
   const ro = readonlyFields(user.actor, "companies");
@@ -108,7 +108,7 @@ export async function updateCompany(id: string, input: CompanyInput): Promise<{ 
   }
 }
 
-/** 4. Обновить реквизиты из ЕГРЮЛ по ИНН */
+/** 4. Обновить реквизиты из реестра ЮЛ (soliq.uz) по ИНН */
 export async function refreshCompanyByInn(id: string, innOverride?: string): Promise<{ ok: true; name: string; source: string } | Fail> {
   const user = await requireUser();
   try {
@@ -117,7 +117,7 @@ export async function refreshCompanyByInn(id: string, innOverride?: string): Pro
     if (!inn) return fail("У клиента не указан ИНН");
     const data = await lookupCompanyByInn(inn);
     if (!data) return fail("Компания по этому ИНН не найдена");
-    await db.update(schema.companies).set({ name: data.name, shortName: data.shortName, inn: data.inn, kpp: data.kpp || null, ogrn: data.ogrn || null, okved: data.okved || null, legalAddress: data.legalAddress || null, director: data.director || null, directorPosition: data.directorPosition || null, updatedAt: new Date().toISOString() }).where(eq(schema.companies.id, id));
+    await db.update(schema.companies).set({ name: data.name, shortName: data.shortName, inn: data.inn, oked: data.oked || null, regNumber: data.regNumber || null, legalAddress: data.legalAddress || null, director: data.director || null, directorPosition: data.directorPosition || null, updatedAt: new Date().toISOString() }).where(eq(schema.companies.id, id));
     await logActivity({ type: "system", title: `Реквизиты обновлены по ИНН ${inn}`, body: `${data.name}, ${data.status}${data.source === "sandbox" ? " (демо-данные)" : ""}`, companyId: id, userId: user.id });
     revalidateCompany(id);
     return { ok: true, name: data.name, source: data.source };
@@ -128,11 +128,11 @@ export async function refreshCompanyByInn(id: string, innOverride?: string): Pro
 
 // ───────────────────────────── Контакты ─────────────────────────────
 
-export type ContactInput = { name: string; position?: string | null; phone?: string | null; email?: string | null; telegram?: string | null; whatsapp?: string | null; max?: string | null; vk?: string | null; isPrimary?: boolean; birthday?: string | null };
+export type ContactInput = { name: string; position?: string | null; phone?: string | null; email?: string | null; telegram?: string | null; whatsapp?: string | null; max?: string | null; instagram?: string | null; isPrimary?: boolean; birthday?: string | null };
 
 function cleanContact(input: ContactInput) {
   const s = (v: string | null | undefined) => (v ?? "").trim() || null;
-  return { name: input.name.trim(), position: s(input.position), phone: s(input.phone), email: s(input.email), telegram: s(input.telegram), whatsapp: s(input.whatsapp), max: s(input.max), vk: s(input.vk), isPrimary: !!input.isPrimary, birthday: s(input.birthday) };
+  return { name: input.name.trim(), position: s(input.position), phone: s(input.phone), email: s(input.email), telegram: s(input.telegram), whatsapp: s(input.whatsapp), max: s(input.max), instagram: s(input.instagram), isPrimary: !!input.isPrimary, birthday: s(input.birthday) };
 }
 
 export async function addContact(companyId: string, input: ContactInput): Promise<{ ok: true; id: string } | Fail> {

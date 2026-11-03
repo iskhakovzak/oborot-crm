@@ -20,7 +20,7 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Документы" };
 
 const TYPE_TABS: { key: string; label: string }[] = [
-  { key: "", label: "Все" }, { key: "invoice", label: "Счета" }, { key: "contract", label: "Договоры" }, { key: "upd", label: "УПД" }, { key: "act", label: "Акты" }, { key: "kp", label: "КП" }, { key: "report", label: "Отчёты" },
+  { key: "", label: "Все" }, { key: "invoice", label: "Счета" }, { key: "contract", label: "Договоры" }, { key: "upd", label: "ЭСФ" }, { key: "act", label: "Акты" }, { key: "kp", label: "КП" }, { key: "report", label: "Отчёты" },
 ];
 const TYPES: DocumentType[] = ["invoice", "contract", "upd", "act", "kp", "report"];
 
@@ -69,7 +69,7 @@ export default async function DocumentsPage({ searchParams }: { searchParams: Pr
     <>
       <PageHeader
         title="Документы"
-        description="Счета, договоры, УПД, акты и КП формируются по сделке в один клик, уходят клиенту и в ЭДО."
+        description="Счета, договоры, ЭСФ, акты и КП формируются по сделке в один клик, уходят клиенту и в ЭДО."
         actions={<NewDocumentDialog deals={dealOptions} companies={companyOptions} initialType={sp.new} canCreate={canCreate} />}
       />
       <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

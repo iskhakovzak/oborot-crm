@@ -6,7 +6,7 @@ import { requireUser } from "@/lib/auth";
 import { can, hiddenFields } from "@/lib/permissions";
 import { sendConversion } from "@/lib/integrations/metrika";
 
-/** 27. Повторная отправка конверсии в Яндекс Метрику / сквозную аналитику */
+/** 27. Повторная отправка конверсии в Яндекс Метрику, Google Analytics / сквозную аналитику */
 export async function resendExport(exportId: string): Promise<{ ok: boolean; message: string }> {
   const user = await requireUser();
   if (!can(user.actor, "analytics", "view") || hiddenFields(user.actor, "analytics").includes("marketing")) return { ok: false, message: "Нет доступа к маркетинговой аналитике" };
