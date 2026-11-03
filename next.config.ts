@@ -5,6 +5,8 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["@electric-sql/pglite", "postgres", "pdf-lib", "nodemailer", "@pdf-lib/fontkit"],
   outputFileTracingIncludes: {
     "/**": ["./drizzle/**", "./data/pg/**", "./src/assets/fonts/**"],
+    "/*": ["./drizzle/**", "./data/pg/**", "./src/assets/fonts/**"],
+    "/api/**": ["./drizzle/**", "./data/pg/**", "./src/assets/fonts/**"],
   },
   turbopack: {
     rules: {

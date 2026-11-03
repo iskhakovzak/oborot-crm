@@ -10,7 +10,14 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   if (await getCurrentUser()) redirect(sp.next && sp.next.startsWith("/") ? sp.next : "/");
   async function action(fd: FormData) {
     "use server";
-    const r = await login(String(fd.get("email") ?? ""), String(fd.get("password") ?? ""));
+    const { ensureDatabase } = await import("@/db/ensure");
+    await ensureDatabase();
+    let r: Awaited<ReturnType<typeof login>>;
+    try {
+      r = await login(String(fd.get("email") ?? ""), String(fd.get("password") ?? ""));
+    } catch (e) {
+      r = { ok: false, error: `База данных недоступна: ${e instanceof Error ? e.message : String(e)}. Откройте /api/health для диагностики.` };
+    }
     const next = String(fd.get("next") ?? "/");
     if (!r.ok) redirect(`/login?error=${encodeURIComponent(r.error)}&next=${encodeURIComponent(next)}`);
     redirect(next.startsWith("/") ? next : "/");
