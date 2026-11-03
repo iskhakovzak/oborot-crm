@@ -22,7 +22,7 @@ export function MobileNav({ allowed }: { allowed: Record<string, boolean> }) {
         <DialogPrimitive.Content className="fixed inset-y-0 left-0 z-50 w-[260px] overflow-y-auto bg-side p-2 shadow-pop outline-none lg:hidden">
           <DialogPrimitive.Title className="sr-only">Навигация</DialogPrimitive.Title>
           <div className="mb-3 flex items-center justify-between px-2">
-            <span className="text-[15px] font-semibold">Оборот</span>
+            <span className="text-[15px] font-semibold">WS_CRM</span>
             <DialogPrimitive.Close className="rounded-md p-1 text-muted hover:bg-black/5" aria-label="Закрыть"><X className="size-4" /></DialogPrimitive.Close>
           </div>
           {NAV.map((g) => {

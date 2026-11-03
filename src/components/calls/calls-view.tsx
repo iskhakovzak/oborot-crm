@@ -160,7 +160,7 @@ export function CallsView({ calls, contacts, canCreate, canEdit, aiCallsEnabled,
                   {view.transcript.split("\n").filter(Boolean).map((line, i) => {
                     const m = line.match(/^([^:]{1,40}):\s*(.*)$/);
                     const who = m?.[1] ?? "";
-                    const isAi = /^ИИ|^Оборот|^Мария/i.test(who);
+                    const isAi = /^ИИ|^WS_CRM|^Мария/i.test(who);
                     return (
                       <div key={i} className={cn("flex", isAi ? "justify-start" : "justify-end")}>
                         <div className={cn("max-w-[80%] rounded-[14px] px-3.5 py-2 text-[13.5px] leading-relaxed", isAi ? "rounded-bl-[5px] bg-violet-soft text-ink" : "rounded-br-[5px] border border-line bg-surface")}>

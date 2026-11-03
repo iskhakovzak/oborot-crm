@@ -368,7 +368,7 @@ function NewConversationDialog({ open, onOpenChange, contacts }: { open: boolean
               })}
             </div>
           </Field>
-          <Field label="Сообщение"><Textarea value={text} onChange={(e) => setText(e.target.value)} placeholder="Здравствуйте! Это Оборот…" /></Field>
+          <Field label="Сообщение"><Textarea value={text} onChange={(e) => setText(e.target.value)} placeholder="Здравствуйте! Это WS_CRM…" /></Field>
           <div className="flex justify-end gap-2">
             <Button variant="secondary" onClick={() => onOpenChange(false)}>Отмена</Button>
             <Button onClick={submit} disabled={busy || !contactId || (!!contact && !channels.length)}>{busy ? <Loader2 className="animate-spin" /> : <Send />} Отправить</Button>

@@ -42,6 +42,7 @@ export const users = pgTable("users", {
   leadWeight: integer("lead_weight").notNull().default(1),
   skills: json<string[]>("skills").default([]),
   telegramChatId: text("telegram_chat_id"),
+  telegramUsername: text("telegram_username"),
   workStart: text("work_start").notNull().default("09:00"),
   workEnd: text("work_end").notNull().default("18:00"),
   workDays: json<number[]>("work_days").default([1, 2, 3, 4, 5]),

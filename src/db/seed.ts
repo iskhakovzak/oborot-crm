@@ -39,16 +39,12 @@ export async function seedDatabase() {
     { id: roleAcc, name: "Бухгалтер", slug: "accountant", description: "Документы, оплаты, ЭДО и банк", permissions: accountantPermissions(), isSystem: true },
   ]);
   const pw = await bcrypt.hash("demo123", 10);
-  const admin = id("usr"), jasur = id("usr"), nigora = id("usr"), bobur = id("usr"), sherzod = id("usr"), dilnoza = id("usr");
+  const admin = id("usr");
   await db.insert(schema.users).values([
-    { id: admin, name: "Алишер Каримов", email: "admin@oborot.uz", phone: "+998 90 100-00-01", passwordHash: await bcrypt.hash("admin123", 10), roleId: roleAdmin, color: "#16181d", teamId: "sales", acceptsLeads: false, skills: ["крупные сделки"] },
-    { id: jasur, name: "Жасур Юсупов", email: "jasur@oborot.uz", phone: "+998 90 100-00-02", passwordHash: pw, roleId: roleManager, color: "#2456d6", teamId: "sales", leadWeight: 2, skills: ["кондиционеры", "вентиляция"] },
-    { id: nigora, name: "Нигора Турсунова", email: "nigora@oborot.uz", phone: "+998 91 100-00-03", passwordHash: pw, roleId: roleManager, color: "#6b3fd6", teamId: "sales", skills: ["тепловые завесы", "сервис"] },
-    { id: bobur, name: "Бобур Алиев", email: "bobur@oborot.uz", phone: "+998 93 100-00-06", passwordHash: pw, roleId: roleManager, color: "#b96a00", teamId: "sales", skills: ["вентиляция", "проекты"] },
-    { id: sherzod, name: "Шерзод Назаров", email: "sherzod@oborot.uz", phone: "+998 94 100-00-04", passwordHash: pw, roleId: roleProd, color: "#138a5e", teamId: "production", acceptsLeads: false },
-    { id: dilnoza, name: "Дилноза Рашидова", email: "dilnoza@oborot.uz", phone: "+998 97 100-00-05", passwordHash: pw, roleId: roleAcc, color: "#c8102e", teamId: "finance", acceptsLeads: false },
+    { id: admin, name: "Закир Исхаков", email: "ishakovzakir0@gmail.com", telegramUsername: "ws_zr", phone: "+998 90 100-00-01", passwordHash: await bcrypt.hash("admin123", 10), roleId: roleAdmin, color: "#18181b", teamId: "sales", acceptsLeads: true, skills: ["кондиционеры", "вентиляция", "проекты"] },
   ]);
-  const managers = [jasur, nigora, bobur];
+  const jasur = admin, nigora = admin, bobur = admin, sherzod = admin, dilnoza = admin;
+  const managers = [admin];
 
   // ── воронки
   const pSales = id("pipe"), pShip = id("pipe"), pService = id("pipe"), pProd = id("pipe");
@@ -122,10 +118,10 @@ export async function seedDatabase() {
     ["BRZ-1000", "4604567890123", "Приточная установка Breezart 1000 Lux", "Вентиляция", "Breezart", 28_350_000, 19_650_000, 2, 48],
     ["TUBE-14", "4605678901234", "Медная труба 1/4″ × 15 м", "Расходные материалы", "Halcor", 630_000, 435_000, 60, 2.1],
     ["TUBE-38", "4605678901241", "Медная труба 3/8″ × 15 м", "Расходные материалы", "Halcor", 915_000, 645_000, 44, 3],
-    ["MNT-35", "4606789012345", "Монтаж сплит-системы до 3,5 кВт", "Услуги", "Oborot", 1_400_000, 600_000, 0, 0],
-    ["MNT-VENT", "4606789012352", "Монтаж приточной установки", "Услуги", "Oborot", 6_750_000, 3_300_000, 0, 0],
-    ["SRV-TO", "4606789012369", "Сервисное обслуживание (ТО), 1 выезд", "Услуги", "Oborot", 675_000, 270_000, 0, 0],
-    ["PRJ-VENT", "4606789012376", "Проект вентиляции, до 500 м²", "Услуги", "Oborot", 9_750_000, 4_500_000, 0, 0],
+    ["MNT-35", "4606789012345", "Монтаж сплит-системы до 3,5 кВт", "Услуги", "WS", 1_400_000, 600_000, 0, 0],
+    ["MNT-VENT", "4606789012352", "Монтаж приточной установки", "Услуги", "WS", 6_750_000, 3_300_000, 0, 0],
+    ["SRV-TO", "4606789012369", "Сервисное обслуживание (ТО), 1 выезд", "Услуги", "WS", 675_000, 270_000, 0, 0],
+    ["PRJ-VENT", "4606789012376", "Проект вентиляции, до 500 м²", "Услуги", "WS", 9_750_000, 4_500_000, 0, 0],
   ].map(([sku, barcode, name, category, brand, price, cost, stock, w]) => ({ id: id("prd"), sku: String(sku), barcode: String(barcode), name: String(name), category: String(category), brand: String(brand), unit: category === "Услуги" ? "усл" : category === "Расходные материалы" ? "бухта" : "шт", price: Number(price), cost: Number(cost), stock: Number(stock), weightKg: Number(w) || null, vatRate: VAT, description: `${name}. Доставка по Ташкенту 1–2 дня, по регионам 3–5 дней, гарантия 3 года.`, attributes: { "Гарантия": "3 года" } }));
   await db.insert(schema.products).values(products);
   const MNT = 11; // индекс услуги «Монтаж сплит-системы»
@@ -164,7 +160,7 @@ export async function seedDatabase() {
   const pays: (typeof schema.payments.$inferInsert)[] = [];
   let inv = 100, ctr = 40, upd = 70, kp = 200;
   const openSales = deals.filter((d) => d.pipelineId === pSales && d.status === "open");
-  const seller = { name: "ООО «Oborot Climate»", inn: "305123456", oked: "43220", regNumber: "1234567", address: "100015, г. Ташкент, Мирабадский район, ул. Шахрисабз, 16", bankName: "АКБ «Капиталбанк»", mfo: "00974", account: "20208000900123456001", director: "Каримов Алишер Бахтиёрович", directorPosition: "Директор" };
+  const seller = { name: "ООО «WS Climate»", inn: "305123456", oked: "43220", regNumber: "1234567", address: "100015, г. Ташкент, Мирабадский район, ул. Шахрисабз, 16", bankName: "АКБ «Капиталбанк»", mfo: "00974", account: "20208000900123456001", director: "Каримов Алишер Бахтиёрович", directorPosition: "Директор" };
   const y = new Date().getFullYear();
   const mkDoc = (d: typeof schema.deals.$inferInsert, type: "invoice" | "contract" | "upd" | "kp", status: "draft" | "sent" | "signed" | "paid", edo: "none" | "sent" | "delivered" | "signed", days: number) => {
     const number = type === "invoice" ? `СЧ-${y}-${String(++inv).padStart(4, "0")}` : type === "contract" ? `Д-${y}-${String(++ctr).padStart(4, "0")}` : type === "upd" ? `ЭСФ-${y}-${String(++upd).padStart(4, "0")}` : `КП-${y}-${String(++kp).padStart(4, "0")}`;
@@ -243,7 +239,7 @@ export async function seedDatabase() {
   const calls: (typeof schema.calls.$inferInsert)[] = [];
   companies.slice(0, 8).forEach((c, i) => {
     const ai = i === 1 || i === 6;
-    calls.push({ id: id("call"), direction: i % 2 ? "out" : "in", phone: contacts[i].phone!, contactId: contacts[i].id, companyId: c.id, dealId: deals.find((d) => d.companyId === c.id)?.id ?? null, userId: ai ? null : c.managerId, provider: "onlinepbx", status: ai ? "ai_handled" : i === 4 ? "missed" : "completed", durationSec: ai ? 95 : i === 4 ? 0 : 120 + i * 37, recordingUrl: null, aiHandled: ai, transcript: ai ? `ИИ: Здравствуйте! Компания Oborot, меня зовут Малика. Чем могу помочь?\n${contacts[i].name.split(" ")[1]}: Добрый день, нужен кондиционер в переговорную, 20 метров.\nИИ: Подойдёт Ballu BSAG-09 с монтажом — 5 750 000 сум, доставка по Ташкенту 1–2 дня, монтаж через 3 дня. Как к вам обращаться и куда прислать расчёт?\n${contacts[i].name.split(" ")[1]}: В Telegram, пожалуйста.\nИИ: Отправим в течение часа. Спасибо за звонок!` : null, aiSummary: ai ? "Запрос: кондиционер в переговорную 20 м², расчёт в Telegram в течение часа." : null, startedAt: daysAgo(i % 3, 10 + i) });
+    calls.push({ id: id("call"), direction: i % 2 ? "out" : "in", phone: contacts[i].phone!, contactId: contacts[i].id, companyId: c.id, dealId: deals.find((d) => d.companyId === c.id)?.id ?? null, userId: ai ? null : c.managerId, provider: "onlinepbx", status: ai ? "ai_handled" : i === 4 ? "missed" : "completed", durationSec: ai ? 95 : i === 4 ? 0 : 120 + i * 37, recordingUrl: null, aiHandled: ai, transcript: ai ? `ИИ: Здравствуйте! Компания WS, меня зовут Малика. Чем могу помочь?\n${contacts[i].name.split(" ")[1]}: Добрый день, нужен кондиционер в переговорную, 20 метров.\nИИ: Подойдёт Ballu BSAG-09 с монтажом — 5 750 000 сум, доставка по Ташкенту 1–2 дня, монтаж через 3 дня. Как к вам обращаться и куда прислать расчёт?\n${contacts[i].name.split(" ")[1]}: В Telegram, пожалуйста.\nИИ: Отправим в течение часа. Спасибо за звонок!` : null, aiSummary: ai ? "Запрос: кондиционер в переговорную 20 м², расчёт в Telegram в течение часа." : null, startedAt: daysAgo(i % 3, 10 + i) });
   });
   await db.insert(schema.calls).values(calls);
 

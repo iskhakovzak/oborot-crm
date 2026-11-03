@@ -239,7 +239,7 @@ export async function renderUpd(p: { number: string; date: string; seller: Party
   pdf.text(`Товар получил / услуги принял (Покупатель): ______________ ${p.buyer.director ?? ""}`, { size: 9 });
   pdf.gap(10);
   pdf.text(`Дата получения: «____» ____________ ${new Date(p.date).getFullYear()} г.`, { size: 9, color: MUTED });
-  pdf.footer(`ЭСФ № ${p.number} · сформирована в Оборот CRM`);
+  pdf.footer(`ЭСФ № ${p.number} · сформирована в WS_CRM`);
   return pdf.bytes();
 }
 

@@ -31,14 +31,14 @@ export async function GET(req: Request) {
   const profile = await getSetting("company");
 
   const pdf = await Pdf.create();
-  pdf.text(`${profile.name} · Оборот CRM`, { size: 9, color: MUTED });
+  pdf.text(`${profile.name} · WS_CRM`, { size: 9, color: MUTED });
   pdf.heading(`Отчёт: ${TYPES[type].toLowerCase()}`, `Период: ${dateRu(period.from.toISOString())} — ${dateRu(period.to.toISOString())} (${days} дн.) · сформирован ${dateRu(new Date().toISOString())}, ${user.name}`);
 
   if (type === "marketing") renderMarketing(pdf, await marketing(period));
   if (type === "sales") renderSales(pdf, await sales(period));
   if (type === "production") renderProduction(pdf, await production(period));
 
-  pdf.footer(`${profile.name} · Отчёт «${TYPES[type]}» · Оборот CRM`);
+  pdf.footer(`${profile.name} · Отчёт «${TYPES[type]}» · WS_CRM`);
   const bytes = await pdf.bytes();
   const filename = `Отчёт-${FILE[type]}-${new Date().toISOString().slice(0, 10)}.pdf`;
   return new Response(new Uint8Array(bytes), {

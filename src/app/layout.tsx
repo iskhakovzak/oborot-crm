@@ -3,7 +3,7 @@ import "./globals.css";
 import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
-  title: { default: "Оборот CRM", template: "%s — Оборот CRM" },
+  title: { default: "WS_CRM", template: "%s — WS_CRM" },
   description: "CRM для продаж, отгрузки и производства: 30 возможностей в одной системе",
 };
 

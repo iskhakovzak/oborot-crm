@@ -10,8 +10,8 @@ export function Sidebar({ allowed, user }: { allowed: Record<string, boolean>; u
   return (
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-[224px] flex-col border-r border-line bg-side lg:flex">
       <Link href="/" className="flex h-12 items-center gap-2.5 px-4">
-        <span className="grid size-6 place-items-center rounded-[6px] bg-ink text-white text-[12px] font-semibold">О</span>
-        <span className="text-[13.5px] font-semibold text-ink">Оборот</span>
+        <span className="grid size-6 place-items-center rounded-[6px] bg-ink text-white text-[12px] font-semibold">W</span>
+        <span className="text-[13.5px] font-semibold text-ink">WS_CRM</span>
       </Link>
       <nav className="flex-1 overflow-y-auto px-2 pb-3">
         {NAV.map((g) => {

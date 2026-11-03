@@ -70,7 +70,7 @@ export async function POST(req: Request) {
 
   const user = await db.query.users.findFirst({ where: eq(schema.users.telegramChatId, chatId) });
   if (!user || !user.isActive) {
-    const r = await reply(chatId, "Этот чат не привязан к сотруднику CRM. Отправьте команду:\n/start ваш@email — тот, под которым вы входите в Оборот.");
+    const r = await reply(chatId, "Этот чат не привязан к сотруднику CRM. Отправьте команду:\n/start ваш@email — тот, под которым вы входите в WS_CRM.");
     await db.insert(schema.telegramCommands).values({ id: newId("tgc"), chatId, userId: null, text, intent: "unknown", result: "Чат не привязан к сотруднику", status: "unknown" });
     return NextResponse.json({ ok: true, replied: "not_linked", sandbox: r.sandbox });
   }

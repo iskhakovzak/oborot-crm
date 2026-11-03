@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { cache } from "react";
-import { eq, and, gt } from "drizzle-orm";
+import { eq, and, gt, or } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { db, schema } from "@/db";
 import { newId } from "./utils";
@@ -23,9 +23,11 @@ export type SessionUser = {
   actor: Actor;
 };
 
-export async function login(email: string, password: string): Promise<{ ok: true } | { ok: false; error: string }> {
-  const user = await db.query.users.findFirst({ where: eq(schema.users.email, email.trim().toLowerCase()) });
-  if (!user || !user.isActive) return { ok: false, error: "Пользователь с таким email не найден" };
+/** Вход по email или Telegram-нику (с @ или без) */
+export async function login(identifier: string, password: string): Promise<{ ok: true } | { ok: false; error: string }> {
+  const id = identifier.trim().toLowerCase().replace(/^@/, "");
+  const user = await db.query.users.findFirst({ where: or(eq(schema.users.email, id), eq(schema.users.telegramUsername, id)) });
+  if (!user || !user.isActive) return { ok: false, error: "Пользователь с таким email или Telegram не найден" };
   const ok = await bcrypt.compare(password, user.passwordHash);
   if (!ok) return { ok: false, error: "Неверный пароль" };
   const sid = newId("ses");

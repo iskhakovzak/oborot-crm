@@ -53,7 +53,7 @@ export function BookFlow({ slug, type, slots: initialSlots, company }: Props) {
   };
 
   const ics = done
-    ? "data:text/calendar;charset=utf-8," + encodeURIComponent(["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Oborot CRM//RU", "BEGIN:VEVENT", `UID:${done.bookingId}@oborot`, `DTSTAMP:${icsDate(new Date().toISOString())}`, `DTSTART:${icsDate(done.startsAt)}`, `DTEND:${icsDate(done.endsAt)}`, `SUMMARY:${type.name} — ${company.name}`, `LOCATION:${type.location}`, `DESCRIPTION:Специалист: ${type.userName}. Телефон: ${company.phone}`, "END:VEVENT", "END:VCALENDAR"].join("\r\n"))
+    ? "data:text/calendar;charset=utf-8," + encodeURIComponent(["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//WS CRM//RU", "BEGIN:VEVENT", `UID:${done.bookingId}@oborot`, `DTSTAMP:${icsDate(new Date().toISOString())}`, `DTSTART:${icsDate(done.startsAt)}`, `DTEND:${icsDate(done.endsAt)}`, `SUMMARY:${type.name} — ${company.name}`, `LOCATION:${type.location}`, `DESCRIPTION:Специалист: ${type.userName}. Телефон: ${company.phone}`, "END:VEVENT", "END:VCALENDAR"].join("\r\n"))
     : "";
 
   return (

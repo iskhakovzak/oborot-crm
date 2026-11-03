@@ -19,8 +19,8 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
     <div className="grid min-h-screen lg:grid-cols-[1.1fr_1fr]">
       <div className="hidden lg:flex flex-col justify-between bg-mesh p-12 text-white">
         <div className="flex items-center gap-2.5">
-          <span className="grid size-9 place-items-center rounded-[11px] bg-brand-gradient text-white text-sm font-bold shadow-brand">О</span>
-          <span className="text-lg font-semibold">Оборот</span>
+          <span className="grid size-9 place-items-center rounded-[8px] bg-white text-ink text-sm font-bold">W</span>
+          <span className="text-lg font-semibold">WS_CRM</span>
         </div>
         <div className="max-w-[34ch]">
           <h1 className="text-[40px] font-semibold leading-[1.1] tracking-[-0.02em]">Заявка, счёт, отгрузка, оплата — в одном обороте.</h1>
@@ -37,17 +37,15 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
       <div className="flex items-center justify-center bg-canvas p-6">
         <form action={action} className="card w-full max-w-sm p-8">
           <h2 className="text-[22px] font-semibold">Вход в систему</h2>
-          <p className="mt-1 text-[13px] text-muted">Демо-доступ: admin@oborot.uz / admin123</p>
+          <p className="mt-1 text-[13px] text-muted">Вход по email или Telegram-нику</p>
           {sp.error && <div className="mt-4 rounded-[8px] bg-accent-soft px-3 py-2 text-[13px] text-accent">{sp.error}</div>}
           <input type="hidden" name="next" value={sp.next ?? "/"} />
           <div className="mt-6 space-y-4">
-            <Field label="Email"><Input name="email" type="email" required autoComplete="email" defaultValue="admin@oborot.uz" /></Field>
+            <Field label="Email или Telegram"><Input name="email" type="text" required autoComplete="username" defaultValue="@ws_zr" /></Field>
             <Field label="Пароль"><Input name="password" type="password" required autoComplete="current-password" defaultValue="admin123" /></Field>
             <Button type="submit" size="lg" className="w-full">Войти</Button>
           </div>
-          <div className="mt-6 rounded-[10px] bg-surface-2 p-3 text-xs text-muted leading-relaxed">
-            Другие роли для проверки прав: менеджер — jasur@oborot.uz, производство — sherzod@oborot.uz, бухгалтер — dilnoza@oborot.uz. Пароль у всех: demo123.
-          </div>
+          <div className="mt-6 rounded-[8px] bg-surface-2 p-3 text-xs text-muted leading-relaxed">Пароль по умолчанию: admin123. Смените его в разделе «Настройки → Профиль».</div>
         </form>
       </div>
     </div>
