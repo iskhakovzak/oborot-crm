@@ -42,9 +42,9 @@ export function AiSandbox({ assistantName, live }: { assistantName: string; live
           </div>
           <div className="flex justify-end"><Button onClick={runReply} disabled={busyReply || !text.trim()}>{busyReply ? <Loader2 className="animate-spin" /> : <Sparkles />} Проверить ответ</Button></div>
           {reply && (
-            <div className="space-y-2 rounded-[10px] bg-surface-2/70 p-3">
-              <div className="flex justify-end"><div className="max-w-[85%] rounded-[14px] rounded-br-[5px] bg-ink px-3.5 py-2 text-[13.5px] leading-relaxed text-white"><div className="mb-0.5 flex items-center gap-1 text-[11px] text-white/60"><UserRound className="size-3" /> Клиент</div>{text}</div></div>
-              <div className="flex justify-start"><div className="max-w-[85%] rounded-[14px] rounded-bl-[5px] border border-line bg-surface px-3.5 py-2 text-[13.5px] leading-relaxed"><div className="mb-0.5 flex items-center gap-1 text-[11px] text-violet"><Bot className="size-3" /> {assistantName}</div>{reply.reply}</div></div>
+            <div className="space-y-2 rounded-[10px] border border-line p-3">
+              <div className="flex justify-end"><div className="max-w-[85%] rounded-[14px] rounded-br-[5px] bg-ink px-3.5 py-2 text-[13.5px] leading-relaxed text-canvas"><div className="mb-0.5 flex items-center gap-1 text-[11px] text-canvas/60"><UserRound className="size-3" /> Клиент</div>{text}</div></div>
+              <div className="flex justify-start"><div className="max-w-[85%] rounded-[14px] rounded-bl-[5px] border border-line bg-surface-2 px-3.5 py-2 text-[13.5px] leading-relaxed"><div className="mb-0.5 flex items-center gap-1 text-[11px] text-violet"><Bot className="size-3" /> {assistantName}</div>{reply.reply}</div></div>
               <div className="flex flex-wrap items-center gap-2 pt-1 text-[12px] text-muted">
                 {reply.handoff ? <Badge tone="warn">Передаст менеджеру</Badge> : <Badge tone="good">Ответит сам</Badge>}
                 {reply.sandbox && <span>демо-режим без ключа API</span>}
@@ -66,7 +66,7 @@ export function AiSandbox({ assistantName, live }: { assistantName: string; live
                 <p className="mt-1 text-[12.5px] text-ink-2">Следующий шаг: {call.nextStep}</p>
                 <div className="mt-2 flex gap-2">{call.createLead ? <Badge tone="good">Создаст заявку и задачу менеджеру</Badge> : <Badge tone="neutral">Без заявки</Badge>}{call.sandbox && <Badge tone="warn">демо</Badge>}</div>
               </div>
-              <div className="space-y-1.5 rounded-[10px] bg-surface-2/70 p-3">
+              <div className="space-y-1.5 rounded-[10px] border border-line p-3">
                 {call.transcript.split("\n").filter(Boolean).map((line, i) => {
                   const m = line.match(/^([^:]{1,40}):\s*(.*)$/);
                   const isAi = /^ИИ/i.test(m?.[1] ?? "") || (m?.[1] ?? "").includes(assistantName);

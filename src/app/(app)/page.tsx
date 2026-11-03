@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { and, asc, count, desc, eq, gt, gte, inArray, lt, or, sql, sum, type SQL } from "drizzle-orm";
-import { Plus, CheckSquare, Workflow } from "lucide-react";
+import { Plus, CheckSquare, Workflow, TrendingUp } from "lucide-react";
 import { db, schema } from "@/db";
 import { requireUser } from "@/lib/auth";
 import { can, scopeOf } from "@/lib/permissions";
-import { fmtTime, relTime, plural } from "@/lib/format";
+import { fmtTime, relTime, plural, fmtMoneyCompact } from "@/lib/format";
 import { Money } from "@/components/ui/money";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -33,6 +33,7 @@ export default async function Dashboard() {
   const dayStart = new Date(now); dayStart.setHours(0, 0, 0, 0);
   const dayEnd = new Date(now); dayEnd.setHours(23, 59, 59, 999);
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+  const prevMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString();
   const weekAgo = new Date(now.getTime() - 7 * 86400_000).toISOString();
   const dayAgo = new Date(now.getTime() - 86400_000).toISOString();
   const staleBefore = new Date(now.getTime() - 5 * 86400_000).toISOString();
@@ -52,10 +53,11 @@ export default async function Dashboard() {
   const seePayments = can(a, "payments", "view");
   const dealsWhere = scopeWhere("deals", schema.deals.managerId);
 
-  const [mine, visible, won, todayTasks, unread, bookingsToday, attention, inbox, runs, payWeek, unpaid, recentPayments] = await Promise.all([
+  const [mine, visible, won, wonPrev, todayTasks, unread, bookingsToday, attention, inbox, runs, payWeek, unpaid, recentPayments] = await Promise.all([
     seeDeals ? db.select({ n: count(), s: sum(schema.deals.amount) }).from(schema.deals).where(and(eq(schema.deals.status, "open"), eq(schema.deals.managerId, user.id))).then((r) => r[0]) : null,
     seeDeals ? db.select({ n: count(), s: sum(schema.deals.amount) }).from(schema.deals).where(and(eq(schema.deals.status, "open"), dealsWhere)).then((r) => r[0]) : null,
     seeDeals && seeMoney ? db.select({ n: count(), s: sum(schema.deals.amount) }).from(schema.deals).where(and(eq(schema.deals.status, "won"), gte(schema.deals.closedAt, monthStart), dealsWhere)).then((r) => r[0]) : null,
+    seeDeals && seeMoney ? db.select({ n: count(), s: sum(schema.deals.amount) }).from(schema.deals).where(and(eq(schema.deals.status, "won"), gte(schema.deals.closedAt, prevMonthStart), lt(schema.deals.closedAt, monthStart), dealsWhere)).then((r) => r[0]) : null,
     loadTodayTasks(user),
     seeConv ? db.select({ n: count() }).from(schema.conversations).where(and(gt(schema.conversations.unread, 0), eq(schema.conversations.status, "open"), scopeWhere("conversations", schema.conversations.assigneeId))).then((r) => r[0]) : null,
     seeBookings
@@ -114,6 +116,15 @@ export default async function Dashboard() {
   const recentRuns = runs.filter((r) => r.r.createdAt >= dayAgo);
   const feed = recentRuns.length ? recentRuns : runs.slice(0, 6);
 
+  // «Громкая» карточка: выручка месяца против прошлого и 8 тиков условного плана (прошлый месяц × 1,1)
+  const wonSum = Number(won?.s ?? 0);
+  const prevSum = Number(wonPrev?.s ?? 0);
+  const deltaPct = prevSum > 0 ? Math.round(((wonSum - prevSum) / prevSum) * 100) : null;
+  const insightTitle = deltaPct === null ? "Первый месяц в системе" : deltaPct === 0 ? "Как в прошлом месяце" : deltaPct > 0 ? `На ${deltaPct}% больше, чем в прошлом месяце` : `На ${Math.abs(deltaPct)}% меньше, чем в прошлом месяце`;
+  const planShare = prevSum > 0 ? wonSum / (prevSum * 1.1) : (won?.n ?? 0) / Math.max(1, (won?.n ?? 0) + (visible?.n ?? 0));
+  const ticksOn = Math.max(0, Math.min(8, Math.round(planShare * 8)));
+  const insightSub = prevSum > 0 ? `План ${fmtMoneyCompact(prevSum * 1.1)} · выполнено ${Math.min(999, Math.round(planShare * 100))}%` : `${plural(won?.n ?? 0, "сделка закрыта", "сделки закрыты", "сделок закрыто")} из ${(won?.n ?? 0) + (visible?.n ?? 0)}`;
+
   const firstName = user.name.split(/\s+/)[0];
   const rawDate = new Intl.DateTimeFormat("ru-RU", { weekday: "long", day: "numeric", month: "long" }).format(now);
   const dateStr = rawDate.charAt(0).toUpperCase() + rawDate.slice(1);
@@ -125,9 +136,9 @@ export default async function Dashboard() {
 
   return (
     <>
-      <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
+      <div className="rise mb-5 flex flex-wrap items-end justify-between gap-4" style={{ ["--rise-i" as string]: 0 }}>
         <div>
-          <div className="text-[13px] text-muted">{dateStr}</div>
+          <div className="eyebrow">{`// Работа · ${dateStr}`}</div>
           <h1 className="mt-0.5 text-[28px] font-semibold leading-8 tracking-[-0.02em]">
             {greeting(now)}, {firstName}
           </h1>
@@ -143,18 +154,34 @@ export default async function Dashboard() {
         </div>
       </div>
 
-      <Tiles>
-        {seeDeals && <Tile label={dealsTile.label} value={dealsTile.n} sub={<Money value={dealsTile.s} compact />} href="/deals" />}
-        {won && <Tile label="Выручка за месяц" value={<Money value={Number(won.s ?? 0)} compact />} sub={won.n ? plural(won.n, "сделка закрыта", "сделки закрыты", "сделок закрыто") : "пока без закрытий"} tone="good" href="/analytics" />}
-        <Tile label="Задачи на сегодня" value={dueToday.length} sub={noDue.length ? `${plural(noDue.length, "задача", "задачи", "задач")} без срока` : "по сроку"} href="/tasks" />
-        <Tile label="Просрочено" value={overdueTasks.length} tone={overdueTasks.length ? "accent" : undefined} sub={overdueTasks.length ? "требуют внимания" : "всё в срок"} href="/tasks?tab=overdue" />
-        {unread && <Tile label="Непрочитанные" value={unread.n} tone={unread.n ? "info" : undefined} sub="переписки с клиентами" href="/inbox" />}
-        {seeBookings && <Tile label="Записи на сегодня" value={bookingsToday.length} sub={bookingsToday[0] ? `ближайшая в ${fmtTime(bookingsToday[0].b.startsAt)}` : "встреч нет"} href="/calendar" />}
+      <Tiles cols={won ? 5 : 6}>
+        {seeDeals && <Tile i={1} label={dealsTile.label} value={dealsTile.n} sub={<Money value={dealsTile.s} compact />} href="/deals" />}
+        <Tile i={2} label="Задачи на сегодня" value={dueToday.length} sub={noDue.length ? `${plural(noDue.length, "задача", "задачи", "задач")} без срока` : "по сроку"} href="/tasks" />
+        <Tile i={3} label="Просрочено" value={overdueTasks.length} tone={overdueTasks.length ? "accent" : undefined} sub={overdueTasks.length ? "требуют внимания" : "всё в срок"} href="/tasks?tab=overdue" />
+        {unread && <Tile i={4} label="Непрочитанные" value={unread.n} tone={unread.n ? "info" : undefined} sub="переписки с клиентами" href="/inbox" />}
+        {seeBookings && <Tile i={5} label="Записи на сегодня" value={bookingsToday.length} sub={bookingsToday[0] ? `ближайшая в ${fmtTime(bookingsToday[0].b.startsAt)}` : "встреч нет"} href="/calendar" />}
       </Tiles>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
         <div className="space-y-4">
-          <Panel title="Задачи на сегодня" count={todayTasks.length} href="/tasks" empty="На сегодня задач нет.">
+          {won && (
+            <Link href="/analytics?tab=sales" className="insight block p-5 sm:p-6" style={{ ["--rise-i" as string]: 6 }}>
+              <div className="insight-grain" />
+              <div className="insight-shard" />
+              <div className="relative flex min-w-0 flex-col gap-4">
+                <span className="insight-pill"><TrendingUp className="size-3.5" /> Выручка за месяц</span>
+                <div className="truncate text-[clamp(28px,3vw,44px)] font-bold leading-none tracking-[-0.04em] tnum" title={fmtMoneyCompact(wonSum)}>{fmtMoneyCompact(wonSum)}</div>
+                <div className="min-w-0">
+                  <div className="truncate text-[15px] font-semibold tracking-[-0.01em]">{insightTitle}</div>
+                  <div className="mt-1 truncate text-[11.5px] text-white/70">{insightSub}</div>
+                </div>
+                <div className="insight-ticks flex gap-1.5" aria-label={`Выполнение плана: ${ticksOn} из 8`}>
+                  {Array.from({ length: 8 }, (_, i) => <span key={i} data-on={i < ticksOn ? "" : undefined} />)}
+                </div>
+              </div>
+            </Link>
+          )}
+          <Panel i={7} title="Задачи на сегодня" count={todayTasks.length} href="/tasks" empty="На сегодня задач нет.">
             {[...overdueTasks, ...dueToday, ...noDue].slice(0, 10).map((t) => (
               <TaskRow key={t.id} task={t} users={[]} compact />
             ))}
@@ -164,13 +191,13 @@ export default async function Dashboard() {
           </Panel>
 
           {seeDeals && (
-            <Panel title="Сделки, требующие внимания" count={attention.length} href="/deals" empty="По всем сделкам была активность за последние 5 дней.">
+            <Panel i={8} title="Сделки, требующие внимания" count={attention.length} href="/deals" empty="По всем сделкам была активность за последние 5 дней.">
               {attention.map(({ d, companyName, stageName, stageColor, managerName, managerColor }) => {
                 const stale = Math.floor((now.getTime() - new Date(d.updatedAt).getTime()) / 86400_000);
                 const expired = !!d.expectedCloseAt && new Date(d.expectedCloseAt).getTime() < now.getTime();
                 return (
                   <Row key={d.id} href={`/deals/${d.id}`}>
-                    <span className="size-2 shrink-0 rounded-full" style={{ background: stageColor ?? "#cdd2da" }} />
+                    <span className="size-2 shrink-0 rounded-full" style={{ background: stageColor ?? "var(--line-strong)" }} />
                     <div className="min-w-0 flex-1">
                       <div className="truncate font-medium">{d.title}</div>
                       <div className="truncate text-xs text-muted">{companyName ?? "Без клиента"} · {stageName ?? "—"}</div>
@@ -185,7 +212,7 @@ export default async function Dashboard() {
           )}
 
           {seePayments && (
-            <Panel title="Деньги" href="/finance">
+            <Panel i={9} title="Деньги" href="/finance">
               <div className="grid grid-cols-2 divide-x divide-line">
                 <div className="min-w-0 px-4 py-3">
                   <div className="text-xs text-muted">Поступления за 7 дней</div>
@@ -215,7 +242,7 @@ export default async function Dashboard() {
 
         <div className="space-y-4">
           {seeConv && (
-            <Panel title="Входящие" count={inbox.length} href="/inbox" empty="Непрочитанных сообщений нет.">
+            <Panel i={7} title="Входящие" count={inbox.length} href="/inbox" empty="Непрочитанных сообщений нет.">
               {inbox.map(({ c, companyName, lastText }) => (
                 <Row key={c.id} href={`/inbox?c=${c.id}`}>
                   <Avatar name={c.peerName} size={28} />
@@ -233,7 +260,7 @@ export default async function Dashboard() {
           )}
 
           {seeBookings && (
-            <Panel title="Календарь на сегодня" count={bookingsToday.length} href="/calendar" empty="Встреч на сегодня нет.">
+            <Panel i={8} title="Календарь на сегодня" count={bookingsToday.length} href="/calendar" empty="Встреч на сегодня нет.">
               {bookingsToday.map(({ b, userName, userColor }) => (
                 <Row key={b.id} href="/calendar">
                   <div className="w-[88px] shrink-0 text-xs text-muted tnum">{fmtTime(b.startsAt)}–{fmtTime(b.endsAt)}</div>
@@ -249,7 +276,7 @@ export default async function Dashboard() {
           )}
 
           {seeAuto && (
-            <Panel title="Что сделала система за 24 часа" count={feed.length} href="/automations" hrefLabel="Автоматизации" empty="За последние сутки автоматизации не запускались.">
+            <Panel i={9} title="Что сделала система за 24 часа" count={feed.length} href="/automations" hrefLabel="Автоматизации" empty="За последние сутки автоматизации не запускались.">
               {!recentRuns.length && feed.length > 0 && <p className="px-4 py-2 text-xs text-muted">За сутки запусков не было — последние запуски:</p>}
               {feed.map(({ r, name }) => (
                 <Row key={r.id} href={`/automations/${r.automationId}`}>
@@ -267,7 +294,7 @@ export default async function Dashboard() {
           )}
 
           {!seeConv && !seeBookings && !seeAuto && (
-            <div className="rounded-[12px] border border-dashed border-line-strong p-5 text-center text-[13px] text-muted">
+            <div className="rise rounded-[12px] border border-dashed border-line-strong p-5 text-center text-[13px] text-muted" style={{ ["--rise-i" as string]: 7 }}>
               <CheckSquare className="mx-auto mb-2 size-6" />
               Ваша роль видит только задачи{seeDeals ? " и сделки" : ""}. Остальные разделы откроет администратор в настройках ролей.
             </div>

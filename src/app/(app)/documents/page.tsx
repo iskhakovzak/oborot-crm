@@ -68,7 +68,7 @@ export default async function DocumentsPage({ searchParams }: { searchParams: Pr
 
   return (
     <>
-      <PageHeader
+      <PageHeader eyebrow="Деньги и документы"
         title="Документы"
         description="Счета, договоры, ЭСФ, акты и КП по сделкам, отправка клиенту и в ЭДО."
         actions={<NewDocumentDialog deals={dealOptions} companies={companyOptions} initialType={sp.new} canCreate={canCreate} />}
@@ -89,21 +89,21 @@ export default async function DocumentsPage({ searchParams }: { searchParams: Pr
         <Table>
           <thead>
             <tr>
-              <th>Номер</th><th>Тип</th><th>Клиент</th><th>Сделка</th><th className="text-right">Сумма</th><th>Дата</th><th>Статус</th><th>ЭДО</th><th className="w-10"></th>
+              <th className="!px-3">Номер</th><th className="!px-3">Тип</th><th className="!px-3">Клиент</th><th className="hidden !px-3 lg:table-cell">Сделка</th><th className="!px-3 text-right">Сумма</th><th className="hidden !px-3 xl:table-cell">Дата</th><th className="!px-3">Статус</th><th className="!px-3">ЭДО</th><th className="w-10 !px-3"></th>
             </tr>
           </thead>
           <tbody>
             {list.map(({ d, companyName, dealNumber, dealTitle }) => (
               <tr key={d.id}>
-                <td><Link href={`/documents/${d.id}`} className="font-medium hover:underline">{d.number}</Link></td>
-                <td><Badge tone={DOC_TYPE_TONE[d.type]}>{DOC_TYPE_LABEL[d.type]}</Badge></td>
-                <td className="max-w-[260px] truncate">{d.companyId ? <Link href={`/companies/${d.companyId}`} className="hover:underline">{companyName ?? "—"}</Link> : <span className="text-muted">—</span>}</td>
-                <td className="max-w-[240px] truncate">{d.dealId ? <Link href={`/deals/${d.dealId}`} className="hover:underline" title={dealTitle ?? ""}>№{dealNumber} · {dealTitle}</Link> : <span className="text-muted">—</span>}</td>
-                <td className="text-right tnum font-medium whitespace-nowrap">{fmtMoney(d.amount)}</td>
-                <td className="text-muted whitespace-nowrap">{fmtDate(d.createdAt, { day: "numeric", month: "short", year: "numeric" })}</td>
-                <td><Badge tone={DOC_STATUS_TONE[d.status as DocStatus]} dot>{DOC_STATUS_LABEL[d.status as DocStatus]}</Badge></td>
-                <td>{d.edoStatus === "none" ? <span className="text-muted">—</span> : <Badge tone={EDO_STATUS_TONE[d.edoStatus as EdoStatus]}>{EDO_STATUS_LABEL[d.edoStatus as EdoStatus]}</Badge>}</td>
-                <td className="text-right"><DocumentActionsMenu doc={{ id: d.id, type: d.type, status: d.status, edoStatus: d.edoStatus, number: d.number }} /></td>
+                <td className="!px-3 whitespace-nowrap"><Link href={`/documents/${d.id}`} className="font-medium hover:underline">{d.number}</Link></td>
+                <td className="!px-3"><Badge tone={DOC_TYPE_TONE[d.type]}>{DOC_TYPE_LABEL[d.type]}</Badge></td>
+                <td className="max-w-[200px] truncate !px-3 xl:max-w-[260px]">{d.companyId ? <Link href={`/companies/${d.companyId}`} className="hover:underline">{companyName ?? "—"}</Link> : <span className="text-muted">—</span>}</td>
+                <td className="hidden max-w-[200px] truncate !px-3 lg:table-cell xl:max-w-[240px]">{d.dealId ? <Link href={`/deals/${d.dealId}`} className="hover:underline" title={dealTitle ?? ""}>№{dealNumber} · {dealTitle}</Link> : <span className="text-muted">—</span>}</td>
+                <td className="!px-3 text-right tnum font-medium whitespace-nowrap">{fmtMoney(d.amount)}</td>
+                <td className="hidden !px-3 text-muted whitespace-nowrap xl:table-cell">{fmtDate(d.createdAt, { day: "numeric", month: "short", year: "numeric" })}</td>
+                <td className="!px-3"><Badge tone={DOC_STATUS_TONE[d.status as DocStatus]} dot>{DOC_STATUS_LABEL[d.status as DocStatus]}</Badge></td>
+                <td className="!px-3">{d.edoStatus === "none" ? <span className="text-muted">—</span> : <Badge tone={EDO_STATUS_TONE[d.edoStatus as EdoStatus]}>{EDO_STATUS_LABEL[d.edoStatus as EdoStatus]}</Badge>}</td>
+                <td className="!px-3 text-right"><DocumentActionsMenu doc={{ id: d.id, type: d.type, status: d.status, edoStatus: d.edoStatus, number: d.number }} /></td>
               </tr>
             ))}
           </tbody>

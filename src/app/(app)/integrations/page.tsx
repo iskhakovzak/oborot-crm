@@ -24,7 +24,7 @@ export default async function IntegrationsPage({ searchParams }: { searchParams:
   if (!can(user.actor, "integrations", "view")) {
     return (
       <>
-        <PageHeader title="Интеграции" />
+        <PageHeader eyebrow="Система" title="Интеграции" />
         <EmptyState title="Нет доступа" description="Раздел доступен администратору и бухгалтеру. Попросите открыть «Интеграции» для вашей роли." />
       </>
     );
@@ -59,7 +59,7 @@ export default async function IntegrationsPage({ searchParams }: { searchParams:
 
   return (
     <>
-      <PageHeader title="Интеграции" description="Мессенджеры, телефония, банк, ЭДО, финучёт, аналитика и ИИ. Без ключей сервис работает в демо-режиме." />
+      <PageHeader eyebrow="Система" title="Интеграции" description="Мессенджеры, телефония, банк, ЭДО, финучёт, аналитика и ИИ. Без ключей сервис работает в демо-режиме." />
       <Tiles cols={4}>
         <Tile label="Подключено" value={connected} tone={connected ? "good" : undefined} sub="ключи заданы, обмен реальный" />
         <Tile label="В демо-режиме" value={demo} tone="warn" sub="включено без ключей" />

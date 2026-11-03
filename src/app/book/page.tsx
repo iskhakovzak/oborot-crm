@@ -35,7 +35,7 @@ export default async function BookIndexPage() {
               <span className="inline-flex items-center gap-1.5"><MapPin className="size-4 text-muted" />{t.location}</span>
               <span className="inline-flex items-center gap-1.5"><Avatar name={userName} color={userColor} size={18} />{userName}</span>
             </div>
-            <div className="mt-4 inline-flex h-10 items-center justify-center rounded-[8px] bg-ink px-4 text-[14px] font-medium text-white">Выбрать время</div>
+            <div className="mt-4 inline-flex h-10 items-center justify-center rounded-[8px] bg-ink px-4 text-[14px] font-medium text-canvas">Выбрать время</div>
           </Link>
         ))}
         {!types.length && (

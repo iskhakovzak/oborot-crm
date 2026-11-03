@@ -40,7 +40,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
 
   return (
     <>
-      <PageHeader title="Настройки" description={isSettingsAdmin ? "Реквизиты для документов, сотрудники, роли и права доступа, распределение заявок, онлайн-запись." : "Ваш профиль и пароль. Остальные настройки доступны администратору."} />
+      <PageHeader eyebrow="Система" title="Настройки" description={isSettingsAdmin ? "Реквизиты для документов, сотрудники, роли и права доступа, распределение заявок, онлайн-запись." : "Ваш профиль и пароль. Остальные настройки доступны администратору."} />
       <LinkTabs className="mb-4" active={tab} items={tabs.map((t) => ({ key: t.key, label: t.label, href: t.key === tabs[0].key ? "/settings" : `/settings?tab=${t.key}` }))} />
 
       {tab === "company" && <CompanyForm initial={await getSetting("company")} canEdit={canEdit} />}

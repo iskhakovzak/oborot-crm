@@ -110,7 +110,7 @@ function BookingTypeDialog({ initial, users, currentUserId, lockUser, onClose }:
             <div className="flex flex-wrap gap-1.5">
               {DAY_IDX.map((d, i) => {
                 const on = f.workDays.includes(d);
-                return <button key={d} type="button" onClick={() => set("workDays", on ? f.workDays.filter((x) => x !== d) : [...f.workDays, d])} className={cn("h-8 w-11 rounded-[7px] border text-[13px] font-medium", on ? "border-ink bg-ink text-white" : "border-line-strong text-ink-2 hover:bg-surface-2")}>{DAYS[i]}</button>;
+                return <button key={d} type="button" onClick={() => set("workDays", on ? f.workDays.filter((x) => x !== d) : [...f.workDays, d])} className={cn("h-8 w-11 rounded-[7px] border text-[13px] font-medium", on ? "border-ink bg-ink text-canvas" : "border-line-strong text-ink-2 hover:bg-surface-2")}>{DAYS[i]}</button>;
               })}
             </div>
           </div>

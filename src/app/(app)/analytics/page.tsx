@@ -41,7 +41,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
 
   return (
     <>
-      <PageHeader
+      <PageHeader eyebrow="Рост"
         title="Аналитика"
         description={`Маркетинг, продажи и производство: ${periodLabel}.`}
         actions={
@@ -51,9 +51,9 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
         }
       />
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <nav className="inline-flex h-9 items-center gap-1 rounded-[9px] bg-black/5 p-1">
+        <nav className="inline-flex h-9 items-center gap-1 rounded-full border border-line bg-canvas p-1">
           {tabs.map((t) => (
-            <Link key={t.key} href={`/analytics?tab=${t.key}&days=${days}`} className={cn("inline-flex h-7 items-center gap-1.5 rounded-[7px] px-3 text-[13px] font-medium transition-colors", tab === t.key ? "bg-surface text-ink shadow-sm" : "text-ink-2 hover:text-ink")}>
+            <Link key={t.key} href={`/analytics?tab=${t.key}&days=${days}`} className={cn("inline-flex h-7 items-center gap-1.5 rounded-full px-3 text-[13px] font-medium transition-colors", tab === t.key ? "bg-ink text-canvas" : "text-ink-2 hover:text-ink")}>
               <t.icon className="size-3.5" /> {t.label}
             </Link>
           ))}
@@ -61,7 +61,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
         <div className="inline-flex items-center gap-1 text-[13px]">
           <span className="mr-1 text-muted">Период:</span>
           {DAYS.map((d) => (
-            <Link key={d} href={`/analytics?tab=${tab}&days=${d}`} className={cn("rounded-[7px] px-2.5 py-1 tnum", days === d ? "bg-ink text-white" : "text-ink-2 hover:bg-black/5")}>
+            <Link key={d} href={`/analytics?tab=${tab}&days=${d}`} className={cn("rounded-[7px] px-2.5 py-1 tnum", days === d ? "bg-ink text-canvas" : "text-ink-2 hover:bg-surface-2")}>
               {d} дней
             </Link>
           ))}

@@ -35,9 +35,9 @@ export function NewOrderDialog({ deals, companies, users }: { deals: DealForOrde
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent title="Новый заказ в производство" description="Из выигранной сделки позиции и клиент переносятся автоматически.">
           <div className="space-y-4">
-            <div className="inline-flex h-9 items-center gap-1 rounded-[9px] bg-black/5 p-1">
+            <div className="inline-flex h-9 items-center gap-1 rounded-full border border-line bg-canvas p-1">
               {(["deal", "manual"] as const).map((m) => (
-                <button key={m} type="button" onClick={() => setMode(m)} className={`h-7 rounded-[7px] px-3 text-[13px] font-medium transition-colors ${mode === m ? "bg-surface text-ink shadow-sm" : "text-ink-2"}`}>{m === "deal" ? "Из сделки" : "Вручную"}</button>
+                <button key={m} type="button" onClick={() => setMode(m)} className={`h-7 rounded-full px-3 text-[13px] font-medium transition-colors ${mode === m ? "bg-ink text-canvas" : "text-ink-2"}`}>{m === "deal" ? "Из сделки" : "Вручную"}</button>
               ))}
             </div>
             {mode === "deal" ? (

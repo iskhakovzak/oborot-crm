@@ -13,7 +13,8 @@ async function client(): Promise<{ c: Anthropic | null; model: string }> {
   return { c: new Anthropic({ apiKey: r.config.apiKey }), model: ai.model || DEFAULT_MODEL };
 }
 
-async function ask(system: string, user: string, opts?: { json?: boolean; maxTokens?: number }): Promise<{ text: string; sandbox: boolean }> {
+/** Запрос к ИИ: системный промпт + сообщение. Без ключа возвращает sandbox=true и пустой текст. */
+export async function ask(system: string, user: string, opts?: { json?: boolean; maxTokens?: number }): Promise<{ text: string; sandbox: boolean }> {
   const { c, model } = await client();
   if (!c) return { text: "", sandbox: true };
   try {

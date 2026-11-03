@@ -12,7 +12,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ru" className="h-full">
       <body className="min-h-full">
         {children}
-        <Toaster position="bottom-right" richColors closeButton toastOptions={{ style: { fontFamily: "inherit" } }} />
+        <Toaster theme="dark" position="bottom-right" richColors closeButton toastOptions={{ style: { fontFamily: "inherit" } }} />
       </body>
     </html>
   );

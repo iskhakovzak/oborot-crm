@@ -3,10 +3,10 @@ import { ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /** Секция рабочего стола: заголовок, счётчик, ссылка «все», список строк с разделителями */
-export function Panel({ title, count, href, hrefLabel = "Все", children, className, empty }: { title: string; count?: number; href?: string; hrefLabel?: string; children?: React.ReactNode; className?: string; empty?: string }) {
+export function Panel({ title, count, href, hrefLabel = "Все", children, className, empty, i = 0 }: { title: string; count?: number; href?: string; hrefLabel?: string; children?: React.ReactNode; className?: string; empty?: string; i?: number }) {
   const isEmpty = count === 0 || (count === undefined && !children);
   return (
-    <section className={cn("card min-w-0 overflow-hidden", className)}>
+    <section className={cn("card rise min-w-0 overflow-hidden", className)} style={{ ["--rise-i" as string]: i }}>
       <div className="flex items-center gap-2 px-4 py-2.5">
         <h2 className="text-[15px] font-semibold tracking-[-0.01em]">{title}</h2>
         {count !== undefined && count > 0 && <span className="rounded-full border border-line px-1.5 text-[10px] text-ink-2 tnum">{count}</span>}
@@ -35,20 +35,21 @@ const chips = {
 } as const;
 
 /** Плитка показателя */
-export function Tile({ label, value, sub, tone, href, icon }: { label: string; value: React.ReactNode; sub?: React.ReactNode; tone?: keyof typeof tones; href?: string; icon?: React.ReactNode }) {
+export function Tile({ label, value, sub, tone, href, icon, i = 0 }: { label: string; value: React.ReactNode; sub?: React.ReactNode; tone?: keyof typeof tones; href?: string; icon?: React.ReactNode; i?: number }) {
   const body = (
     <>
       <div className="flex items-start justify-between gap-2">
         <div className="label">{label}</div>
-        {icon && <span className={cn("grid size-6 shrink-0 place-items-center rounded-[6px] [&_svg]:size-3.5", tone ? chips[tone] : "bg-surface-3 text-ink-2")}>{icon}</span>}
+        {icon && <span className={cn("grid size-6 shrink-0 place-items-center rounded-[6px] [&_svg]:size-3.5", tone ? chips[tone] : "border border-line text-ink-2")}>{icon}</span>}
       </div>
       <div className={cn("mt-1 min-w-0 truncate text-[22px] font-semibold leading-7 tracking-[-0.02em] tnum", tone ? tones[tone] : "text-ink")}>{value}</div>
       {sub && <div className="mt-0.5 truncate text-xs text-muted">{sub}</div>}
     </>
   );
   const cls = "card rise min-w-0 px-5 py-4";
-  if (href) return <Link href={href} className={cn(cls, "block transition-colors hover:bg-surface-2")}>{body}</Link>;
-  return <div className={cls}>{body}</div>;
+  const style = { ["--rise-i" as string]: i };
+  if (href) return <Link href={href} className={cn(cls, "block transition-colors hover:bg-surface-2")} style={style}>{body}</Link>;
+  return <div className={cls} style={style}>{body}</div>;
 }
 
 export function Tiles({ children, cols = 6, className }: { children: React.ReactNode; cols?: 3 | 4 | 5 | 6; className?: string }) {

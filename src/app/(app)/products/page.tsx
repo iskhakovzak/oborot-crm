@@ -38,7 +38,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
 
   return (
     <>
-      <PageHeader
+      <PageHeader eyebrow="Деньги и документы"
         title="Товары и услуги"
         description={<>{plural(list.length, "позиция", "позиции", "позиций")} · {categories.length} категорий · остатки на <span className="tnum font-medium text-ink">{fmtMoney(stockValue)}</span></>}
         actions={can(user.actor, "products", "create") && <ProductDialog categories={categories} hideCost={hideCost} openByParam={sp.new === "1"} />}

@@ -64,7 +64,7 @@ export function CompanyContacts({ companyId, contacts, canCreate, canEdit, canDe
                 </div>
               </div>
               <div className="flex shrink-0 items-center gap-0.5">
-                {canEdit && <button type="button" onClick={() => setEditing({ id: c.id, values: { name: c.name, position: c.position ?? "", phone: c.phone ?? "", email: c.email ?? "", telegram: c.telegram ?? "", whatsapp: c.whatsapp ?? "", max: c.max ?? "", instagram: c.instagram ?? "", isPrimary: c.isPrimary, birthday: c.birthday ?? "" } })} className="rounded-md p-1.5 text-muted hover:bg-black/5 hover:text-ink" aria-label="Изменить"><Pencil className="size-4" /></button>}
+                {canEdit && <button type="button" onClick={() => setEditing({ id: c.id, values: { name: c.name, position: c.position ?? "", phone: c.phone ?? "", email: c.email ?? "", telegram: c.telegram ?? "", whatsapp: c.whatsapp ?? "", max: c.max ?? "", instagram: c.instagram ?? "", isPrimary: c.isPrimary, birthday: c.birthday ?? "" } })} className="rounded-md p-1.5 text-muted hover:bg-surface-2 hover:text-ink" aria-label="Изменить"><Pencil className="size-4" /></button>}
                 {canDelete && <button type="button" onClick={() => remove(c)} disabled={pending} className="rounded-md p-1.5 text-muted hover:bg-accent-soft hover:text-accent" aria-label="Удалить"><Trash2 className="size-4" /></button>}
               </div>
             </li>

@@ -58,7 +58,7 @@ export function RolesEditor({ roles, canEdit, canDelete }: { roles: RoleRow[]; c
         {roles.map((r) => (
           <article key={r.id} className="flex flex-col rounded-[12px] border border-line bg-surface px-5 py-4">
             <div className="flex items-start gap-3">
-              <span className={cn("grid size-9 shrink-0 place-items-center rounded-[9px]", r.slug === "admin" ? "bg-ink text-white" : "bg-surface-2 text-ink-2")}>{r.slug === "admin" ? <ShieldCheck className="size-4" /> : <Lock className="size-4" />}</span>
+              <span className={cn("grid size-9 shrink-0 place-items-center rounded-[9px]", r.slug === "admin" ? "bg-ink text-canvas" : "bg-surface-2 text-ink-2")}>{r.slug === "admin" ? <ShieldCheck className="size-4" /> : <Lock className="size-4" />}</span>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <h3 className="text-[15px] font-semibold">{r.name}</h3>

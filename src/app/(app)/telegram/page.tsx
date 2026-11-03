@@ -27,7 +27,7 @@ export default async function TelegramPage() {
 
   return (
     <>
-      <PageHeader
+      <PageHeader eyebrow="Система"
         title="Telegram-бот для сотрудников"
         description="Команды из Telegram: «создай сделку», «поставь задачу Ивану», «покажи продажи за неделю»."
         actions={r.live ? <Badge tone="good" dot>Бот подключён</Badge> : <Badge tone="warn" dot>Демо-режим</Badge>}

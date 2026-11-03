@@ -28,7 +28,7 @@ export default async function CampaignsPage({ searchParams }: { searchParams: Pr
 
   return (
     <>
-      <PageHeader
+      <PageHeader eyebrow="Рост"
         title="Рассылки"
         description="Сообщения сегменту клиентов в мессенджеры, на email и по SMS с подстановкой данных из CRM."
         actions={canCreate && <Button asChild><Link href="/campaigns?new=1"><Plus /> Новая рассылка</Link></Button>}

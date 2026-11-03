@@ -20,7 +20,7 @@ export default async function TasksPage({ searchParams }: { searchParams: Promis
   if (!can(user.actor, "tasks", "view")) {
     return (
       <>
-        <PageHeader title="Задачи" />
+        <PageHeader eyebrow="Работа" title="Задачи" />
         <EmptyState title="Нет доступа к задачам" description="Попросите администратора открыть раздел «Задачи» для вашей роли." />
       </>
     );
@@ -58,7 +58,7 @@ export default async function TasksPage({ searchParams }: { searchParams: Promis
 
   return (
     <>
-      <PageHeader
+      <PageHeader eyebrow="Работа"
         title="Задачи"
         description="Задачи сотрудников, автоматизаций, Telegram-бота и ИИ."
         actions={canCreate ? <Button asChild><Link href={`/tasks?${tab === "my" ? "" : `tab=${tab}&`}new=1`}><Plus /> Новая задача</Link></Button> : undefined}

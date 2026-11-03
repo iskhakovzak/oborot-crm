@@ -23,7 +23,7 @@ export default async function AutomationRunsPage({ params }: { params: Promise<{
   if (!can(user.actor, "automations", "view")) {
     return (
       <>
-        <PageHeader title="Автоматизации" />
+        <PageHeader eyebrow="Система" title="Автоматизации" />
         <EmptyState title="Нет доступа" description="Раздел доступен администратору." />
       </>
     );
@@ -37,7 +37,7 @@ export default async function AutomationRunsPage({ params }: { params: Promise<{
   return (
     <>
       <Link href="/automations" className="mb-3 inline-flex items-center gap-1 text-[13px] text-muted hover:text-ink"><ArrowLeft className="size-3.5" /> Все автоматизации</Link>
-      <PageHeader
+      <PageHeader eyebrow="Система"
         title={rule.name}
         description={rule.description ?? undefined}
         actions={

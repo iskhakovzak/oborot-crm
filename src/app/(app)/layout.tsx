@@ -1,6 +1,7 @@
 import { requireUser, logout } from "@/lib/auth";
 import { Sidebar } from "@/components/shell/sidebar";
 import { Topbar } from "@/components/shell/topbar";
+import { Conductor } from "@/components/conductor/conductor";
 import { ENTITIES, can, type EntityKey } from "@/lib/permissions";
 import { db, schema } from "@/db";
 import { and, eq, count } from "drizzle-orm";
@@ -25,6 +26,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <div className="lg:pl-[232px]">
         <Topbar user={{ name: user.name, color: user.color, roleName: user.roleName, email: user.email }} onLogout={doLogout} openTasks={n} allowed={allowed} />
         <main className="mx-auto w-full max-w-[1440px] px-4 py-5 lg:px-7"><div className="slab">{children}</div></main>
+        <Conductor />
       </div>
     </div>
   );

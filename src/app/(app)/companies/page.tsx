@@ -50,15 +50,15 @@ export default async function CompaniesPage({ searchParams }: { searchParams: Pr
 
   return (
     <>
-      <PageHeader
+      <PageHeader eyebrow="Работа"
         title="Клиенты"
         description={`${counts.all} компаний · ${counts.client} клиентов · ${counts.lead} лидов`}
         actions={can(user.actor, "companies", "create") && <NewCompanyDialog users={users} hidden={hidden} openByParam={sp.new === "1"} />}
       />
       <form method="get" className="mb-4 flex flex-wrap items-center gap-2">
-        <div className="inline-flex h-9 items-center gap-1 rounded-[9px] bg-black/5 p-1">
+        <div className="inline-flex h-9 items-center gap-1 rounded-full border border-line bg-canvas p-1">
           {[["", "Все", counts.all], ["lead", "Лиды", counts.lead], ["client", "Клиенты", counts.client], ["partner", "Партнёры", counts.partner]].map(([v, l, n]) => (
-            <Link key={String(v)} href={href({ status: String(v) || undefined })} className={cn("inline-flex h-7 items-center gap-1.5 rounded-[7px] px-3 text-[13px] font-medium", (sp.status ?? "") === v ? "bg-surface text-ink shadow-sm" : "text-ink-2 hover:text-ink")}>
+            <Link key={String(v)} href={href({ status: String(v) || undefined })} className={cn("inline-flex h-7 items-center gap-1.5 rounded-full px-3 text-[13px] font-medium", (sp.status ?? "") === v ? "bg-ink text-canvas" : "text-ink-2 hover:text-ink")}>
               {l} <span className="text-[11px] text-muted tnum">{n}</span>
             </Link>
           ))}

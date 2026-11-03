@@ -41,7 +41,7 @@ export function InlineText({ value, onSave, type = "text", placeholder = "—", 
   }
   const empty = value == null || value === "";
   return (
-    <button type="button" onClick={() => setEditing(true)} className={cn("group inline-flex max-w-full items-center gap-1.5 rounded-[6px] text-left transition-colors hover:bg-black/5 -mx-1 px-1", className)} title="Нажмите, чтобы изменить">
+    <button type="button" onClick={() => setEditing(true)} className={cn("group inline-flex max-w-full items-center gap-1.5 rounded-[6px] text-left transition-colors hover:bg-surface-2 -mx-1 px-1", className)} title="Нажмите, чтобы изменить">
       <span className={cn("min-w-0", empty && "text-muted")}>{empty ? placeholder : format ? format(value) : value}</span>
       <Pencil className="size-3 shrink-0 text-muted opacity-0 transition-opacity group-hover:opacity-100" />
     </button>

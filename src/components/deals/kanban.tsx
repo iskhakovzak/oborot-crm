@@ -58,7 +58,7 @@ function Column({ stage, deals, hideAmount, active }: { stage: StageInfo; deals:
       <div className="mb-2 flex items-center gap-2 px-1">
         <span className="size-2 rounded-full" style={{ background: stage.color }} />
         <span className="min-w-0 truncate text-[13px] font-semibold">{stage.name}</span>
-        <span className="shrink-0 rounded-full bg-black/5 px-1.5 text-[11px] text-ink-2 tnum">{deals.length}</span>
+        <span className="shrink-0 rounded-full bg-surface-2 px-1.5 text-[11px] text-ink-2 tnum">{deals.length}</span>
         {!hideAmount && <span className="ml-auto shrink-0 text-[12px] text-muted"><Money value={sum} compact /></span>}
       </div>
       <div

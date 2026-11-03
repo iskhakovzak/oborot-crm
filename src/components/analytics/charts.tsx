@@ -3,8 +3,19 @@ import { Area, AreaChart, Bar, BarChart, CartesianGrid, Legend, Line, LineChart,
 import { fmtMoney, fmtMoneyCompact, fmtMoneyShort, fmtNum } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-/** Палитра графиков: один акцент, остальное приглушено */
-export const CHART = { ink: "#16181d", info: "#2456d6", good: "#138a5e", warn: "#b96a00", muted: "#8a91a0", soft: "#c9cdd5", line: "#e3e6eb", text: "#4b5260" };
+/** Палитра графиков: данные — рампа синий → лёд → фиолетовый → орхидея (--ramp-1..4), good/warn/accent — семантика */
+export const CHART = {
+  ink: "var(--ramp-1, #6e96f2)",
+  info: "var(--ramp-3, #6656e3)",
+  soft: "var(--ramp-2, #d9e4fb)",
+  violet: "var(--ramp-4, #bd5fe8)",
+  good: "var(--good, #2fd36f)",
+  warn: "var(--warn, #ffb000)",
+  accent: "var(--accent, #ff2d3f)",
+  muted: "var(--ink-2, #9c9c9c)",
+  line: "var(--line, #242424)",
+  text: "var(--ink-2, #9c9c9c)",
+};
 
 export type Series = { key: string; label: string; color: string; money?: boolean };
 type Row = Record<string, string | number | null>;
@@ -12,7 +23,7 @@ type Row = Record<string, string | number | null>;
 function ChartTooltip({ active, payload, label, series }: { active?: boolean; payload?: { dataKey?: string | number; value?: number | string }[]; label?: string | number; series: Series[] }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-[8px] border border-line bg-surface px-3 py-2 text-xs shadow-pop">
+    <div className="rounded-[8px] border border-line-strong bg-surface-2 px-3 py-2 text-xs shadow-pop">
       <div className="mb-1 font-medium text-ink">{label}</div>
       {payload.map((p) => {
         const s = series.find((x) => x.key === p.dataKey);
@@ -42,7 +53,7 @@ export function BarsChart({ data, xKey, series, height = 240, className }: { dat
           <CartesianGrid vertical={false} stroke={CHART.line} />
           <XAxis dataKey={xKey} {...axisProps} interval={data.length > 8 ? "preserveStartEnd" : 0} minTickGap={12} tickFormatter={(v: string) => (v.length > 14 ? v.slice(0, 13) + "…" : v)} />
           <YAxis {...axisProps} width={money ? 84 : 44} allowDecimals={false} tickFormatter={(v: number) => (money ? fmtMoneyCompact(v) : fmtNum(v))} />
-          <Tooltip cursor={{ fill: "rgba(22,24,29,0.04)" }} content={<ChartTooltip series={series} />} />
+          <Tooltip cursor={{ fill: "rgba(255,255,255,0.04)" }} content={<ChartTooltip series={series} />} />
           {series.length > 1 && <Legend {...legendProps} />}
           {series.map((s) => (
             <Bar key={s.key} dataKey={s.key} name={s.label} fill={s.color} radius={[4, 4, 0, 0]} maxBarSize={36} />
@@ -62,7 +73,7 @@ export function TrendChart({ data, xKey, series, kind = "line", height = 220, cl
       <CartesianGrid vertical={false} stroke={CHART.line} />
       <XAxis dataKey={xKey} {...axisProps} minTickGap={16} />
       <YAxis {...axisProps} width={money ? 84 : 44} allowDecimals={false} tickFormatter={(v: number) => (money ? fmtMoneyCompact(v) : fmtNum(v))} />
-      <Tooltip cursor={{ stroke: CHART.soft }} content={<ChartTooltip series={series} />} />
+      <Tooltip cursor={{ stroke: "var(--line-strong)" }} content={<ChartTooltip series={series} />} />
       {series.length > 1 && <Legend {...legendProps} />}
     </>
   );
@@ -73,14 +84,14 @@ export function TrendChart({ data, xKey, series, kind = "line", height = 220, cl
           <AreaChart {...common}>
             {children}
             {series.map((s) => (
-              <Area key={s.key} type="monotone" dataKey={s.key} name={s.label} stroke={s.color} strokeWidth={2} fill={s.color} fillOpacity={0.08} dot={false} activeDot={{ r: 4, strokeWidth: 2, stroke: "#fff" }} />
+              <Area key={s.key} type="monotone" dataKey={s.key} name={s.label} stroke={s.color} strokeWidth={2} fill={s.color} fillOpacity={0.08} dot={false} activeDot={{ r: 4, strokeWidth: 2, stroke: "var(--canvas)" }} />
             ))}
           </AreaChart>
         ) : (
           <LineChart {...common}>
             {children}
             {series.map((s) => (
-              <Line key={s.key} type="monotone" dataKey={s.key} name={s.label} stroke={s.color} strokeWidth={2} dot={false} activeDot={{ r: 4, strokeWidth: 2, stroke: "#fff" }} />
+              <Line key={s.key} type="monotone" dataKey={s.key} name={s.label} stroke={s.color} strokeWidth={2} dot={false} activeDot={{ r: 4, strokeWidth: 2, stroke: "var(--canvas)" }} />
             ))}
           </LineChart>
         )}
@@ -119,7 +130,7 @@ export function Funnel({ stages, won }: { stages: { name: string; color: string;
         <div key={s.name} className="grid grid-cols-[minmax(0,130px)_minmax(0,1fr)_auto] items-center gap-3 text-[13px]">
           <div className="flex min-w-0 items-center gap-2 truncate"><span className="size-2 shrink-0 rounded-full" style={{ background: s.color }} />{s.name}</div>
           <div className="flex items-center gap-2">
-            <div className="h-6 rounded-[4px] bg-ink/90" style={{ width: `${Math.max(2, (s.reached / max) * 100)}%` }} title={`Дошли до этапа: ${s.reached}`} />
+            <div className="h-6 rounded-[4px]" style={{ background: CHART.ink, width: `${Math.max(2, (s.reached / max) * 100)}%` }} title={`Дошли до этапа: ${s.reached}`} />
             <span className="tnum text-ink-2">{s.reached}</span>
           </div>
           <div className="whitespace-nowrap text-right tnum text-muted">

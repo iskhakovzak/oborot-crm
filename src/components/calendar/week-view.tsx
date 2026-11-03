@@ -69,7 +69,7 @@ export function WeekView({ weekStart, bookings, users, companies, filterUser, ca
               return (
                 <div key={key} className={cn("border-l border-line px-2 py-2 text-center", isToday && "bg-info-soft/40")}>
                   <div className="text-[11px] uppercase tracking-wide text-muted">{WEEKDAYS[i]}</div>
-                  <div className={cn("mx-auto mt-0.5 grid size-7 place-items-center rounded-full text-[15px] font-semibold tnum", isToday && "bg-ink text-white")}>{d.getDate()}</div>
+                  <div className={cn("mx-auto mt-0.5 grid size-7 place-items-center rounded-full text-[15px] font-semibold tnum", isToday && "bg-ink text-canvas")}>{d.getDate()}</div>
                   <div className="text-[11px] text-muted">{n ? `${n} соб.` : " "}</div>
                 </div>
               );
@@ -89,7 +89,7 @@ export function WeekView({ weekStart, bookings, users, companies, filterUser, ca
                   {hours.map((h) => (
                     <div
                       key={h}
-                      className={cn("absolute inset-x-0 border-t border-line", canCreate && "cursor-pointer hover:bg-black/[0.03]")}
+                      className={cn("absolute inset-x-0 border-t border-line", canCreate && "cursor-pointer hover:bg-surface-2")}
                       style={{ top: (h - HOUR_START) * HOUR_H, height: HOUR_H }}
                       onClick={() => canCreate && setCreating({ date: key, time: `${String(h).padStart(2, "0")}:00` })}
                     />

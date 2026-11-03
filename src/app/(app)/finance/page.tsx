@@ -78,7 +78,7 @@ export default async function FinancePage({ searchParams }: { searchParams: Prom
 
   return (
     <>
-      <PageHeader title="Финансы" description="Оплаты, выписка банка, ссылки Payme/Click и синхронизация с финучётом." actions={canCreate ? <PaymentDialog options={options} /> : undefined} />
+      <PageHeader eyebrow="Деньги и документы" title="Финансы" description="Оплаты, выписка банка, ссылки Payme/Click и синхронизация с финучётом." actions={canCreate ? <PaymentDialog options={options} /> : undefined} />
       <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <Stat label="Поступления за 30 дней" value={<Money value={monthIn} compact />} tone="good" sub={plural(incoming.filter((x) => x.p.paidAt >= monthAgo).length, "платёж", "платежа", "платежей")} />
         <Stat label="За 7 дней" value={<Money value={weekIn} compact />} sub={plural(incoming.filter((x) => x.p.paidAt >= weekAgo).length, "платёж", "платежа", "платежей")} />

@@ -98,7 +98,7 @@ export function AutomationEditor({ open, onOpenChange, rule, users, stages, labe
 
           <div className="rounded-[10px] border border-line">
             <div className="flex items-center gap-3 border-b border-line bg-surface-2 px-4 py-2.5">
-              <span className="grid size-6 place-items-center rounded-full bg-ink text-[11px] font-semibold text-white">1</span>
+              <span className="grid size-6 place-items-center rounded-full bg-ink text-[11px] font-semibold text-canvas">1</span>
               <span className="text-[13px] font-semibold">Когда</span>
             </div>
             <div className="p-4">
@@ -114,7 +114,7 @@ export function AutomationEditor({ open, onOpenChange, rule, users, stages, labe
 
           <div className="rounded-[10px] border border-line">
             <div className="flex items-center gap-3 border-b border-line bg-surface-2 px-4 py-2.5">
-              <span className="grid size-6 place-items-center rounded-full bg-ink text-[11px] font-semibold text-white">2</span>
+              <span className="grid size-6 place-items-center rounded-full bg-ink text-[11px] font-semibold text-canvas">2</span>
               <span className="text-[13px] font-semibold">Если</span>
               <span className="text-xs text-muted">{conditions.length ? "все условия должны выполняться" : "условий нет — правило срабатывает всегда"}</span>
               <Button type="button" variant="ghost" size="sm" className="ml-auto" onClick={() => setConditions((c) => [...c, { field: "deal.amount", op: "gt", value: "" }])}>
@@ -147,7 +147,7 @@ export function AutomationEditor({ open, onOpenChange, rule, users, stages, labe
 
           <div className="rounded-[10px] border border-line">
             <div className="flex items-center gap-3 border-b border-line bg-surface-2 px-4 py-2.5">
-              <span className="grid size-6 place-items-center rounded-full bg-ink text-[11px] font-semibold text-white">3</span>
+              <span className="grid size-6 place-items-center rounded-full bg-ink text-[11px] font-semibold text-canvas">3</span>
               <span className="text-[13px] font-semibold">То</span>
               <span className="text-xs text-muted">действия выполняются по порядку</span>
               <Button type="button" variant="ghost" size="sm" className="ml-auto" onClick={() => setActions((a) => [...a, defaultAction("create_task")])}>

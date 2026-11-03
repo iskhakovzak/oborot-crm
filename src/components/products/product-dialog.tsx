@@ -84,7 +84,7 @@ export function ProductDialog({ product, categories, hideCost, openByParam, trig
     <>
       {product ? (
         trigger === "icon" ? (
-          <button type="button" onClick={() => { setForm(fromRow(product)); setOpen(true); }} className="rounded-md p-1.5 text-muted hover:bg-black/5 hover:text-ink" aria-label="Изменить"><Pencil className="size-4" /></button>
+          <button type="button" onClick={() => { setForm(fromRow(product)); setOpen(true); }} className="rounded-md p-1.5 text-muted hover:bg-surface-2 hover:text-ink" aria-label="Изменить"><Pencil className="size-4" /></button>
         ) : (
           <Button size="sm" variant="secondary" onClick={() => { setForm(fromRow(product)); setOpen(true); }}><Pencil /> Изменить</Button>
         )

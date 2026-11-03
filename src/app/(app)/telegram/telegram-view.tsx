@@ -58,13 +58,13 @@ export function TelegramView({ live, hasToken, webhookUrl, settings, linked, log
         <Section title="Подключение" description={live ? "Бот подключён, команды из Telegram выполняются в CRM" : "Без токена бот работает в демо-режиме — команды проверяются в консоли справа"}>
           <ol className="space-y-3 text-[13.5px]">
             {[
-              <>Откройте в Telegram <b>@BotFather</b>, отправьте <code className="rounded bg-black/5 px-1">/newbot</code> и получите токен вида <span className="tnum">123456:ABC…</span></>,
-              <>Вставьте токен в <a href="/integrations" className="text-info hover:underline">Интеграциях</a> → «Telegram-бот для сотрудников» (или в переменную <code className="rounded bg-black/5 px-1">TELEGRAM_BOT_TOKEN</code>)</>,
+              <>Откройте в Telegram <b>@BotFather</b>, отправьте <code className="rounded bg-surface-2 px-1">/newbot</code> и получите токен вида <span className="tnum">123456:ABC…</span></>,
+              <>Вставьте токен в <a href="/integrations" className="text-info hover:underline">Интеграциях</a> → «Telegram-бот для сотрудников» (или в переменную <code className="rounded bg-surface-2 px-1">TELEGRAM_BOT_TOKEN</code>)</>,
               <>Нажмите «Установить вебхук» — Telegram начнёт присылать сообщения на адрес ниже</>,
-              <>Каждый сотрудник пишет боту <code className="rounded bg-black/5 px-1">/start {currentUser.email}</code> — чат привяжется к его аккаунту</>,
+              <>Каждый сотрудник пишет боту <code className="rounded bg-surface-2 px-1">/start {currentUser.email}</code> — чат привяжется к его аккаунту</>,
             ].map((step, i) => (
               <li key={i} className="flex gap-3">
-                <span className={cn("grid size-6 shrink-0 place-items-center rounded-full text-[12px] font-semibold", (i === 1 && hasToken) || (i === 3 && currentUser.chatId) ? "bg-good-soft text-good" : "bg-black/5 text-ink-2")}>{(i === 1 && hasToken) || (i === 3 && currentUser.chatId) ? <Check className="size-3.5" /> : i + 1}</span>
+                <span className={cn("grid size-6 shrink-0 place-items-center rounded-full text-[12px] font-semibold", (i === 1 && hasToken) || (i === 3 && currentUser.chatId) ? "bg-good-soft text-good" : "bg-surface-2 text-ink-2")}>{(i === 1 && hasToken) || (i === 3 && currentUser.chatId) ? <Check className="size-3.5" /> : i + 1}</span>
                 <span className="leading-6">{step}</span>
               </li>
             ))}
@@ -96,7 +96,7 @@ export function TelegramView({ live, hasToken, webhookUrl, settings, linked, log
 
         <Section title="Привязанные сотрудники" description="Команды выполняются с правами роли сотрудника">
           {linked.length === 0 ? (
-            <p className="text-[13px] text-muted">Пока никто не привязан. Напишите боту <code className="rounded bg-black/5 px-1">/start {currentUser.email}</code>.</p>
+            <p className="text-[13px] text-muted">Пока никто не привязан. Напишите боту <code className="rounded bg-surface-2 px-1">/start {currentUser.email}</code>.</p>
           ) : (
             <ul className="divide-y divide-line">
               {linked.map((u) => (

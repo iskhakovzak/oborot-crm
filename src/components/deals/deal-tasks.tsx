@@ -44,7 +44,7 @@ export function DealTasks({ dealId, tasks, canCreate }: { dealId: string; tasks:
         <ul className="space-y-1">
           {tasks.map((t) => (
             <li key={t.id} className="flex items-start gap-2 rounded-[8px] px-1 py-1 hover:bg-surface-2">
-              <button type="button" onClick={() => toggle(t.id)} disabled={pending || t.status === "cancelled"} className={cn("mt-0.5 grid size-4 shrink-0 place-items-center rounded-full border", t.status === "done" ? "border-good bg-good text-white" : "border-line-strong text-transparent hover:border-ink")} aria-label={t.status === "done" ? "Вернуть в работу" : "Выполнить"}>
+              <button type="button" onClick={() => toggle(t.id)} disabled={pending || t.status === "cancelled"} className={cn("mt-0.5 grid size-4 shrink-0 place-items-center rounded-full border", t.status === "done" ? "border-good bg-good text-canvas" : "border-line-strong text-transparent hover:border-ink")} aria-label={t.status === "done" ? "Вернуть в работу" : "Выполнить"}>
                 {t.status === "done" ? <Check className="size-3" /> : <Circle className="size-3" />}
               </button>
               <div className="min-w-0 flex-1">

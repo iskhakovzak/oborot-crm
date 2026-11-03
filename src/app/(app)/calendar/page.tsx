@@ -75,16 +75,16 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
 
   return (
     <>
-      <PageHeader title="Календарь" description="Встречи, замеры и консультации сотрудников; клиенты записываются через публичную страницу." />
+      <PageHeader eyebrow="Работа" title="Календарь" description="Встречи, замеры и консультации сотрудников; клиенты записываются через публичную страницу." />
       <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Stat label="Событий на неделе" value={weekCount} sub={`${iso(start).slice(8)}.${iso(start).slice(5, 7)} — ${iso(new Date(end.getTime() - 1)).slice(8)}.${iso(new Date(end.getTime() - 1)).slice(5, 7)}`} />
         <Stat label="Через онлайн-запись" value={publicCount} sub="за 30 дней" tone="info" />
         <Stat label="Типов записи" value={`${activeTypes} / ${types.length}`} sub="включено" />
         <Stat label="Сотрудников" value={visibleUsers.length} sub="в календаре" />
       </div>
-      <nav className="mb-4 inline-flex h-9 items-center gap-1 rounded-[9px] bg-black/5 p-1">
+      <nav className="mb-4 inline-flex h-9 items-center gap-1 rounded-full border border-line bg-canvas p-1">
         {tabs.map((t) => (
-          <Link key={t.key} href={`/calendar?tab=${t.key}${sp.week ? `&week=${sp.week}` : ""}`} className={cn("inline-flex h-7 items-center gap-1.5 rounded-[7px] px-3 text-[13px] font-medium transition-colors", tab === t.key ? "bg-surface text-ink shadow-sm" : "text-ink-2 hover:text-ink")}>
+          <Link key={t.key} href={`/calendar?tab=${t.key}${sp.week ? `&week=${sp.week}` : ""}`} className={cn("inline-flex h-7 items-center gap-1.5 rounded-full px-3 text-[13px] font-medium transition-colors", tab === t.key ? "bg-ink text-canvas" : "text-ink-2 hover:text-ink")}>
             <t.icon className="size-3.5" /> {t.label}
           </Link>
         ))}

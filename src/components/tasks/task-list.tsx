@@ -93,7 +93,7 @@ export function TaskRow({ task, users, onEdit, compact }: { task: TaskRowData; u
         aria-label={done ? "Открыть задачу" : "Выполнить задачу"}
         className={cn(
           "grid size-[18px] shrink-0 place-items-center rounded-[5px] border transition-colors",
-          done ? "border-good bg-good text-white" : "border-line-strong bg-surface hover:border-ink",
+          done ? "border-good bg-good text-canvas" : "border-line-strong bg-surface hover:border-ink",
         )}
       >
         {done && <Check className="size-3" strokeWidth={3} />}

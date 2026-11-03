@@ -19,7 +19,7 @@ export default async function PayPage({ params, searchParams }: { params: Promis
   const expired = !!link && link.status === "active" && !!link.expiresAt && link.expiresAt < now;
   const status = !link ? "missing" : expired ? "expired" : link.status;
   const payer = link?.companyId ? await db.query.companies.findFirst({ where: eq(schema.companies.id, link.companyId) }) : null;
-  const qr = link && status === "active" ? await QRCode.toDataURL(link.qrPayload, { width: 440, margin: 1, errorCorrectionLevel: "M", color: { dark: "#16181d", light: "#ffffff" } }) : null;
+  const qr = link && status === "active" ? await QRCode.toDataURL(link.qrPayload, { width: 440, margin: 1, errorCorrectionLevel: "M", color: { dark: "#0a0a0a", light: "#ffffff" } }) : null;
 
   async function simulate() {
     "use server";
@@ -31,11 +31,11 @@ export default async function PayPage({ params, searchParams }: { params: Promis
   return (
     <div className="min-h-screen bg-canvas px-4 py-8 sm:py-14">
       <div className="mx-auto w-full max-w-md">
-        <div className="mb-6 flex items-center justify-center gap-2.5">
-          <span className="grid size-9 place-items-center rounded-[10px] bg-ink text-white text-[15px] font-bold">{company.shortName.slice(0, 1).toUpperCase()}</span>
+        <div className="rise mb-6 flex items-center justify-center gap-2.5">
+          <span className="grid size-9 place-items-center rounded-[10px] bg-ink text-canvas text-[15px] font-bold">{company.shortName.slice(0, 1).toUpperCase()}</span>
           <span className="text-lg font-semibold tracking-[-0.01em]">{company.shortName}</span>
         </div>
-        <div className="overflow-hidden rounded-[18px] border border-line bg-surface shadow-pop">
+        <div className="slab rise overflow-hidden !p-0">
           {status === "missing" || status === "cancelled" || status === "expired" ? (
             <div className="px-7 py-12 text-center">
               <div className="mx-auto mb-4 grid size-14 place-items-center rounded-full bg-surface-2 text-muted">{status === "expired" ? <Clock className="size-7" /> : <XCircle className="size-7" />}</div>
@@ -48,7 +48,7 @@ export default async function PayPage({ params, searchParams }: { params: Promis
           ) : (
             <>
               <div className="border-b border-line px-7 pt-7 pb-6 text-center">
-                <div className="text-[13px] text-muted">{status === "paid" ? "Оплачено" : "К оплате"}</div>
+                <div className="eyebrow">{status === "paid" ? "// Оплачено" : "// К оплате"}</div>
                 <div className="mt-1 whitespace-nowrap text-[32px] font-semibold leading-none tracking-[-0.02em] tnum sm:text-[36px]">{Number.isInteger(link!.amount) ? fmtMoney(link!.amount) : fmtMoneyFull(link!.amount)}</div>
                 <div className="mt-3 text-[14px] text-ink-2 leading-relaxed">{link!.purpose}</div>
                 {payer && <div className="mt-1 text-[13px] text-muted">Плательщик: {payer.name}</div>}
@@ -61,16 +61,16 @@ export default async function PayPage({ params, searchParams }: { params: Promis
                 </div>
               ) : (
                 <div className="px-7 py-6">
-                  <div className="mx-auto w-full max-w-[280px] rounded-[14px] border border-line bg-white p-3">
+                  <div className="mx-auto w-full max-w-[280px] rounded-[14px] bg-white p-3">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={qr!} alt="QR-код Payme/Click" className="block w-full" width={440} height={440} />
                   </div>
                   <p className="mt-3 text-center text-[13px] text-muted">Отсканируйте QR в приложении Payme или Click, либо нажмите кнопку на телефоне</p>
                   <div className="mt-5 space-y-2">
-                    <Button size="lg" className="w-full bg-[#00c2b3] text-white hover:bg-[#00a99c]" asChild>
+                    <Button size="lg" className="w-full border-transparent bg-[#00c2b3] text-white hover:bg-[#00a99c]" asChild>
                       <a href={link!.qrPayload}><span className="rounded-[5px] bg-white/20 px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-wide">Payme</span> Оплатить через Payme</a>
                     </Button>
-                    <Button size="lg" className="w-full bg-[#0f9af0] text-white hover:bg-[#0b85d1]" asChild>
+                    <Button size="lg" className="w-full border-transparent bg-[#0f9af0] text-white hover:bg-[#0b85d1]" asChild>
                       <a href={link!.qrPayload}><span className="rounded-[5px] bg-white/20 px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-wide">Click</span> Оплатить через Click</a>
                     </Button>
                     <form action={simulate}>

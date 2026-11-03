@@ -50,7 +50,7 @@ export default async function CampaignPage({ params, searchParams }: { params: P
   return (
     <>
       <div className="mb-3"><Link href="/campaigns" className="inline-flex items-center gap-1 text-[13px] text-muted hover:text-ink"><ArrowLeft className="size-3.5" /> Все рассылки</Link></div>
-      <PageHeader
+      <PageHeader eyebrow="Рост"
         title={<span className="flex flex-wrap items-center gap-2">{c.name} <Badge tone={CHANNEL_TONE[c.channel] ?? "neutral"}>{CHANNEL_LABEL[c.channel]}</Badge> <Badge tone={st.tone} dot>{st.label}</Badge></span>}
         description={`Сегмент: ${segmentSummary(c.segment ?? {}, managers)} · ${c.sentAt ? `отправлена ${fmtDateTime(c.sentAt)}` : `создана ${fmtDateTime(c.createdAt)}`}`}
         actions={
@@ -71,7 +71,7 @@ export default async function CampaignPage({ params, searchParams }: { params: P
         <Section title="Воронка доставки" className="lg:col-span-1">
           {s.total ? (
             <>
-              <Segments parts={[{ label: "Переход", value: s.clicked, color: CHART.good }, { label: "Открыто", value: s.opened - s.clicked, color: CHART.info }, { label: "Доставлено", value: s.delivered - s.opened, color: CHART.soft }, { label: "Ошибка", value: s.failed, color: "#c8102e" }]} total={s.total} />
+              <Segments parts={[{ label: "Переход", value: s.clicked, color: CHART.good }, { label: "Открыто", value: s.opened - s.clicked, color: CHART.info }, { label: "Доставлено", value: s.delivered - s.opened, color: CHART.soft }, { label: "Ошибка", value: s.failed, color: CHART.accent }]} total={s.total} />
               <div className="mt-4 space-y-1.5 text-[13px]">
                 {[["Отправлено", s.sent], ["Доставлено", s.delivered], ["Открыто", s.opened], ["Перешли по ссылке", s.clicked]].map(([k, v]) => (
                   <div key={String(k)} className="flex items-center justify-between"><span className="text-ink-2">{k}</span><span className="tnum">{v} <span className="text-muted">{rate(Number(v))}</span></span></div>

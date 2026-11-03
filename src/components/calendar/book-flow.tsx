@@ -73,7 +73,7 @@ export function BookFlow({ slug, type, slots: initialSlots, company }: Props) {
         <ol className="mt-5 flex items-center gap-1 text-[12px] text-muted">
           {["День", "Время", "Контакты"].map((s, i) => (
             <li key={s} className="flex items-center gap-1">
-              <span className={cn("inline-flex h-6 items-center gap-1.5 rounded-full px-2.5 font-medium", step === i + 1 ? "bg-ink text-white" : step > i + 1 ? "bg-good-soft text-good" : "bg-black/5")}>{step > i + 1 ? <CheckCircle2 className="size-3.5" /> : <span className="tnum">{i + 1}</span>} {s}</span>
+              <span className={cn("inline-flex h-6 items-center gap-1.5 rounded-full px-2.5 font-medium", step === i + 1 ? "bg-ink text-canvas" : step > i + 1 ? "bg-good-soft text-good" : "bg-surface-2")}>{step > i + 1 ? <CheckCircle2 className="size-3.5" /> : <span className="tnum">{i + 1}</span>} {s}</span>
               {i < 2 && <ChevronRight className="size-3.5" />}
             </li>
           ))}
@@ -92,8 +92,8 @@ export function BookFlow({ slug, type, slots: initialSlots, company }: Props) {
               <div className="mt-0.5 text-ink-2">{form.name}, {form.phone}</div>
             </div>
             <p className="mt-3 text-[13px] text-muted">Подтверждение отправили в мессенджер или на почту. Если планы изменятся — позвоните {company.phone}.</p>
-            <a href={ics} download={`${slug}.ics`} className="mt-4 inline-flex h-11 w-full items-center justify-center gap-2 rounded-[8px] bg-ink text-[15px] font-medium text-white hover:bg-[#2a2e37]"><CalendarPlus className="size-4" /> Добавить в календарь</a>
-            <Link href="/book" className="mt-2 inline-flex h-10 w-full items-center justify-center rounded-[8px] text-[14px] text-ink-2 hover:bg-black/5">Записаться ещё</Link>
+            <a href={ics} download={`${slug}.ics`} className="mt-4 inline-flex h-11 w-full items-center justify-center gap-2 rounded-[8px] bg-ink text-[15px] font-medium text-canvas hover:bg-brand-2"><CalendarPlus className="size-4" /> Добавить в календарь</a>
+            <Link href="/book" className="mt-2 inline-flex h-10 w-full items-center justify-center rounded-[8px] text-[14px] text-ink-2 hover:bg-surface-2">Записаться ещё</Link>
           </div>
         ) : step === 1 ? (
           <>
@@ -136,7 +136,7 @@ export function BookFlow({ slug, type, slots: initialSlots, company }: Props) {
             <Field label="Компания (необязательно)"><Input className="h-11 text-[15px]" value={form.company} onChange={(e) => set("company", e.target.value)} autoComplete="organization" placeholder="ООО «Ромашка»" /></Field>
             <Field label="Комментарий"><Textarea value={form.comment} onChange={(e) => set("comment", e.target.value)} rows={3} placeholder="Что хотите обсудить, адрес объекта" /></Field>
             {error && <div className="rounded-[8px] bg-accent-soft px-3 py-2 text-[13px] text-accent">{error}</div>}
-            <button type="submit" disabled={busy} className="inline-flex h-12 w-full items-center justify-center rounded-[8px] bg-ink text-[15px] font-medium text-white hover:bg-[#2a2e37] disabled:opacity-60">{busy ? "Записываем…" : "Записаться"}</button>
+            <button type="submit" disabled={busy} className="inline-flex h-12 w-full items-center justify-center rounded-[8px] bg-ink text-[15px] font-medium text-canvas hover:bg-brand-2 disabled:opacity-60">{busy ? "Записываем…" : "Записаться"}</button>
             <p className="text-center text-[12px] text-muted">Нажимая «Записаться», вы соглашаетесь на обработку персональных данных.</p>
           </form>
         )}

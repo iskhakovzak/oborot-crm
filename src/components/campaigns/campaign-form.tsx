@@ -20,7 +20,7 @@ function Chips({ options, value, onChange }: { options: { value: string; label: 
       {options.map((o) => {
         const on = value.includes(o.value);
         return (
-          <button key={o.value} type="button" onClick={() => onChange(on ? value.filter((v) => v !== o.value) : [...value, o.value])} className={cn("rounded-full border px-2.5 py-0.5 text-xs transition-colors", on ? "border-ink bg-ink text-white" : "border-line-strong text-ink-2 hover:bg-surface-2")}>
+          <button key={o.value} type="button" onClick={() => onChange(on ? value.filter((v) => v !== o.value) : [...value, o.value])} className={cn("rounded-full border px-2.5 py-0.5 text-xs transition-colors", on ? "border-ink bg-ink text-canvas" : "border-line-strong text-ink-2 hover:bg-surface-2")}>
             {o.label}
           </button>
         );

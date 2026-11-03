@@ -73,7 +73,7 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
 
   return (
     <div className="flex h-[calc(100vh-5.5rem)] min-h-[560px] flex-col">
-      <PageHeader title="Переписки" description="Telegram, WhatsApp, MAX, Instagram, почта и SMS в одном окне." className="mb-4" />
+      <PageHeader eyebrow="Работа" title="Переписки" description="Telegram, WhatsApp, MAX, Instagram, почта и SMS в одном окне." className="mb-4" />
       <InboxView
         conversations={list}
         counts={counts}

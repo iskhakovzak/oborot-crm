@@ -29,7 +29,7 @@ export default async function AiPage() {
 
   return (
     <>
-      <PageHeader
+      <PageHeader eyebrow="Рост"
         title="ИИ-помощник"
         description={`${ai.assistantName} отвечает клиентам в переписках, принимает входящие звонки и разбирает команды сотрудников из Telegram.`}
         actions={
@@ -42,7 +42,7 @@ export default async function AiPage() {
       />
       {!r.live && (
         <div className="mb-5 rounded-[10px] border border-warn/30 bg-warn-soft px-4 py-3 text-[13px] text-ink-2">
-          Ответы и звонки сейчас генерируются встроенными шаблонами. Чтобы включить настоящий ИИ, добавьте ключ Anthropic {canIntegrations ? <Link href="/integrations" className="font-medium text-info hover:underline">в Интеграциях</Link> : "в Интеграциях"} или переменную окружения <code className="rounded bg-black/5 px-1">ANTHROPIC_API_KEY</code>. Модель: <span className="tnum">{ai.model}</span>.
+          Ответы и звонки сейчас генерируются встроенными шаблонами. Чтобы включить настоящий ИИ, добавьте ключ Anthropic {canIntegrations ? <Link href="/integrations" className="font-medium text-info hover:underline">в Интеграциях</Link> : "в Интеграциях"} или переменную окружения <code className="rounded bg-surface-2 px-1">ANTHROPIC_API_KEY</code>. Модель: <span className="tnum">{ai.model}</span>.
         </div>
       )}
       <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">

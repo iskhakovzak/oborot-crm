@@ -21,7 +21,7 @@ export default async function AutomationsPage() {
   if (!can(user.actor, "automations", "view")) {
     return (
       <>
-        <PageHeader title="Автоматизации" />
+        <PageHeader eyebrow="Система" title="Автоматизации" />
         <EmptyState title="Нет доступа" description="Раздел доступен администратору. Попросите открыть «Автоматизации» для вашей роли." />
       </>
     );
@@ -41,7 +41,7 @@ export default async function AutomationsPage() {
 
   return (
     <>
-      <PageHeader
+      <PageHeader eyebrow="Система"
         title="Автоматизации"
         description="Правила «событие → действие»: сообщение клиенту, задача, счёт, передача в отгрузку, конверсии."
         actions={can(user.actor, "automations", "create") ? <Button asChild><Link href="/automations?new=1"><Plus /> Новая автоматизация</Link></Button> : undefined}

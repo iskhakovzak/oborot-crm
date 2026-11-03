@@ -67,7 +67,7 @@ export default async function ProductionPage({ searchParams }: { searchParams: P
 
   return (
     <>
-      <PageHeader
+      <PageHeader eyebrow="Деньги и документы"
         title="Производство"
         description="Заказы по этапам, сроки, исполнители и брак."
         actions={canCreate ? <NewOrderDialog deals={dealOptions} companies={companyOptions} users={users} /> : undefined}

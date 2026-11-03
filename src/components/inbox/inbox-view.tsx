@@ -60,9 +60,9 @@ export function InboxView(props: {
       <aside className={cn("flex min-h-0 flex-col border-r border-line", selected && "hidden lg:flex")}>
         <div className="space-y-2.5 border-b border-line px-3 pt-3 pb-2.5">
           <div className="flex items-center gap-1.5">
-            <div className="inline-flex h-8 flex-1 items-center gap-0.5 rounded-[8px] bg-black/5 p-0.5">
+            <div className="inline-flex h-8 flex-1 items-center gap-0.5 rounded-full border border-line bg-canvas p-0.5">
               {filters.map(([key, label, n]) => (
-                <Link key={key} href={href({ c: selected?.id, channel, f: key })} className={cn("flex h-7 flex-1 items-center justify-center gap-1 rounded-[6px] text-[12.5px] font-medium", filter === key ? "bg-surface text-ink shadow-sm" : "text-ink-2 hover:text-ink")}>
+                <Link key={key} href={href({ c: selected?.id, channel, f: key })} className={cn("flex h-7 flex-1 items-center justify-center gap-1 rounded-full text-[12.5px] font-medium", filter === key ? "bg-ink text-canvas" : "text-ink-2 hover:text-ink")}>
                   {label}
                   <span className={cn("tnum text-[11px]", filter === key ? "text-muted" : "text-muted/80")}>{n}</span>
                 </Link>
@@ -76,9 +76,9 @@ export function InboxView(props: {
             )}
           </div>
           <div className="flex flex-wrap gap-1">
-            <Link href={href({ c: selected?.id, f: filter })} className={cn("inline-flex h-6 items-center rounded-full border px-2 text-[11.5px]", !channel ? "border-ink bg-ink text-white" : "border-line text-ink-2 hover:border-line-strong")}>Все каналы</Link>
+            <Link href={href({ c: selected?.id, f: filter })} className={cn("inline-flex h-6 items-center rounded-full border px-2 text-[11.5px]", !channel ? "border-ink bg-ink text-canvas" : "border-line text-ink-2 hover:border-line-strong")}>Все каналы</Link>
             {CHANNEL_LIST.filter((ch) => ch !== "web" || byChannel.web > 0).map((ch) => (
-              <Link key={ch} href={href({ c: selected?.id, channel: ch, f: filter })} className={cn("inline-flex h-6 items-center gap-1 rounded-full border px-1.5 pr-2 text-[11.5px]", channel === ch ? "border-ink bg-ink text-white" : "border-line text-ink-2 hover:border-line-strong")}>
+              <Link key={ch} href={href({ c: selected?.id, channel: ch, f: filter })} className={cn("inline-flex h-6 items-center gap-1 rounded-full border px-1.5 pr-2 text-[11.5px]", channel === ch ? "border-ink bg-ink text-canvas" : "border-line text-ink-2 hover:border-line-strong")}>
                 <ChannelIcon channel={ch} size={14} />
                 {CHANNELS[ch].label}
                 <span className="tnum opacity-60">{byChannel[ch]}</span>
@@ -91,7 +91,7 @@ export function InboxView(props: {
           {conversations.map((c) => (
             <Link key={c.id} href={href({ c: c.id, channel, f: filter })} className={cn("flex gap-3 border-b border-line px-3 py-2.5 transition-colors hover:bg-surface-2", selected?.id === c.id && "bg-surface-2")}>
               <div className="relative shrink-0">
-                <Avatar name={c.peerName} size={38} color={c.status === "closed" ? "#aeb4c0" : undefined} />
+                <Avatar name={c.peerName} size={38} color={c.status === "closed" ? "#3a3a3a" : undefined} />
                 <ChannelIcon channel={c.channel} size={16} className="absolute -right-1 -bottom-0.5 ring-2 ring-surface" />
               </div>
               <div className="min-w-0 flex-1">
@@ -262,12 +262,12 @@ function Chat({ conv, messages, dealTitle, users, currentUserId, canEdit, canCre
                         {m.isAutomation && <Badge tone="info" className="h-5 text-[10.5px]"><Zap className="size-3" /> Автоматизация</Badge>}
                       </div>
                     )}
-                    <div className={cn("whitespace-pre-wrap break-words rounded-[16px] px-3.5 py-2 text-[13.5px] leading-relaxed", out ? "rounded-br-[5px] bg-ink text-white" : "rounded-bl-[5px] border border-line bg-surface text-ink", m.pending && "opacity-60", m.status === "failed" && "ring-2 ring-accent/40")}>
+                    <div className={cn("whitespace-pre-wrap break-words rounded-[16px] px-3.5 py-2 text-[13.5px] leading-relaxed", out ? "rounded-br-[5px] bg-ink text-canvas" : "rounded-bl-[5px] border border-line bg-surface-2 text-ink", m.pending && "opacity-60", m.status === "failed" && "ring-2 ring-accent/40")}>
                       {m.text}
                       {m.attachments.length > 0 && (
-                        <div className={cn("mt-1.5 flex flex-col gap-1 border-t pt-1.5 text-[12.5px]", out ? "border-white/15" : "border-line")}>
+                        <div className={cn("mt-1.5 flex flex-col gap-1 border-t pt-1.5 text-[12.5px]", out ? "border-canvas/15" : "border-line")}>
                           {m.attachments.map((a, k) => (
-                            <a key={k} href={a.url} target="_blank" rel="noreferrer" className={cn("inline-flex items-center gap-1.5 underline-offset-2 hover:underline", out ? "text-white/90" : "text-info")}><Paperclip className="size-3.5" />{a.name}</a>
+                            <a key={k} href={a.url} target="_blank" rel="noreferrer" className={cn("inline-flex items-center gap-1.5 underline-offset-2 hover:underline", out ? "text-canvas/90" : "text-info")}><Paperclip className="size-3.5" />{a.name}</a>
                           ))}
                         </div>
                       )}
@@ -294,7 +294,7 @@ function Chat({ conv, messages, dealTitle, users, currentUserId, canEdit, canCre
                 <Sparkles className="size-4" /> Предложение ИИ
                 {suggestion.handoff && <Badge tone="warn" className="ml-1">Рекомендует передать менеджеру</Badge>}
                 {suggestion.sandbox && <span className="font-normal text-muted">· демо-режим</span>}
-                <button className="ml-auto rounded p-1 text-muted hover:bg-black/5 hover:text-ink" onClick={() => setSuggestion(null)} aria-label="Закрыть"><X className="size-4" /></button>
+                <button className="ml-auto rounded p-1 text-muted hover:bg-surface-2 hover:text-ink" onClick={() => setSuggestion(null)} aria-label="Закрыть"><X className="size-4" /></button>
               </div>
               <p className="mt-1.5 whitespace-pre-wrap text-[13.5px] leading-relaxed">{suggestion.text}</p>
               <div className="mt-2.5 flex gap-2">
@@ -361,7 +361,7 @@ function NewConversationDialog({ open, onOpenChange, contacts }: { open: boolean
               {CHANNEL_LIST.filter((ch) => ch !== "web").map((ch) => {
                 const ok = !contact || channels.includes(ch);
                 return (
-                  <button key={ch} type="button" disabled={!ok} onClick={() => setChannel(ch)} className={cn("inline-flex h-8 items-center gap-1.5 rounded-[8px] border px-2.5 text-[13px]", channel === ch ? "border-ink bg-ink text-white" : "border-line-strong text-ink-2 hover:bg-surface-2", !ok && "opacity-40")}>
+                  <button key={ch} type="button" disabled={!ok} onClick={() => setChannel(ch)} className={cn("inline-flex h-8 items-center gap-1.5 rounded-[8px] border px-2.5 text-[13px]", channel === ch ? "border-ink bg-ink text-canvas" : "border-line-strong text-ink-2 hover:bg-surface-2", !ok && "opacity-40")}>
                     <ChannelIcon channel={ch} size={16} />{CHANNELS[ch].label}
                   </button>
                 );
@@ -404,9 +404,9 @@ function SimulateDialog({ open, onOpenChange, contacts, selected }: { open: bool
       <DialogContent title="Имитировать входящее" description="Демо: сообщение от клиента попадёт в переписку и запустит автоматизации, включая ответ ИИ">
         <div className="space-y-4">
           {selected && (
-            <div className="inline-flex h-9 items-center gap-0.5 rounded-[9px] bg-black/5 p-1">
-              <button type="button" onClick={() => setMode("current")} className={cn("h-7 rounded-[7px] px-3 text-[13px] font-medium", mode === "current" ? "bg-surface text-ink shadow-sm" : "text-ink-2")}>В текущую переписку</button>
-              <button type="button" onClick={() => setMode("contact")} className={cn("h-7 rounded-[7px] px-3 text-[13px] font-medium", mode === "contact" ? "bg-surface text-ink shadow-sm" : "text-ink-2")}>От другого контакта</button>
+            <div className="inline-flex h-9 items-center gap-0.5 rounded-full border border-line bg-canvas p-1">
+              <button type="button" onClick={() => setMode("current")} className={cn("h-7 rounded-full px-3 text-[13px] font-medium", mode === "current" ? "bg-ink text-canvas" : "text-ink-2")}>В текущую переписку</button>
+              <button type="button" onClick={() => setMode("contact")} className={cn("h-7 rounded-full px-3 text-[13px] font-medium", mode === "contact" ? "bg-ink text-canvas" : "text-ink-2")}>От другого контакта</button>
             </div>
           )}
           {mode === "current" && selected ? (

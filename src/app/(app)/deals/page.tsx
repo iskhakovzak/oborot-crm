@@ -90,7 +90,7 @@ export default async function DealsPage({ searchParams }: { searchParams: Promis
 
   return (
     <>
-      <PageHeader
+      <PageHeader eyebrow="Работа"
         title="Сделки"
         description={
           <>
@@ -103,24 +103,24 @@ export default async function DealsPage({ searchParams }: { searchParams: Promis
       />
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
-        <div className="inline-flex h-9 items-center gap-1 rounded-[9px] bg-black/5 p-1">
+        <div className="inline-flex h-9 items-center gap-1 rounded-full border border-line bg-canvas p-1">
           {pipelines.map((p) => (
-            <Link key={p.id} href={href({ pipeline: p.id })} className={cn("inline-flex h-7 items-center rounded-[7px] px-3 text-[13px] font-medium transition-colors", p.id === current.id ? "bg-surface text-ink shadow-sm" : "text-ink-2 hover:text-ink")}>
+            <Link key={p.id} href={href({ pipeline: p.id })} className={cn("inline-flex h-7 items-center rounded-full px-3 text-[13px] font-medium transition-colors", p.id === current.id ? "bg-ink text-canvas" : "text-ink-2 hover:text-ink")}>
               {p.name}
             </Link>
           ))}
         </div>
-        <div className="inline-flex h-9 items-center gap-1 rounded-[9px] bg-black/5 p-1">
-          <Link href={href({ view: "kanban" })} className={cn("inline-flex h-7 items-center gap-1.5 rounded-[7px] px-2.5 text-[13px] font-medium", view === "kanban" ? "bg-surface text-ink shadow-sm" : "text-ink-2 hover:text-ink")} aria-label="Канбан">
+        <div className="inline-flex h-9 items-center gap-1 rounded-full border border-line bg-canvas p-1">
+          <Link href={href({ view: "kanban" })} className={cn("inline-flex h-7 items-center gap-1.5 rounded-full px-2.5 text-[13px] font-medium", view === "kanban" ? "bg-ink text-canvas" : "text-ink-2 hover:text-ink")} aria-label="Канбан">
             <KanbanSquare className="size-4" /> Канбан
           </Link>
-          <Link href={href({ view: "list" })} className={cn("inline-flex h-7 items-center gap-1.5 rounded-[7px] px-2.5 text-[13px] font-medium", view === "list" ? "bg-surface text-ink shadow-sm" : "text-ink-2 hover:text-ink")} aria-label="Список">
+          <Link href={href({ view: "list" })} className={cn("inline-flex h-7 items-center gap-1.5 rounded-full px-2.5 text-[13px] font-medium", view === "list" ? "bg-ink text-canvas" : "text-ink-2 hover:text-ink")} aria-label="Список">
             <List className="size-4" /> Список
           </Link>
         </div>
-        <div className="inline-flex h-9 items-center gap-1 rounded-[9px] bg-black/5 p-1">
-          <Link href={href({ mine: undefined })} className={cn("inline-flex h-7 items-center rounded-[7px] px-3 text-[13px] font-medium", !mine ? "bg-surface text-ink shadow-sm" : "text-ink-2 hover:text-ink")}>Все</Link>
-          <Link href={href({ mine: "1" })} className={cn("inline-flex h-7 items-center rounded-[7px] px-3 text-[13px] font-medium", mine ? "bg-surface text-ink shadow-sm" : "text-ink-2 hover:text-ink")}>Мои</Link>
+        <div className="inline-flex h-9 items-center gap-1 rounded-full border border-line bg-canvas p-1">
+          <Link href={href({ mine: undefined })} className={cn("inline-flex h-7 items-center rounded-full px-3 text-[13px] font-medium", !mine ? "bg-ink text-canvas" : "text-ink-2 hover:text-ink")}>Все</Link>
+          <Link href={href({ mine: "1" })} className={cn("inline-flex h-7 items-center rounded-full px-3 text-[13px] font-medium", mine ? "bg-ink text-canvas" : "text-ink-2 hover:text-ink")}>Мои</Link>
         </div>
         <form method="get" className="relative ml-auto w-full max-w-xs">
           <input type="hidden" name="pipeline" value={current.id} />

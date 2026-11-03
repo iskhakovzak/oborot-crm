@@ -111,7 +111,7 @@ export function DistributionForm({ initial, managers, sources, canEdit }: { init
                   {managers.map((m) => {
                     const on = r.managerIds.includes(m.id);
                     return (
-                      <button key={m.id} type="button" disabled={!canEdit} onClick={() => setV({ ...v, skillRules: v.skillRules.map((x, j) => (j === i ? { ...x, managerIds: on ? x.managerIds.filter((id) => id !== m.id) : [...x.managerIds, m.id] } : x)) })} className={cn("rounded-full border px-2.5 py-0.5 text-xs transition-colors", on ? "border-ink bg-ink text-white" : "border-line text-ink-2 hover:border-line-strong")}>
+                      <button key={m.id} type="button" disabled={!canEdit} onClick={() => setV({ ...v, skillRules: v.skillRules.map((x, j) => (j === i ? { ...x, managerIds: on ? x.managerIds.filter((id) => id !== m.id) : [...x.managerIds, m.id] } : x)) })} className={cn("rounded-full border px-2.5 py-0.5 text-xs transition-colors", on ? "border-ink bg-ink text-canvas" : "border-line text-ink-2 hover:border-line-strong")}>
                         {m.name}
                       </button>
                     );

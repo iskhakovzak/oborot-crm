@@ -11,7 +11,8 @@ import { can, type Actor } from "./permissions";
 import { startOfDayTz } from "@/lib/format";
 
 export type BotUser = { id: string; name: string };
-export type CommandResult = { ok: boolean; text: string; intent: BotIntent["intent"]; status: "ok" | "error" | "unknown"; sandbox: boolean };
+export type CommandLink = { label: string; href: string };
+export type CommandResult = { ok: boolean; text: string; intent: BotIntent["intent"]; status: "ok" | "error" | "unknown"; sandbox: boolean; links?: CommandLink[] };
 
 export const BOT_EXAMPLES = [
   "создай сделку Кондиционеры в офис для Кофейня №1 на 120 000",
@@ -116,7 +117,7 @@ function cleanDealTitle(title: string, company?: string) {
   return t || "Новая сделка";
 }
 
-async function run(intent: BotIntent, user: BotUser, actor: Actor): Promise<{ ok: boolean; text: string }> {
+async function run(intent: BotIntent, user: BotUser, actor: Actor): Promise<{ ok: boolean; text: string; links?: CommandLink[] }> {
   switch (intent.intent) {
     case "create_deal": {
       if (!can(actor, "deals", "create")) return { ok: false, text: "У вас нет права создавать сделки" };
@@ -124,7 +125,7 @@ async function run(intent: BotIntent, user: BotUser, actor: Actor): Promise<{ ok
       if (intent.company && !company) return { ok: false, text: `Клиент «${intent.company}» не найден. Сначала создайте его: «создай клиента ${intent.company}»` };
       const title = cleanDealTitle(intent.title, intent.company);
       const d = await createDealQuick({ title, companyId: company?.id, amount: intent.amount, managerId: user.id, source: "Telegram-бот", userId: user.id });
-      return { ok: true, text: `Сделка №${d.number} «${title}»${company ? ` для ${company.name}` : ""}${intent.amount ? ` на ${fmtMoney(intent.amount)}` : ""} создана, этап «${d.stageName}»` };
+      return { ok: true, text: `Сделка №${d.number} «${title}»${company ? ` для ${company.name}` : ""}${intent.amount ? ` на ${fmtMoney(intent.amount)}` : ""} создана, этап «${d.stageName}»`, links: [{ label: `Сделка №${d.number}`, href: `/deals/${d.id}` }, ...(company ? [{ label: company.name, href: `/companies/${company.id}` }] : [])] };
     }
     case "create_task": {
       if (!can(actor, "tasks", "create")) return { ok: false, text: "У вас нет права создавать задачи" };
@@ -132,8 +133,9 @@ async function run(intent: BotIntent, user: BotUser, actor: Actor): Promise<{ ok
       if (intent.assignee && !assignee) return { ok: false, text: `Сотрудник «${intent.assignee}» не найден` };
       const company = await findCompany(intent.title);
       const due = new Date(Date.now() + (intent.dueInHours ?? 24) * 3600_000);
-      await db.insert(schema.tasks).values({ id: newId("task"), title: intent.title, assigneeId: assignee?.id ?? user.id, creatorId: user.id, companyId: company?.id ?? null, dueAt: due.toISOString(), priority: (intent.dueInHours ?? 24) <= 4 ? "high" : "normal", source: "telegram" });
-      return { ok: true, text: `Задача «${intent.title}» создана. Исполнитель — ${assignee ? assignee.name : "вы"}, срок ${fmtDateTime(due.toISOString())}${company ? `, клиент ${company.name}` : ""}` };
+      const taskId = newId("task");
+      await db.insert(schema.tasks).values({ id: taskId, title: intent.title, assigneeId: assignee?.id ?? user.id, creatorId: user.id, companyId: company?.id ?? null, dueAt: due.toISOString(), priority: (intent.dueInHours ?? 24) <= 4 ? "high" : "normal", source: "telegram" });
+      return { ok: true, text: `Задача «${intent.title}» создана. Исполнитель — ${assignee ? assignee.name : "вы"}, срок ${fmtDateTime(due.toISOString())}${company ? `, клиент ${company.name}` : ""}`, links: [{ label: "Открыть задачи", href: "/tasks" }, ...(company ? [{ label: company.name, href: `/companies/${company.id}` }] : [])] };
     }
     case "create_company": {
       if (!can(actor, "companies", "create")) return { ok: false, text: "У вас нет права создавать клиентов" };
@@ -142,7 +144,7 @@ async function run(intent: BotIntent, user: BotUser, actor: Actor): Promise<{ ok
       const id = newId("cmp");
       await db.insert(schema.companies).values({ id, name: intent.name, shortName: intent.name.replace(/^(ООО|АО|ИП|ПАО)\s*/i, "").replace(/[«»"]/g, ""), inn: intent.inn ?? null, phone: intent.phone ?? null, status: "lead", source: "Telegram-бот", managerId: user.id });
       await logActivity({ type: "system", title: "Клиент создан через Telegram-бота", companyId: id, userId: user.id });
-      return { ok: true, text: `Клиент ${/[«"]/.test(intent.name) ? intent.name : `«${intent.name}»`} создан${intent.inn ? `, ИНН ${intent.inn}` : ""}. Менеджер — ${user.name}` };
+      return { ok: true, text: `Клиент ${/[«"]/.test(intent.name) ? intent.name : `«${intent.name}»`} создан${intent.inn ? `, ИНН ${intent.inn}` : ""}. Менеджер — ${user.name}`, links: [{ label: intent.name, href: `/companies/${id}` }] };
     }
     case "move_deal": {
       if (!can(actor, "deals", "edit")) return { ok: false, text: "У вас нет права менять сделки" };
@@ -160,7 +162,7 @@ async function run(intent: BotIntent, user: BotUser, actor: Actor): Promise<{ ok
       await emit("deal.stage_changed", payload);
       if (stage.kind === "won") await emit("deal.won", payload);
       if (stage.kind === "lost") await emit("deal.lost", payload);
-      return { ok: true, text: `Сделка №${deal.number} «${deal.title}» переведена на этап «${stage.name}»` };
+      return { ok: true, text: `Сделка №${deal.number} «${deal.title}» переведена на этап «${stage.name}»`, links: [{ label: `Сделка №${deal.number}`, href: `/deals/${deal.id}` }] };
     }
     case "send_invoice": {
       if (!can(actor, "documents", "create")) return { ok: false, text: "У вас нет права выставлять счета" };
@@ -168,7 +170,7 @@ async function run(intent: BotIntent, user: BotUser, actor: Actor): Promise<{ ok
       if (!deal) return { ok: false, text: `Сделка «${intent.deal}» не найдена` };
       const doc = await createDocument({ type: "invoice", dealId: deal.id, userId: user.id });
       const r = await sendDocument(doc.id, "preferred", user.id);
-      return { ok: true, text: `${doc.title} на ${fmtMoney(doc.amount)} по сделке №${deal.number} сформирован${r.ok ? ` и отправлен клиенту (${r.channel}${r.sandbox ? ", демо" : ""})` : `. Не отправлен: ${r.error}`}` };
+      return { ok: true, text: `${doc.title} на ${fmtMoney(doc.amount)} по сделке №${deal.number} сформирован${r.ok ? ` и отправлен клиенту (${r.channel}${r.sandbox ? ", демо" : ""})` : `. Не отправлен: ${r.error}`}`, links: [{ label: doc.title, href: `/documents/${doc.id}` }, { label: `Сделка №${deal.number}`, href: `/deals/${deal.id}` }] };
     }
     case "stats": {
       if (!can(actor, "analytics", "view") && !can(actor, "deals", "view")) return { ok: false, text: "У вас нет доступа к статистике" };
@@ -185,9 +187,9 @@ async function run(intent: BotIntent, user: BotUser, actor: Actor): Promise<{ ok
     }
     case "my_tasks": {
       const tasks = await db.query.tasks.findMany({ where: and(eq(schema.tasks.assigneeId, user.id), eq(schema.tasks.status, "open")), orderBy: asc(schema.tasks.dueAt), limit: 10 });
-      if (!tasks.length) return { ok: true, text: "Открытых задач нет — отличная работа!" };
+      if (!tasks.length) return { ok: true, text: "Открытых задач нет — отличная работа!", links: [{ label: "Задачи", href: "/tasks" }] };
       const now = Date.now();
-      return { ok: true, text: `Ваши задачи (${tasks.length}):\n${tasks.map((t, i) => `${i + 1}. ${t.title}${t.dueAt ? ` — ${fmtDateTime(t.dueAt)}${new Date(t.dueAt).getTime() < now ? " ⚠️ просрочена" : ""}` : ""}`).join("\n")}` };
+      return { ok: true, text: `Ваши задачи (${tasks.length}):\n${tasks.map((t, i) => `${i + 1}. ${t.title}${t.dueAt ? ` — ${fmtDateTime(t.dueAt)}${new Date(t.dueAt).getTime() < now ? " ⚠️ просрочена" : ""}` : ""}`).join("\n")}`, links: [{ label: "Открыть задачи", href: "/tasks" }] };
     }
     case "find": {
       const q = `%${intent.query.replace(/[«»"]/g, "").trim()}%`;
@@ -196,21 +198,24 @@ async function run(intent: BotIntent, user: BotUser, actor: Actor): Promise<{ ok
       const deals = can(actor, "deals", "view") ? await db.query.deals.findMany({ where: or(ilike(schema.deals.title, q), num ? eq(schema.deals.number, num) : sql`false`), orderBy: desc(schema.deals.updatedAt), limit: 5 }) : [];
       if (!companies.length && !deals.length) return { ok: true, text: `По запросу «${intent.query}» ничего не найдено` };
       const lines: string[] = [];
+      const links: CommandLink[] = [];
       for (const c of companies) {
+        links.push({ label: c.name, href: `/companies/${c.id}` });
         const open = await db.query.deals.findMany({ where: and(eq(schema.deals.companyId, c.id), eq(schema.deals.status, "open")) });
         lines.push(`🏢 ${c.name}${c.inn ? ` (ИНН ${c.inn})` : ""} — ${c.phone ?? "без телефона"}, баланс ${fmtMoney(c.balance)}, открытых сделок: ${open.length}`);
       }
       for (const d of deals) {
+        links.push({ label: `Сделка №${d.number}`, href: `/deals/${d.id}` });
         const stage = await db.query.stages.findFirst({ where: eq(schema.stages.id, d.stageId) });
         lines.push(`📄 Сделка №${d.number} «${d.title}» — ${fmtMoney(d.amount)}, этап «${stage?.name ?? "—"}»`);
       }
-      return { ok: true, text: lines.join("\n") };
+      return { ok: true, text: lines.join("\n"), links };
     }
     case "note": {
       const deal = await findDeal(intent.deal);
       if (!deal) return { ok: false, text: `Сделка «${intent.deal}» не найдена` };
       await logActivity({ type: "note", title: "Заметка из Telegram", body: intent.text, dealId: deal.id, companyId: deal.companyId, contactId: deal.contactId, userId: user.id });
-      return { ok: true, text: `Заметка добавлена к сделке №${deal.number} «${deal.title}»` };
+      return { ok: true, text: `Заметка добавлена к сделке №${deal.number} «${deal.title}»`, links: [{ label: `Сделка №${deal.number}`, href: `/deals/${deal.id}` }] };
     }
     case "unknown":
       return { ok: false, text: `Не понял команду «${intent.text}».\n\n${BOT_HELP}` };
@@ -249,7 +254,7 @@ export async function executeCommand(text: string, user: BotUser, chatId = "web"
   const sandbox = parsed.sandbox;
   const actor = await loadActor(user.id);
   if (!actor) return { ok: false, text: "Пользователь не найден", intent: intent.intent, status: "error", sandbox };
-  let r: { ok: boolean; text: string };
+  let r: { ok: boolean; text: string; links?: CommandLink[] };
   try {
     r = await run(intent, user, actor);
   } catch (e) {

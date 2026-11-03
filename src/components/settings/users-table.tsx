@@ -21,7 +21,7 @@ export type UserRow = {
 export type RoleOption = { id: string; name: string; slug: string };
 
 const DAYS = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
-const COLORS = ["#2456D6", "#6b3fd6", "#b96a00", "#138a5e", "#c8102e", "#16181d", "#0e7490", "#be185d"];
+const COLORS = ["#2456D6", "#6b3fd6", "#b96a00", "#138a5e", "#c8102e", "#6e96f2", "#0e7490", "#be185d"];
 
 export function UsersTable({ users, roles, currentUserId, canEdit }: { users: UserRow[]; roles: RoleOption[]; currentUserId: string; canEdit: boolean }) {
   const router = useRouter();
@@ -176,7 +176,7 @@ function UserDialog({ open, onOpenChange, user, roles }: { open: boolean; onOpen
               {[1, 2, 3, 4, 5, 6, 0].map((d) => {
                 const on = v.workDays.includes(d);
                 return (
-                  <button key={d} type="button" onClick={() => setV({ ...v, workDays: on ? v.workDays.filter((x) => x !== d) : [...v.workDays, d].sort() })} className={cn("h-9 flex-1 rounded-[7px] border text-[13px]", on ? "border-ink bg-ink text-white" : "border-line-strong text-ink-2 hover:bg-surface-2")}>
+                  <button key={d} type="button" onClick={() => setV({ ...v, workDays: on ? v.workDays.filter((x) => x !== d) : [...v.workDays, d].sort() })} className={cn("h-9 flex-1 rounded-[7px] border text-[13px]", on ? "border-ink bg-ink text-canvas" : "border-line-strong text-ink-2 hover:bg-surface-2")}>
                     {DAYS[d]}
                   </button>
                 );

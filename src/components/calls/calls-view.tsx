@@ -66,9 +66,9 @@ export function CallsView({ calls, contacts, canCreate, canEdit, aiCallsEnabled,
   return (
     <>
       <div className="mb-3 flex flex-wrap items-center gap-2">
-        <div className="inline-flex h-9 items-center gap-1 rounded-[9px] bg-black/5 p-1">
+        <div className="inline-flex h-9 items-center gap-1 rounded-full border border-line bg-canvas p-1">
           {FILTERS.map(([k, label]) => (
-            <button key={k} type="button" onClick={() => setFilter(k)} className={cn("h-7 rounded-[7px] px-3 text-[13px] font-medium", filter === k ? "bg-surface text-ink shadow-sm" : "text-ink-2 hover:text-ink")}>{label}</button>
+            <button key={k} type="button" onClick={() => setFilter(k)} className={cn("h-7 rounded-full px-3 text-[13px] font-medium", filter === k ? "bg-ink text-canvas" : "text-ink-2 hover:text-ink")}>{label}</button>
           ))}
         </div>
         {canCreate && (
