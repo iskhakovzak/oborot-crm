@@ -21,15 +21,15 @@ export function Topbar({ user, onLogout, openTasks, allowed }: { user: { name: s
     return () => window.removeEventListener("keydown", h);
   }, []);
   return (
-    <header className="sticky top-0 z-20 flex h-12 items-center gap-2 border-b border-line bg-surface px-4 lg:px-7">
+    <header className="sticky top-0 z-20 flex h-14 items-center gap-2 border-b border-line bg-canvas/90 px-4 backdrop-blur lg:px-7">
       <MobileNav allowed={allowed} />
       <button
         onClick={() => setOpen(true)}
-        className="flex h-8 w-full max-w-sm items-center gap-2 rounded-[6px] border border-line bg-surface-2 px-2.5 text-[12.5px] text-muted transition-colors hover:border-line-strong"
+        className="pressable flex h-8 w-full max-w-sm items-center gap-2 rounded-[6px] border border-line bg-canvas px-2.5 text-[11.5px] text-ink-2 hover:text-ink"
       >
         <Search className="size-4" />
         <span>Найти клиента, сделку, документ…</span>
-        <kbd className="ml-auto rounded border border-line bg-surface px-1 text-[10.5px] text-muted">⌘K</kbd>
+        <kbd className="ml-auto rounded-[5px] border border-line-strong border-b-2 bg-canvas px-1.5 text-[9.5px] text-ink-2">⌘K</kbd>
       </button>
       <div className="ml-auto flex items-center gap-2">
         <Dropdown>
@@ -46,13 +46,13 @@ export function Topbar({ user, onLogout, openTasks, allowed }: { user: { name: s
             <DropdownItem asChild><Link href="/campaigns?new=1">Рассылку</Link></DropdownItem>
           </DropdownContent>
         </Dropdown>
-        <Link href="/tasks" className="relative grid size-8 place-items-center rounded-[6px] text-ink-2 hover:bg-surface-3 hover:text-ink" aria-label="Задачи">
+        <Link href="/tasks" className="pressable relative grid size-8 place-items-center rounded-full border border-line text-ink-2 hover:bg-surface-2 hover:text-ink" aria-label="Задачи">
           <Bell className="size-4" />
           {openTasks > 0 && <span className="absolute right-0.5 top-0.5 grid min-w-3.5 place-items-center rounded-full bg-accent px-0.5 text-[9.5px] font-semibold leading-[14px] text-white">{openTasks}</span>}
         </Link>
         <Dropdown>
           <DropdownTrigger asChild>
-            <button className="flex items-center gap-2 rounded-full p-0.5 hover:bg-black/5" aria-label="Профиль">
+            <button className="pressable flex items-center gap-2 rounded-full border border-line p-0.5" aria-label="Профиль">
               <Avatar name={user.name} color={user.color} size={26} />
             </button>
           </DropdownTrigger>

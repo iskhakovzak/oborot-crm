@@ -7,7 +7,7 @@ export function Tip({ label, children }: { label: string; children: React.ReactN
       <T.Root>
         <T.Trigger asChild>{children}</T.Trigger>
         <T.Portal>
-          <T.Content sideOffset={6} className="z-50 rounded-md bg-ink px-2 py-1 text-xs text-white shadow">
+          <T.Content sideOffset={6} className="z-50 rounded-md bg-ink px-2 py-1 text-[11px] text-canvas shadow">
             {label}
           </T.Content>
         </T.Portal>

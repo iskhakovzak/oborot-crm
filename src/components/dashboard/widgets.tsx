@@ -8,10 +8,10 @@ export function Panel({ title, count, href, hrefLabel = "Все", children, clas
   return (
     <section className={cn("card min-w-0 overflow-hidden", className)}>
       <div className="flex items-center gap-2 px-4 py-2.5">
-        <h2 className="text-[13.5px] font-semibold">{title}</h2>
-        {count !== undefined && count > 0 && <span className="rounded-[4px] bg-surface-3 px-1.5 text-[11px] font-medium text-ink-2 tnum">{count}</span>}
+        <h2 className="text-[15px] font-semibold tracking-[-0.01em]">{title}</h2>
+        {count !== undefined && count > 0 && <span className="rounded-full border border-line px-1.5 text-[10px] text-ink-2 tnum">{count}</span>}
         {href && (
-          <Link href={href} className="ml-auto inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-[12px] font-medium text-muted hover:bg-surface-3 hover:text-ink">
+          <Link href={href} className="ml-auto inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-[10.5px] uppercase tracking-[0.12em] text-ink-2 hover:text-ink">
             {hrefLabel} <ArrowUpRight className="size-3.5" />
           </Link>
         )}
@@ -39,14 +39,14 @@ export function Tile({ label, value, sub, tone, href, icon }: { label: string; v
   const body = (
     <>
       <div className="flex items-start justify-between gap-2">
-        <div className="text-[12px] font-medium text-muted">{label}</div>
+        <div className="label">{label}</div>
         {icon && <span className={cn("grid size-6 shrink-0 place-items-center rounded-[6px] [&_svg]:size-3.5", tone ? chips[tone] : "bg-surface-3 text-ink-2")}>{icon}</span>}
       </div>
       <div className={cn("mt-1 min-w-0 truncate text-[22px] font-semibold leading-7 tracking-[-0.02em] tnum", tone ? tones[tone] : "text-ink")}>{value}</div>
       {sub && <div className="mt-0.5 truncate text-xs text-muted">{sub}</div>}
     </>
   );
-  const cls = "card min-w-0 px-4 py-3";
+  const cls = "card rise min-w-0 px-5 py-4";
   if (href) return <Link href={href} className={cn(cls, "block transition-colors hover:bg-surface-2")}>{body}</Link>;
   return <div className={cls}>{body}</div>;
 }

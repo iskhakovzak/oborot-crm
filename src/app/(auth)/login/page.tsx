@@ -19,22 +19,22 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
     <div className="grid grid-cols-1 min-h-screen lg:grid-cols-[minmax(0,1.1fr)_1fr]">
       <div className="hidden lg:flex flex-col justify-between bg-mesh p-12 text-white">
         <div className="flex items-center gap-2.5">
-          <span className="grid size-9 place-items-center rounded-[8px] bg-white text-ink text-sm font-bold">W</span>
+          <span className="grid size-9 place-items-center rounded-[9px] border border-line-strong bg-ink text-canvas text-sm font-bold">W</span>
           <span className="text-lg font-semibold">WS_CRM</span>
         </div>
         <div className="max-w-[34ch]">
-          <h1 className="text-[40px] font-semibold leading-[1.1] tracking-[-0.02em]">Заявка, счёт, отгрузка, оплата — в одном обороте.</h1>
-          <p className="mt-5 text-[15px] leading-relaxed text-white/70">
+          <h1 className="text-[40px] font-bold leading-[1.05] tracking-[-0.035em]">Заявка, счёт, отгрузка, оплата — в одном обороте.</h1>
+          <p className="mt-5 text-[15px] leading-relaxed text-ink-2">
             Мессенджеры, телефония, банк, ЭДО, оплата через Payme и Click, Яндекс Метрика, Google Analytics и ИИ подключены к одной базе клиентов. Менеджер в Ташкенте или Самарканде работает в сделке, остальное система делает сама.
           </p>
         </div>
-        <div className="grid grid-cols-3 gap-6 text-[13px] text-white/60">
-          <div><div className="text-2xl font-semibold text-white tnum">30</div>автоматизаций из коробки</div>
-          <div><div className="text-2xl font-semibold text-white tnum">1 клик</div>до счёта, договора и ЭСФ</div>
-          <div><div className="text-2xl font-semibold text-white tnum">24/7</div>ИИ отвечает и принимает звонки</div>
+        <div className="grid grid-cols-3 gap-6 text-[13px] text-ink-2">
+          <div><div className="text-2xl font-bold text-ink tnum">30</div>автоматизаций из коробки</div>
+          <div><div className="text-2xl font-bold text-ink tnum">1 клик</div>до счёта, договора и ЭСФ</div>
+          <div><div className="text-2xl font-bold text-ink tnum">24/7</div>ИИ отвечает и принимает звонки</div>
         </div>
       </div>
-      <div className="flex items-center justify-center bg-canvas p-6">
+      <div className="flex items-center justify-center border-l border-line bg-canvas p-6">
         <form action={action} className="card w-full max-w-sm p-8">
           <h2 className="text-[22px] font-semibold">Вход в систему</h2>
           <p className="mt-1 text-[13px] text-muted">Вход по email или Telegram-нику</p>

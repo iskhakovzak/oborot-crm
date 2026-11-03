@@ -13,17 +13,17 @@ export function MobileNav({ allowed }: { allowed: Record<string, boolean> }) {
   return (
     <DialogPrimitive.Root open={open} onOpenChange={setOpen}>
       <DialogPrimitive.Trigger asChild>
-        <button className="lg:hidden rounded-md p-1.5 text-ink-2 hover:bg-black/5" aria-label="Меню">
+        <button className="lg:hidden rounded-md p-1.5 text-ink-2 hover:bg-surface-2" aria-label="Меню">
           <Menu className="size-5" />
         </button>
       </DialogPrimitive.Trigger>
       <DialogPrimitive.Portal>
-        <DialogPrimitive.Overlay className="fixed inset-0 z-40 bg-ink/40 lg:hidden" />
-        <DialogPrimitive.Content className="fixed inset-y-0 left-0 z-50 w-[260px] overflow-y-auto bg-side p-2 shadow-pop outline-none lg:hidden">
+        <DialogPrimitive.Overlay className="fixed inset-0 z-40 bg-black/60 lg:hidden" />
+        <DialogPrimitive.Content className="fixed inset-y-0 left-0 z-50 w-[260px] overflow-y-auto border-r border-line bg-canvas p-2 shadow-pop outline-none lg:hidden">
           <DialogPrimitive.Title className="sr-only">Навигация</DialogPrimitive.Title>
           <div className="mb-3 flex items-center justify-between px-2">
             <span className="text-[15px] font-semibold">WS_CRM</span>
-            <DialogPrimitive.Close className="rounded-md p-1 text-muted hover:bg-black/5" aria-label="Закрыть"><X className="size-4" /></DialogPrimitive.Close>
+            <DialogPrimitive.Close className="rounded-md p-1 text-muted hover:bg-surface-2" aria-label="Закрыть"><X className="size-4" /></DialogPrimitive.Close>
           </div>
           {NAV.map((g) => {
             const items = g.items.filter((i) => !i.entity || allowed[i.entity]);
@@ -36,8 +36,8 @@ export function MobileNav({ allowed }: { allowed: Record<string, boolean> }) {
                     const active = i.href === "/" ? pathname === "/" : pathname.startsWith(i.href);
                     return (
                       <li key={i.href}>
-                        <Link href={i.href} onClick={() => setOpen(false)} className={cn("flex h-9 items-center gap-2.5 rounded-[8px] px-2 text-sm", active ? "bg-ink text-white" : "text-ink-2 hover:bg-black/5")}>
-                          <i.icon className={cn("size-4", active ? "text-white" : "text-muted")} />
+                        <Link href={i.href} onClick={() => setOpen(false)} className={cn("flex h-9 items-center gap-2.5 rounded-[8px] px-2 text-sm", active ? "bg-surface-2 text-ink" : "text-ink-2 hover:bg-surface-2")}>
+                          <i.icon className={cn("size-4", active ? "text-ink" : "text-muted")} />
                           {i.label}
                         </Link>
                       </li>
