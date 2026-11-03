@@ -15,7 +15,7 @@ export async function saveAiSettings(p: Partial<AiSettings>): Promise<R> {
   if (!can(user.actor, "settings", "edit")) return { ok: false, error: "Нет прав на изменение настроек" };
   const clean: Partial<AiSettings> = {
     model: (p.model ?? "").trim() || "claude-opus-5-5",
-    assistantName: (p.assistantName ?? "").trim() || "Мария",
+    assistantName: (p.assistantName ?? "").trim() || "Малика",
     tone: (p.tone ?? "").trim(),
     knowledge: (p.knowledge ?? "").trim(),
     chatAutoReply: !!p.chatAutoReply,

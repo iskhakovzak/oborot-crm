@@ -37,16 +37,16 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
       <div className="flex items-center justify-center bg-canvas p-6">
         <form action={action} className="card w-full max-w-sm p-8">
           <h2 className="text-[22px] font-semibold">Вход в систему</h2>
-          <p className="mt-1 text-[13px] text-muted">Демо-доступ: admin@oborot.ru / admin123</p>
+          <p className="mt-1 text-[13px] text-muted">Демо-доступ: admin@oborot.uz / admin123</p>
           {sp.error && <div className="mt-4 rounded-[8px] bg-accent-soft px-3 py-2 text-[13px] text-accent">{sp.error}</div>}
           <input type="hidden" name="next" value={sp.next ?? "/"} />
           <div className="mt-6 space-y-4">
-            <Field label="Email"><Input name="email" type="email" required autoComplete="email" defaultValue="admin@oborot.ru" /></Field>
+            <Field label="Email"><Input name="email" type="email" required autoComplete="email" defaultValue="admin@oborot.uz" /></Field>
             <Field label="Пароль"><Input name="password" type="password" required autoComplete="current-password" defaultValue="admin123" /></Field>
             <Button type="submit" size="lg" className="w-full">Войти</Button>
           </div>
           <div className="mt-6 rounded-[10px] bg-surface-2 p-3 text-xs text-muted leading-relaxed">
-            Другие роли для проверки прав: менеджер — ivan@oborot.ru, производство — oleg@oborot.ru, бухгалтер — anna@oborot.ru. Пароль у всех: demo123.
+            Другие роли для проверки прав: менеджер — jasur@oborot.uz, производство — sherzod@oborot.uz, бухгалтер — dilnoza@oborot.uz. Пароль у всех: demo123.
           </div>
         </form>
       </div>

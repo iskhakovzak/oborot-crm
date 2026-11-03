@@ -1,4 +1,5 @@
 "use client";
+import { TZ_OFFSET_MIN } from "@/lib/format";
 import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -38,7 +39,7 @@ export function WeekView({ weekStart, bookings, users, companies, filterUser, ca
   const nav = (week: string, user = filterUser) => router.push(`/calendar?week=${week}${user ? `&user=${user}` : ""}`);
   const monthLabel = `${days[0].toLocaleDateString("ru-RU", { day: "numeric", month: "long" })} — ${days[6].toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" })}`;
   const hours = Array.from({ length: HOUR_END - HOUR_START }, (_, i) => HOUR_START + i);
-  const nowTop = (() => { const n = new Date(); const m = n.getHours() * 60 + n.getMinutes() - HOUR_START * 60; return m >= 0 && m <= (HOUR_END - HOUR_START) * 60 ? (m / 60) * HOUR_H : null; })();
+  const nowTop = (() => { const n = new Date(Date.now() + TZ_OFFSET_MIN * 60_000); const m = n.getUTCHours() * 60 + n.getUTCMinutes() - HOUR_START * 60; return m >= 0 && m <= (HOUR_END - HOUR_START) * 60 ? (m / 60) * HOUR_H : null; })();
 
   return (
     <div>
@@ -96,7 +97,7 @@ export function WeekView({ weekStart, bookings, users, companies, filterUser, ca
                   {isToday && nowTop != null && <div className="pointer-events-none absolute inset-x-0 z-10 border-t-2 border-accent" style={{ top: nowTop }} />}
                   {items.map((b) => {
                     const s = new Date(b.startsAt), e = new Date(b.endsAt);
-                    const top = ((s.getHours() * 60 + s.getMinutes() - HOUR_START * 60) / 60) * HOUR_H;
+                    const sl = new Date(s.getTime() + TZ_OFFSET_MIN * 60_000); const top = ((sl.getUTCHours() * 60 + sl.getUTCMinutes() - HOUR_START * 60) / 60) * HOUR_H;
                     const h = Math.max(22, ((e.getTime() - s.getTime()) / 3_600_000) * HOUR_H - 2);
                     if (top + h < 0 || top > hours.length * HOUR_H) return null;
                     return (

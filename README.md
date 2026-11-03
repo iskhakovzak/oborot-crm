@@ -11,7 +11,7 @@ npm run setup                     # создать базу и заполнит�
 npm run dev                       # http://localhost:3000
 ```
 
-Вход: `admin@oborot.ru` / `admin123`. Другие роли: менеджер `ivan@oborot.ru`, производство `oleg@oborot.ru`, бухгалтер `anna@oborot.ru` — пароль `demo123`.
+Вход: `admin@oborot.uz` / `admin123`. Другие роли: менеджер `jasur@oborot.uz`, производство `sherzod@oborot.uz`, бухгалтер `dilnoza@oborot.uz` — пароль `demo123`.
 
 Продакшен: `npm run build && npm start`. База — SQLite-файл `data/crm.db` (переменная `DATABASE_URL`), документы — папка `storage/`.
 
